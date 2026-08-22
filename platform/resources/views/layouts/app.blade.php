@@ -51,7 +51,7 @@
                     ['route' => 'security.alerts',    'label' => 'Security Alerts',  'icon' => 'notifications_active', 'badge' => $unacknowledgedAlerts ?? 0],
                     ['route' => 'security.monitoring','label' => 'Monitoring',       'icon' => 'monitoring'],
                     ['route' => 'security.sandbox',   'label' => 'Sandbox',          'icon' => 'science'],
-                    ['route' => 'projects.graph',     'label' => 'Knowledge Graph',  'icon' => 'hub', 'params' => $defaultProject ? [$defaultProject] : null, 'fallback' => 'projects.create'],
+                    ['route' => 'projects.graph',     'label' => 'Knowledge Graph',  'icon' => 'hub', 'params' => (!empty($defaultProject) ? [$defaultProject] : null), 'fallback' => 'projects.create'],
                     ['route' => 'osint.index',        'label' => 'OSINT',            'icon' => 'travel_explore'],
                     ['route' => 'chat.index',         'label' => 'AI Chatbot',       'icon' => 'smart_toy'],
                 ];
@@ -206,7 +206,7 @@
                 {{ session('error') }}
             </div>
         @endif
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div data-flash class="mx-4 lg:mx-6 mt-4 card border-danger/30 bg-danger/10 px-4 py-3 flex items-start gap-2 text-sm text-red-200">
                 <span class="material-symbols-rounded text-danger">error</span>
                 <div>

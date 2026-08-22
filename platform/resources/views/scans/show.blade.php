@@ -131,14 +131,18 @@
                             @endif
                         </div>
                         <div class="flex flex-col gap-1.5 shrink-0">
-                            <a href="{{ route('remediation.show', $finding) }}" class="btn-ghost !py-1.5 text-xs">View Details</a>
-                            @if (in_array($finding->severity, ['high','critical']) && $finding->remediationScripts->isEmpty())
+                            <a href="{{ route('remediation.show', $finding) }}" class="btn-ghost !py-1.5 text-xs text-center">View Details</a>
+                            @if ($finding->remediationScripts->isEmpty())
                                 <form method="POST" action="{{ route('remediation.generate', $finding) }}">
                                     @csrf
                                     <button type="submit" class="btn-secondary !py-1.5 text-xs w-full">
                                         <span class="material-symbols-rounded text-[14px]">auto_fix_high</span> Generate Remediation
                                     </button>
                                 </form>
+                            @else
+                                <a href="{{ route('remediation.show', $finding) }}" class="btn-secondary !py-1.5 text-xs text-center w-full">
+                                    <span class="material-symbols-rounded text-[14px]">code</span> Remediation ({{ $finding->remediationScripts->count() }})
+                                </a>
                             @endif
                         </div>
                     </div>

@@ -19,15 +19,15 @@ class NucleiService(BaseScannerService):
     _SEVERITY_ORDER = ["info", "low", "medium", "high", "critical"]
 
     _PROFILE_RATE: Dict[str, int] = {
-        "silent": 5,       # requests per second
-        "balanced": 25,
-        "aggressive": 120,
+        "silent": 15,
+        "balanced": 60,
+        "aggressive": 150,
     }
 
     _PROFILE_CONCURRENCY: Dict[str, int] = {
-        "silent": 5,
-        "balanced": 20,
-        "aggressive": 50,
+        "silent": 10,
+        "balanced": 30,
+        "aggressive": 60,
     }
 
     def __init__(self, config: Dict[str, Any] | None = None) -> None:
@@ -42,20 +42,26 @@ class NucleiService(BaseScannerService):
         profile: ScanProfile,
         config: Dict[str, Any],
     ) -> List[str]:
-        rate = self._PROFILE_RATE.get(profile.name, 25)
-        concurrency = self._PROFILE_CONCURRENCY.get(profile.name, 20)
-        # Per-profile rate limit override (requests/second).
+        # Ensure target is a valid URL (default http; nuclei upgrades/follows redirects to https)
+        if not target.startswith(("http://", "https://")):
+            url = f"http://{target}"
+        else:
+            url = target
+
+        rate = self._PROFILE_RATE.get(profile.name, 60)
+        concurrency = self._PROFILE_CONCURRENCY.get(profile.name, 30)
         if "rate_limit_qps" in config:
             rate = int(config["rate_limit_qps"])
 
         cmd: List[str] = [
             self.binary,
-            "-u", target,
+            "-u", url,
             "-jsonl",                  # JSON Lines output to stdout.
             "-silent",                 # No banner / progress bars.
+            "-duc",                    # Disable automatic update check for speed.
             "-rate-limit", str(rate),
             "-c", str(concurrency),
-            "-timeout", "10",
+            "-timeout", "5",
             "-retries", "1",
         ]
 
@@ -66,10 +72,10 @@ class NucleiService(BaseScannerService):
             severities = self._SEVERITY_ORDER[idx:]
             cmd.extend(["-severity", ",".join(severities)])
 
-        # Template directory (default to user-writable location or existing path).
+        # Template directory or smart tag filtering
         templates_dir = config.get(
             "templates_dir",
-            os.environ.get("NUCLEI_TEMPLATES_DIR", "/tmp/nuclei-templates"),
+            os.environ.get("NUCLEI_TEMPLATES_DIR"),
         )
         if templates_dir and os.path.isdir(templates_dir):
             cmd.extend(["-t", templates_dir])
@@ -77,10 +83,9 @@ class NucleiService(BaseScannerService):
             cmd.extend(["-t", str(config["templates"])])
         elif config.get("template"):
             cmd.extend(["-t", str(config["template"])])
-
-        # Optional tag filter (e.g. "cve,fuzz,dns").
-        tags = config.get("tags")
-        if tags:
+        else:
+            # Targeted template tags to ensure fast, high-value findings without timeouts
+            tags = config.get("tags", "cve,exposure,misconfig,tech,ssl,dns")
             cmd.extend(["-tags", str(tags)])
 
         return cmd

@@ -104,7 +104,7 @@
                         @if ($finding->scan)
                             <span>Scan: <a href="{{ route('scans.show', $finding->scan) }}" class="text-gray-300 hover:text-white underline">#{{ $finding->scan->id }} ({{ $finding->scan->type }})</a></span>
                         @endif
-                        <span>Discovered: {{ $finding->discovered_at ? $finding->discovered_at->diffForHumans() : '—' }}</span>
+                        <span>Discovered: {{ $finding->created_at ? $finding->created_at->diffForHumans() : '—' }}</span>
                     </div>
                 </div>
 

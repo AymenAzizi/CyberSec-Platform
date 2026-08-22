@@ -18,9 +18,9 @@ name: cybersec-platform
 x-worker-security: &worker-security
   read_only: true
   tmpfs:
-    - /tmp:noexec,nosuid,nodev,size=512m
-    - /var/tmp:noexec,nosuid,nodev,size=256m
-    - /run:noexec,nosuid,nodev,size=32m
+    - /tmp:size=512m,uid=1001,gid=1001,mode=1777
+    - /var/tmp:size=256m,uid=1001,gid=1001,mode=1777
+    - /run:size=32m,uid=1001,gid=1001,mode=1777
   cap_drop:
     - ALL
   security_opt:

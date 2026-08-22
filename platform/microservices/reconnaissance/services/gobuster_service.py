@@ -17,12 +17,12 @@ class GobusterService(BaseScannerService):
 
     # Default wordlist path inside the container.
     _DEFAULT_WORDLIST = "/app/wordlists/common.txt"
-    _DEFAULT_EXTENSIONS = "php,asp,aspx,jsp,html,js,txt,bak,old,zip"
+    _DEFAULT_EXTENSIONS = "php,html,txt,js"
 
     _PROFILE_RATE: Dict[str, int] = {
-        "silent": 2,
-        "balanced": 10,
-        "aggressive": 30,
+        "silent": 5,
+        "balanced": 30,
+        "aggressive": 60,
     }
 
     def __init__(self, config: Dict[str, Any] | None = None) -> None:
@@ -37,9 +37,9 @@ class GobusterService(BaseScannerService):
         profile: ScanProfile,
         config: Dict[str, Any],
     ) -> List[str]:
-        # Gobuster requires a full URL; promote bare host to https://.
+        # Gobuster requires a full URL; promote bare host to http:// (follows redirects to https if needed).
         if not target.startswith(("http://", "https://")):
-            scheme = config.get("scheme", "https")
+            scheme = config.get("scheme", "http")
             url = f"{scheme}://{target}"
         else:
             url = target
@@ -59,10 +59,9 @@ class GobusterService(BaseScannerService):
                 wordlist = "/app/resources/wordlists/common.txt"
 
         extensions = config.get("extensions", self._DEFAULT_EXTENSIONS)
-        threads = self._PROFILE_RATE.get(profile.name, 10)
-        # Caller-provided rate overrides profile default.
+        threads = self._PROFILE_RATE.get(profile.name, 30)
         if "rate_limit_qps" in config:
-            threads = min(int(config["rate_limit_qps"]), 50)
+            threads = min(int(config["rate_limit_qps"]), 80)
 
         cmd: List[str] = [
             self.binary,
@@ -78,7 +77,7 @@ class GobusterService(BaseScannerService):
             "-s", "200,204,301,302,307,401,403",  # Interesting status codes.
             "--exclude-length", "0",     # Exclude wildcard empty length redirects
             "-k",                       # Skip TLS certificate validation
-            "--timeout", "10s",
+            "--timeout", "4s",
         ]
 
         # Optional: HTTP basic auth, cookies, user-agent.

@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # Restrictive character set for hostnames (RFC 1035 subset) + IPv4 + IPv6.
 _DOMAIN_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
 _DOMAIN_RE = re.compile(
-    rf"^(?:{_DOMAIN_LABEL}\.)+[A-Za-z]{{2,}}$",
+    rf"^(?:{_DOMAIN_LABEL}\.)*[A-Za-z0-9](?:[A-Za-z0-9-]{{0,61}}[A-Za-z0-9])?$",
 )
 _IPV4_RE = re.compile(r"^(?:\d{1,3}\.){3}\d{1,3}$")
 # Strip a scheme + optional port + path before validating host part.

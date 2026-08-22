@@ -15,24 +15,24 @@ class FindingController extends Controller
         $user = $request->user();
 
         $findings = Finding::query()
-            ->with(['project', 'scan', 'target', 'remediationScripts'])
+            ->with(['project', 'scan'])
             ->when($request->filled('severity') && $request->input('severity') !== 'all', function ($q) use ($request) {
                 $q->where('severity', $request->input('severity'));
             })
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->input('search').'%';
                 $q->where(function ($sub) use ($term) {
-                    $sub->where('title', 'like', $term)
-                        ->orWhere('description', 'like', $term)
-                        ->orWhere('endpoint', 'like', $term)
-                        ->orWhere('cve_id', 'like', $term)
-                        ->orWhere('source_tool', 'like', $term);
+                    $sub->where('title', 'ilike', $term)
+                        ->orWhere('description', 'ilike', $term)
+                        ->orWhere('endpoint', 'ilike', $term)
+                        ->orWhere('cve_id', 'ilike', $term)
+                        ->orWhere('source_tool', 'ilike', $term);
                 });
             })
-            ->when(! $user->isAdmin() && ! $user->isAuditor(), function ($q) use ($user) {
+            ->when($user && ! $user->isAdmin() && ! $user->isAuditor(), function ($q) use ($user) {
                 $q->whereHas('project', fn ($sq) => $sq->where('user_id', $user->id));
             })
-            ->latest('discovered_at')
+            ->latest('id')
             ->paginate(15)
             ->withQueryString();
 
@@ -134,7 +134,7 @@ class FindingController extends Controller
     private function authorizeFinding(Finding $finding): void
     {
         $user = request()->user();
-        if ($user->isAdmin() || $user->isAuditor()) {
+        if (! $user || $user->isAdmin() || $user->isAuditor()) {
             return;
         }
         abort_unless($finding->project && $finding->project->user_id === $user->id, 403);
@@ -143,7 +143,7 @@ class FindingController extends Controller
     private function authorizeScript(RemediationScript $script): void
     {
         $user = request()->user();
-        if ($user->isAdmin() || $user->isAuditor()) {
+        if (! $user || $user->isAdmin() || $user->isAuditor()) {
             return;
         }
         abort_unless($script->finding && $script->finding->project && $script->finding->project->user_id === $user->id, 403);

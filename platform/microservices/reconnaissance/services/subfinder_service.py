@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 from typing import Any, Dict, List
 
@@ -26,16 +27,17 @@ class SubfinderService(BaseScannerService):
         profile: ScanProfile,
         config: Dict[str, Any],
     ) -> List[str]:
-        # subfinder is passive, so profile only affects timeouts/sources.
+        # Strip protocol if present for subdomain enumeration
+        host = target.replace("https://", "").replace("http://", "").split("/")[0]
+
         cmd: List[str] = [
             self.binary,
-            "-d", target,
+            "-d", host,
             "-silent",            # No banner.
-            "-timeout", "30",
-            "-t", "10",           # Concurrent HTTP requests to source APIs.
+            "-timeout", "20",
+            "-t", "20",           # Concurrent HTTP requests to source APIs.
         ]
 
-        import os
         # Optional API config file (improves coverage).
         provider_config = config.get("provider_config")
         if provider_config and isinstance(provider_config, str) and os.path.isfile(provider_config):
@@ -45,10 +47,6 @@ class SubfinderService(BaseScannerService):
         sources = config.get("sources")
         if sources:
             cmd.extend(["-s", str(sources)])
-
-        # Aggressive profile enables active verification (HTTP probe).
-        if profile.name == "aggressive" and config.get("active_verify", True):
-            cmd.append("-active")  # Probe each discovered subdomain.
 
         return cmd
 
