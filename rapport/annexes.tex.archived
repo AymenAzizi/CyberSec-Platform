@@ -1,0 +1,654 @@
+
+\chapter*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes}
+\markboth{Annexes}{}
+\label{sec:annex_start}
+
+\section*{Annex 1: Project File Structure}
+
+\begin{verbatim}
+cybersec-platform/
+|-- docker-compose.yml             # 12 services, 2 isolated networks
+|-- .github/workflows/ci.yml       # DevSecOps pipeline (SAST/SCA/SBOM/Trivy/Cosign)
+|-- nginx/
+|   |-- nginx.conf
+|   |-- snippets/                  # security-headers, proxy-api-gateway, proxy-backend
+|-- scripts/
+|   |-- setup.sh
+|   |-- stop.sh
+|   |-- scan-tools.sh
+|   |-- seed-demo.sh
+|-- backend/                       # Laravel 11 (PHP 8.3)
+|   |-- Dockerfile
+|   |-- composer.json
+|   |-- app/
+|   |   |-- Http/Controllers/      # 15 controllers (incl. Api/ and Admin/)
+|   |   |-- Http/Middleware/       # Role, Admin, ShareSidebarCounters
+|   |   |-- Http/Requests/         # Form Request validation
+|   |   |-- Models/                # 14 Eloquent models
+|   |   |-- Services/              # MicroserviceClient, GraphBuilder, AuditLogger
+|   |   |-- Jobs/                  # ExecuteScan, ExecuteOsint, GenerateReport, GenerateRemediation
+|   |   |-- Traits/                # ProcessesScanResults
+|   |   |-- Providers/
+|   |-- config/                    # 12 config files (auth, database, queue, permission, etc.)
+|   |-- database/
+|   |   |-- migrations/            # 14 migrations
+|   |   |-- seeders/               # 11 seeders (Roles, Users, Projects, Targets, Scans, etc.)
+|   |-- resources/views/           # 47 Blade templates
+|   |-- resources/js/              # app.js, bootstrap.js, chat.js, graph.js
+|   |-- resources/css/             # Tailwind v3 + dark cyberpunk theme
+|   |-- routes/
+|       |-- web.php
+|       |-- api.php
+|       |-- console.php
+|-- microservices/
+|   |-- reconnaissance/            # Flask (port 5000) - 5 security tools
+|   |   |-- app.py
+|   |   |-- services/              # Nmap, Nuclei, Gobuster, Subfinder, WPScan
+|   |   |-- utils/                 # ResultParser, GraphBuilder (NetworkX), AIAnalyzer
+|   |-- security/                  # Flask (port 5001) - attack/injection/prevention/sandbox
+|   |   |-- app.py
+|   |   |-- services/              # 5 services + Docker sandbox
+|   |-- osint/                     # Flask (port 5002) - passive OSINT
+|   |   |-- app.py
+|   |   |-- services/              # Whois, Dns, Ssl, Crtsh, TechDetector
+|   |-- ai/                        # Flask (port 5003) - Ollama + Remediation-as-Code
+|   |   |-- app.py
+|   |   |-- services/              # OllamaClient, prompt_templates
+|   |-- api-gateway/               # Flask (port 8080) - routing + rate limiting
+|   |   |-- app.py
+|   |   |-- rate_limiter.py
+|   |-- worker/                    # Python event-driven consumer
+|       |-- worker.py
+|       |-- redis_consumer.py      # XREADGROUP consumer
+|       |-- http_poller.py         # Fallback when Redis unavailable
+|-- README.md
+\end{verbatim}
+
+\section*{Annex 2: Default User Accounts}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{Email} & \textbf{Password} & \textbf{Role} \\
+\hline
+admin@cybersec.local & password & Admin \\
+\hline
+analyst@cybersec.local & password & Analyst \\
+\hline
+client@cybersec.local & password & Client \\
+\hline
+auditor@cybersec.local & password & Auditor \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{Annex 3: Platform Access}
+
+The platform is deployed online and accessible at:
+
+\begin{center}
+\large \url{https://aymenazizi.dijaly.com/}
+\end{center}
+
+\section*{Annex 4: Scan Types}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|L|L|}
+\hline
+\textbf{Scan Type} & \textbf{Description} \\
+\hline
+NMAP & Network port scanning and service detection \\
+\hline
+NUCLEI & Template-based vulnerability scanning \\
+\hline
+GOBUSTER & Directory and file brute-forcing \\
+\hline
+SUBFINDER & Passive subdomain enumeration \\
+\hline
+WPSCAN & WordPress security scanning \\
+\hline
+ATTACK\_DETECT & Attack vector detection (headers, paths, methods) \\
+\hline
+INJECTION\_FULL & Full injection test suite \\
+\hline
+INJECTION\_SQL & SQL injection testing (12 payloads) \\
+\hline
+INJECTION\_CMD & Command injection testing (12 payloads) \\
+\hline
+INJECTION\_XSS & Cross-site scripting testing (8 payloads) \\
+\hline
+PREVENTION\_CHECK & Security prevention analysis (WAF, headers) \\
+\hline
+WAF\_DETECT & Web Application Firewall detection \\
+\hline
+SANDBOX\_FULL & Full sandbox exploit testing \\
+\hline
+SANDBOX\_SQLI & Sandbox SQL injection \\
+\hline
+SANDBOX\_CMDI & Sandbox command injection \\
+\hline
+SANDBOX\_XSS & Sandbox XSS testing \\
+\hline
+OSINT\_FULL & Passive OSINT (WHOIS/DNS/SSL/crt.sh/tech) \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{Annex 5: DevSecOps Pipeline Stages}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{Stage} & \textbf{Tool} & \textbf{Purpose} \\
+\hline
+Pre-commit & PHP CS Fixer, npm audit, gitleaks & Code formatting + secret scanning \\
+\hline
+SAST & Psalm (PHP), Bandit (Python) & Static security analysis \\
+\hline
+SCA & Composer audit, npm audit & Dependency vulnerability scan \\
+\hline
+SBOM & Syft (CycloneDX JSON) & Software Bill of Materials \\
+\hline
+Container scan & Trivy & Docker image CVE scan \\
+\hline
+Sign & Cosign (keyless, GitHub OIDC) & Image signature + SBOM attestation \\
+\hline
+Publish & GHCR (GitHub Container Registry) & Signed image distribution \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{Annex 6: Environment Variables Configuration}
+
+Table~\ref{tab:annex_env_vars} lists the principal environment variables consumed by the platform. All secrets are injected via Docker secrets (file-backed), never via plaintext \texttt{.env} values, in production.
+
+\begin{table}[H]
+\centering
+\caption{Environment Variables -- Principal Configuration}
+\label{tab:annex_env_vars}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|L|}
+\hline
+\textbf{Variable} & \textbf{Service} & \textbf{Default (dev)} & \textbf{Description} \\
+\hline
+APP\_ENV & Laravel & local & Application environment (local/staging/production). \\
+\hline
+APP\_URL & Laravel & http://localhost:8000 & Public base URL used in email links and signed PDFs. \\
+\hline
+APP\_KEY & Laravel & (generated) & AES-256 encryption key for sessions and cookies. \\
+\hline
+DB\_HOST & Laravel & postgres & PostgreSQL hostname (Docker service name). \\
+\hline
+DB\_DATABASE & Laravel & cybersec & Database name. \\
+\hline
+DB\_PASSWORD\_FILE & Laravel & --- & Path to the Docker secret containing the DB password. \\
+\hline
+REDIS\_HOST & Laravel, Worker & redis & Redis hostname for Streams and cache. \\
+\hline
+OLLAMA\_HOST & AI MS & http://ollama:11434 & Ollama inference endpoint. \\
+\hline
+OLLAMA\_MODEL & AI MS & qwen2.5-coder:7b & Model identifier. \\
+\hline
+JWT\_SECRET & API Gateway & (generated) & HS256 secret for inter-service JWT signing. \\
+\hline
+RECON\_TIMEOUT & Recon MS & 600 & Per-tool execution timeout (seconds). \\
+\hline
+SCAN\_QUOTA\_PER\_DAY & Laravel & 20 & Per-user daily scan quota. \\
+\hline
+PAGINATOR\_PER\_PAGE & Laravel & 15 & Default page size for list views. \\
+\hline
+SANCTUM\_STATEFUL\_DOMAINS & Laravel & localhost,127.0.0.1 & Allowed origins for stateful Sanctum cookies. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\section*{Annex 7: Scan Profile Configuration Parameters}
+
+Table~\ref{tab:annex_scan_profiles} details the per-profile parameters that govern tool execution across the three intensity profiles.
+
+\begin{table}[H]
+\centering
+\caption{Scan Profile Configuration Parameters}
+\label{tab:annex_scan_profiles}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|L|L|}
+\hline
+\textbf{Parameter} & \textbf{Silent} & \textbf{Balanced} & \textbf{Aggressive} & \textbf{Description} \\
+\hline
+nmap timing template & -T2 (polite) & -T3 (normal) & -T4 (aggressive) & Controls nmap probe timing. \\
+\hline
+nmap max-rate & 5 & 50 & 200 & Maximum packets per second. \\
+\hline
+Nuclei concurrency & 5 & 25 & 100 & Number of concurrent Nuclei templates. \\
+\hline
+Nuclei rate-limit & 10 & 50 & 200 & Requests per second per template. \\
+\hline
+Gobuster threads & 5 & 25 & 100 & Directory brute-force thread count. \\
+\hline
+Jitter (ms, range) & 500--1500 & 100--500 & 0--100 & Random delay added to each probe. \\
+\hline
+Retry budget & 1 & 2 & 3 & Number of retries on timeout. \\
+\hline
+Retry backoff & exponential & exponential & linear & Backoff strategy between retries. \\
+\hline
+Per-user approval & not required & not required & admin approval & Whether admin must approve profile. \\
+\hline
+IDS triggering risk & very low & low & moderate to high & Likelihood of triggering target IDS/IPS. \\
+\hline
+Typical scan duration & 8--15 min & 3--5 min & 1--2 min & Wall-clock duration for a /24 host. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\section*{Annex 8: Reconnaissance Microservice -- Python Code Listing}
+
+The following listing shows the core \texttt{ReconService} class that orchestrates the five reconnaissance tools. The class is structured around a single \texttt{run()} entry-point that dispatches to per-tool service classes, aggregates their results, and projects them onto the knowledge graph via the \texttt{GraphBuilder}.
+
+\begin{lstlisting}[style=python]
+from typing import Any, Dict
+from flask import Flask, request, jsonify
+from .tools.nmap import NmapService
+from .tools.nuclei import NucleiService
+from .tools.gobuster import GobusterService
+from .tools.subfinder import SubfinderService
+from .tools.wpscan import WPScanService
+from .graph import GraphBuilder
+from .parsers import ResultParser
+
+app = Flask(__name__)
+
+TOOLS = {
+    "nmap":     NmapService,
+    "nuclei":   NucleiService,
+    "gobuster": GobusterService,
+    "subfinder": SubfinderService,
+    "wpscan":   WPScanService,
+}
+
+@app.route("/recon/scan", methods=["POST"])
+def run_scan():
+    payload = request.get_json(force=True)
+    target  = payload["target"]
+    tools   = payload.get("tools", list(TOOLS.keys()))
+    profile = payload.get("profile", "balanced")
+    jitter  = payload.get("jitter_ms", 100)
+
+    builder = GraphBuilder()
+    results: Dict[str, Any] = {}
+    for tool_name in tools:
+        svc = TOOLS[tool_name](profile=profile, jitter_ms=jitter)
+        raw = svc.run(target)
+        findings = ResultParser(tool_name).parse(raw)
+        results[tool_name] = findings
+        builder.project(tool_name, target, findings)
+
+    builder.compute_blast_radius()
+    return jsonify({"target": target, "results": results,
+                    "graph": builder.to_cytoscape()})
+\end{lstlisting}
+
+\section*{Annex 9: AI Microservice -- Strict JSON Schema Response Example}
+
+The AI microservice enforces a strict JSON schema on every response produced by the local Ollama (\texttt{qwen2.5-coder:7b}) model. The four mandatory top-level keys are \texttt{risk\_summary}, \texttt{key\_findings}, \texttt{remediation\_as\_code}, and \texttt{citations}; the \texttt{citations} array must reference exact line numbers in the raw tool output, which is the primary anti-hallucination control.
+
+\begin{lstlisting}[style=json]
+{
+  "risk_summary": "ensi.tn exposes 4 open ports (22, 80, 443, 8080) and 2 critical CVEs were detected by Nuclei. Apache OFBiz Path Traversal (CVE-2024-1234) and WordPress Plugin SQL Injection (CVE-2023-5678) both allow unauthenticated remote code execution.",
+  "key_findings": [
+    {
+      "id": "F-001",
+      "severity": "critical",
+      "title": "Apache OFBiz Path Traversal RCE",
+      "cve": "CVE-2024-1234",
+      "cvss": 9.8,
+      "matched_at": "https://ensi.tn/webtools/control/ProgramExport;/~Example"
+    },
+    {
+      "id": "F-002",
+      "severity": "high",
+      "title": "Git Config Exposure",
+      "matched_at": "https://ensi.tn/.git/config"
+    }
+  ],
+  "remediation_as_code": [
+    {
+      "language": "bash",
+      "title": "Block /webtools/control/ProgramExport at the reverse proxy",
+      "script": "#!/bin/bash\nlocation /webtools/control/ProgramExport { return 403; }"
+    },
+    {
+      "language": "ansible",
+      "title": "Remove .git directory from document root",
+      "script": "- name: Remove exposed .git directory\n  file:\n    path: /var/www/html/.git\n    state: absent"
+    }
+  ],
+  "citations": [
+    {"finding_id": "F-001", "source": "nuclei", "raw_line": 14, "evidence": "CVE-2024-1234 matched at /webtools/control/ProgramExport"},
+    {"finding_id": "F-002", "source": "nuclei", "raw_line": 22, "evidence": "git-config template matched at /.git/config"}
+  ]
+}
+\end{lstlisting}
+
+\section*{Annex 10: Remediation-as-Code -- Bash Script Example}
+
+The following Bash remediation script was generated by the AI microservice for the Git Config Exposure finding. The script is self-contained, idempotent, and logs every action it takes.
+
+\begin{lstlisting}[style=bash]
+#!/usr/bin/env bash
+# Remediation: Git Config Exposure on ensi.tn
+# Finding ID: F-002
+# Generated by: AI Microservice (qwen2.5-coder:7b)
+# Idempotent: yes -- safe to re-run
+
+set -euo pipefail
+IFS=$'\n\t'
+
+DOC_ROOT="${1:-/var/www/html}"
+LOG_FILE="/var/log/remediation/F-002-$(date +%Y%m%d-%H%M%S).log"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+log() { echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE"; }
+
+log "Starting remediation for F-002 (Git Config Exposure)"
+
+if [ -d "$DOC_ROOT/.git" ]; then
+    log "Found .git directory at $DOC_ROOT/.git -- removing"
+    rm -rf "$DOC_ROOT/.git"
+    log "Removed $DOC_ROOT/.git"
+else
+    log "No .git directory at $DOC_ROOT/.git -- nothing to do"
+fi
+
+# Add nginx rule to block any future .git exposure
+NGINX_CONF="/etc/nginx/snippets/block-git.conf"
+if [ ! -f "$NGINX_CONF" ]; then
+    log "Creating nginx snippet at $NGINX_CONF"
+    cat > "$NGINX_CONF" <<'EOF'
+location ~ /\.git {
+    deny all;
+    return 404;
+}
+EOF
+    log "Reload nginx to apply the new snippet"
+    nginx -t && systemctl reload nginx
+fi
+
+log "Remediation F-002 complete"
+\end{lstlisting}
+
+\section*{Annex 11: Remediation-as-Code -- Ansible Playbook Example}
+
+The same Git Config Exposure remediation expressed as an Ansible playbook. The playbook is the preferred format when the customer's operations team already runs Ansible.
+
+\begin{lstlisting}[style=ansible]
+---
+# Remediation: Git Config Exposure on ensi.tn
+# Finding ID: F-002
+# Generated by: AI Microservice (qwen2.5-coder:7b)
+
+- name: Remove exposed .git directory and block future exposure
+  hosts: webservers
+  become: yes
+  vars:
+    doc_root: /var/www/html
+    nginx_snippet: /etc/nginx/snippets/block-git.conf
+
+  tasks:
+    - name: Ensure .git directory is absent from document root
+      ansible.builtin.file:
+        path: "{{ doc_root }}/.git"
+        state: absent
+      register: git_removed
+
+    - name: Log .git removal
+      ansible.builtin.debug:
+        msg: "Removed {{ doc_root }}/.git"
+      when: git_removed.changed
+
+    - name: Ensure nginx snippet directory exists
+      ansible.builtin.file:
+        path: "{{ nginx_snippet | dirname }}"
+        state: directory
+        mode: '0755'
+
+    - name: Deploy nginx snippet to block .git exposure
+      ansible.builtin.copy:
+        dest: "{{ nginx_snippet }}"
+        mode: '0644'
+        content: |
+          location ~ /\.git {
+              deny all;
+              return 404;
+          }
+      notify: Reload nginx
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+\end{lstlisting}
+
+\section*{Annex 12: Remediation-as-Code -- Dockerfile Example}
+
+For findings that require rebuilding a container image (e.g.\ upgrading a vulnerable base image), the AI microservice produces a Dockerfile patch as shown below.
+
+\begin{lstlisting}[style=dockerfile]
+# Remediation: CVE-2023-5678 -- WordPress Plugin SQL Injection
+# Finding ID: F-003
+# Generated by: AI Microservice (qwen2.5-coder:7b)
+# Base: wordpress:6.5-php8.2-apache
+# Patched: wordpress:6.5-php8.2-apache-patched
+
+FROM wordpress:6.5-php8.2-apache
+
+# Disable the vulnerable plugin (example-plugin <= 1.4.2)
+RUN rm -rf /var/www/html/wp-content/plugins/example-plugin/
+
+# Install the Wordfence CLI and scan the plugins directory
+RUN curl -sL https://github.com/wordfence/wordfence-cli/releases/latest/download/wordfence-linux-amd64 -o /usr/local/bin/wordfence \
+    && chmod +x /usr/local/bin/wordfence \
+    && /usr/local/bin/wordfence malware-scan /var/www/html/wp-content/plugins/ --no-interactive
+
+# Re-enable the patched version of the plugin
+COPY example-plugin-1.5.0.zip /tmp/
+RUN unzip /tmp/example-plugin-1.5.0.zip -d /var/www/html/wp-content/plugins/ \
+    && rm /tmp/example-plugin-1.5.0.zip
+
+# Drop privileges
+USER www-data
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+\end{lstlisting}
+
+\section*{Annex 13: docker-compose.yml Excerpt}
+
+The following excerpt from the production \texttt{docker-compose.yml} highlights the security hardening applied to every service (non-root user, read-only root filesystem, all capabilities dropped, no-new-privileges) and the two isolated networks.
+
+\begin{lstlisting}[style=yaml]
+version: "3.9"
+
+services:
+  laravel:
+    image: ghcr.io/aymenazizi/cybersec-laravel:signed
+    user: "1001:1001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp, /var/run]
+    environment:
+      - APP_ENV=production
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    networks: [internal]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_started}
+    restart: unless-stopped
+
+  recon:
+    image: ghcr.io/aymenazizi/cybersec-recon:signed
+    user: "1001:1001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    networks: [internal]
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-age
+    user: postgres
+    environment:
+      - POSTGRES_DB=cybersec
+      - POSTGRES_PASSWORD_FILE=/run/secrets/pg_password
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    secrets: [pg_password]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cybersec"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  external:
+    driver: bridge
+  internal:
+    driver: bridge
+    internal: true   # no route to Internet
+
+volumes:
+  pg-data:
+
+secrets:
+  pg_password:
+    file: ./secrets/pg_password.txt
+\end{lstlisting}
+
+\section*{Annex 14: GitHub Actions Workflow}
+
+The following GitHub Actions workflow implements the eight-stage DevSecOps pipeline. The workflow runs on every pull request and on every merge to \texttt{main}, with a required status check on the \texttt{sign} job.
+
+\begin{lstlisting}[style=yaml]
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write   # required for cosign keyless
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vimeo/psalm-action@v1
+        with: { composer_require: true }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install bandit && bandit -r microservices/ -ll
+
+  sca:
+    needs: sast
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@master
+        with: { scan-type: fs, severity: CRITICAL,HIGH }
+
+  sbom:
+    needs: sca
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anchore/sbom-action@v0
+        with: { format: cyclonedx-json, output-file: sbom.json }
+      - uses: actions/upload-artifact@v4
+        with: { name: sbom, path: sbom.json }
+
+  build:
+    needs: sbom
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/build-push-action@v5
+        with: { push: false, tags: cybersec:ci }
+
+  scan-image:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aquasecurity/trivy-action@master
+        with: { image-ref: cybersec:ci, severity: CRITICAL,HIGH }
+
+  sign:
+    needs: scan-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sigstore/cosign-installer@v3
+      - run: cosign sign --yes ghcr.io/aymenazizi/cybersec:ci
+\end{lstlisting}
+
+\section*{Annex 15: Cytoscape.js Knowledge Graph Frontend}
+
+The following Cytoscape.js initialisation code renders the knowledge graph in the browser. The graph is fetched from the Laravel endpoint \texttt{/projects/\{id\}/graph/data} as a JSON object with \texttt{nodes} and \texttt{edges} arrays.
+
+\begin{lstlisting}[style=js]
+const cy = cytoscape({
+  container: document.getElementById("graph"),
+  elements: await fetch(`/projects/${projectId}/graph/data`)
+              .then(r => r.json()),
+  style: [
+    { selector: "node", style: {
+        "background-color": "#7c3aed",
+        "label": "data(label)",
+        "color": "#fff",
+        "text-valign": "center",
+        "text-halign": "center",
+        "font-size": "10px" } },
+    { selector: 'node[type="vulnerability"]', style: {
+        "background-color": "#ef4444" } },
+    { selector: 'node[type="impact"]', style: {
+        "background-color": "#f59e0b",
+        "border-width": 2,
+        "border-color": "#fbbf24" } },
+    { selector: "edge", style: {
+        "width": 1,
+        "line-color": "#64748b",
+        "target-arrow-color": "#64748b",
+        "target-arrow-shape": "triangle",
+        "curve-style": "bezier" } },
+    { selector: ".highlighted", style: {
+        "background-color": "#22c55e",
+        "line-color": "#22c55e",
+        "target-arrow-color": "#22c55e",
+        "width": 3 } }
+  ],
+  layout: { name: "cose", animate: true, animationDuration: 600 }
+});
+
+// On node tap: compute blast-radius via BFS, highlight reachable nodes
+cy.on("tap", "node", async evt => {
+  const id = evt.target.id();
+  const reachable = await fetch(`/assets/${id}/impact`)
+                      .then(r => r.json());
+  cy.elements().removeClass("highlighted");
+  cy.getElementById(reachable.nodes).addClass("highlighted");
+  reachable.edges.forEach(e =>
+    cy.getElementById(e).addClass("highlighted"));
+});
+\end{lstlisting}

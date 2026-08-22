@@ -1,0 +1,15 @@
+{
+    frankenphp
+    order php_server before file_server
+}
+
+:8000 {
+    # Dev-only alternative to nginx. Use Caddy only for local dev on the host
+    # (no Docker). The production stack uses the nginx config in docker/nginx/.
+    #
+    # Resolve the platform root dynamically so this file works on any machine.
+    # Override with the PLATFORM_ROOT env var before running `caddy run`.
+    root * "{$PLATFORM_ROOT:./public}"
+    encode zstd gzip
+    php_server
+}

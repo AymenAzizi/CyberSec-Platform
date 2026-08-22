@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Use Case Diagram</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1280px; height: 880px;
+    background: #ffffff;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    padding: 32px 40px 28px 40px;
+    position: relative;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 18px;
+    letter-spacing: 0.2px;
+  }
+  .canvas { position: relative; width: 100%; height: 740px; }
+
+  .boundary {
+    position: absolute;
+    top: 0; left: 240px;
+    width: 820px; height: 720px;
+    border: 2px dashed #1e40af;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+  .boundary-label {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    padding: 0 14px;
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.4px;
+  }
+
+  .actor {
+    position: absolute;
+    width: 110px;
+    text-align: center;
+  }
+  .actor .figure {
+    width: 56px; height: 92px;
+    margin: 0 auto 6px;
+    position: relative;
+  }
+  .actor .figure::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 22px; height: 22px;
+    border: 2.5px solid #0f172a;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+  .actor .figure::after {
+    content: '';
+    position: absolute;
+    top: 22px; left: 50%;
+    transform: translateX(-50%);
+    width: 2.5px; height: 38px;
+    background: #0f172a;
+  }
+  .actor .arms {
+    position: absolute;
+    top: 32px; left: 50%;
+    transform: translateX(-50%);
+    width: 44px; height: 2.5px;
+    background: #0f172a;
+  }
+  .actor .legs {
+    position: absolute;
+    top: 60px; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 28px;
+  }
+  .actor .legs::before,
+  .actor .legs::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 2.5px; height: 28px;
+    background: #0f172a;
+    transform-origin: top center;
+  }
+  .actor .legs::before { left: 4px; transform: rotate(18deg); }
+  .actor .legs::after  { right: 4px; transform: rotate(-18deg); }
+  .actor .name { font-size: 15px; font-weight: 700; }
+  .actor .role { font-size: 11px; color: #475569; margin-top: 2px; }
+
+  .uc {
+    position: absolute;
+    min-width: 180px;
+    padding: 10px 18px;
+    border-radius: 100px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    border: 2px solid;
+    background: #ffffff;
+    line-height: 1.25;
+    z-index: 2;
+  }
+  .uc.admin { background: #fef3c7; border-color: #b45309; color: #78350f; }
+  .uc.governance { background: #dcfce7; border-color: #15803d; color: #14532d; }
+  .uc.inherited { background: #dbeafe; border-color: #1e40af; color: #1e3a8a; }
+
+  svg.lines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .legend {
+    position: absolute;
+    bottom: 0; left: 0;
+    display: flex;
+    gap: 18px;
+    font-size: 12px;
+    color: #475569;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid; }
+  .ld-admin { background: #fef3c7; border-color: #b45309; }
+  .ld-governance { background: #dcfce7; border-color: #15803d; }
+  .ld-inherited { background: #dbeafe; border-color: #1e40af; }
+</style>
+</head>
+<body>
+  <h1>Use Case Diagram &mdash; System Administrator</h1>
+  <div class="canvas">
+    <div class="boundary">
+      <div class="boundary-label">CyberSec Platform</div>
+
+      <!-- Admin-only use cases (column 1) -->
+      <div class="uc admin" style="top: 30px;  left: 50px;">Create / Edit User</div>
+      <div class="uc admin" style="top: 100px; left: 50px;">Deactivate User</div>
+      <div class="uc admin" style="top: 170px; left: 50px;">Assign Roles</div>
+      <div class="uc admin" style="top: 240px; left: 50px;">Configure Scan Quotas</div>
+      <div class="uc admin" style="top: 310px; left: 50px;">Override Rate Limit</div>
+      <div class="uc admin" style="top: 380px; left: 50px;">Manage Report Templates</div>
+
+      <!-- Governance use cases (column 2) -->
+      <div class="uc governance" style="top: 30px;  left: 360px;">View Audit Log</div>
+      <div class="uc governance" style="top: 100px; left: 360px;">View All Alerts</div>
+      <div class="uc governance" style="top: 170px; left: 360px;">View System Health</div>
+      <div class="uc governance" style="top: 240px; left: 360px;">Export Audit Report</div>
+      <div class="uc governance" style="top: 310px; left: 360px;">View Microservice Status</div>
+      <div class="uc governance" style="top: 380px; left: 360px;">View Database Metrics</div>
+
+      <!-- Inherited from Analyst (column 3) -->
+      <div class="uc inherited" style="top: 30px;  left: 620px;">Authenticate</div>
+      <div class="uc inherited" style="top: 100px; left: 620px;">Manage Projects</div>
+      <div class="uc inherited" style="top: 170px; left: 620px;">Launch Scan</div>
+      <div class="uc inherited" style="top: 240px; left: 620px;">View Scan Results</div>
+      <div class="uc inherited" style="top: 310px; left: 620px;">Generate Report</div>
+      <div class="uc inherited" style="top: 380px; left: 620px;">Chat with AI Co-pilot</div>
+      <div class="uc inherited" style="top: 450px; left: 620px;">Launch Sandbox</div>
+      <div class="uc inherited" style="top: 520px; left: 620px;">Acknowledge Alert</div>
+
+      <!-- Note: inherited from analyst -->
+      <div style="position:absolute; top: 610px; left: 620px; font-size:11px; color:#475569; font-style: italic;">
+        (inherited from Analyst role)
+      </div>
+    </div>
+
+    <!-- Admin actor on the left -->
+    <div class="actor" style="top: 280px; left: 40px;">
+      <div class="figure"><div class="arms"></div><div class="legs"></div></div>
+      <div class="name">Admin</div>
+      <div class="role">Full access</div>
+    </div>
+
+    <svg class="lines" xmlns="http://www.w3.org/2000/svg">
+      <!-- Admin -> admin column use cases -->
+      <line x1="160" y1="325" x2="290" y2="55"  stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="290" y2="125" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="290" y2="195" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="290" y2="265" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="290" y2="335" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="290" y2="405" stroke="#0f172a" stroke-width="1.5"/>
+
+      <!-- Admin -> governance column use cases -->
+      <line x1="160" y1="325" x2="600" y2="55"  stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="600" y2="125" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="600" y2="195" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="600" y2="265" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="600" y2="335" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="600" y2="405" stroke="#0f172a" stroke-width="1.5"/>
+
+      <!-- Admin -> inherited use cases -->
+      <line x1="160" y1="325" x2="860" y2="55"  stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="125" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="195" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="265" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="335" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="405" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="475" stroke="#0f172a" stroke-width="1.5"/>
+      <line x1="160" y1="325" x2="860" y2="545" stroke="#0f172a" stroke-width="1.5"/>
+    </svg>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot ld-admin"></span>Admin only</div>
+      <div class="legend-item"><span class="legend-dot ld-governance"></span>Governance / oversight</div>
+      <div class="legend-item"><span class="legend-dot ld-inherited"></span>Inherited from Analyst</div>
+    </div>
+  </div>
+</body>
+</html>

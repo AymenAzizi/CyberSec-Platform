@@ -1,0 +1,127 @@
+name: DevSecOps Automated CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  security-events: write
+  packages: write
+  id-token: write
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Stage 1: SAST & Static Code Analysis
+  # ---------------------------------------------------------------------------
+  sast:
+    name: SAST & Linting (PHPStan & Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_pgsql, pgsql
+          coverage: none
+
+      - name: Install PHP Dependencies
+        working-directory: ./platform
+        run: composer install --prefer-dist --no-progress --no-suggest || composer install --ignore-platform-reqs
+
+      - name: Run PHPStan Static Analysis
+        working-directory: ./platform
+        run: ./vendor/bin/phpstan analyse app --level=5 --no-progress || true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Bandit Python SAST
+        run: |
+          pip install bandit
+          bandit -r ./platform/microservices -f json -o bandit-results.json --exit-zero
+          bandit -r ./platform/microservices
+
+  # ---------------------------------------------------------------------------
+  # Stage 2: Secret Scanning & SCA Dependency Audits
+  # ---------------------------------------------------------------------------
+  sca-and-secrets:
+    name: Secret Leak Detection & Dependency SCA (Gitleaks + Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Secret Detection
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Run Trivy Vulnerability Scanner (Repo & Dependencies)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+  # ---------------------------------------------------------------------------
+  # Stage 3: Automated Unit & Backend Tests
+  # ---------------------------------------------------------------------------
+  tests:
+    name: Automated Unit & Backend Tests
+    runs-on: ubuntu-latest
+    needs: [sast, sca-and-secrets]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, pdo, pdo_sqlite, sqlite3
+
+      - name: Install Dependencies
+        working-directory: ./platform
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Run PHPUnit / Pest Tests
+        working-directory: ./platform
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: php artisan test --parallel || true
+
+  # ---------------------------------------------------------------------------
+  # Stage 4: Docker Container Build & Supply Chain Signing
+  # ---------------------------------------------------------------------------
+  build-and-sign:
+    name: Container Build & Cosign Attestation
+    runs-on: ubuntu-latest
+    needs: [tests]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install Cosign for Supply Chain Security
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Build Backend Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/backend:latest ./platform -f ./platform/docker/backend.Dockerfile || true

@@ -1,0 +1,37 @@
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}1}Fondements de la Cybers\'ecurit\'e}{\reset@font\mtcSfont 12}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}1.1}D\'efinition et Importance}{\reset@font\mtcSSfont 12}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}1.2}Concepts Fondamentaux de la S\'ecurit\'e}{\reset@font\mtcSSfont 12}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}2}Le R\'ef\'erentiel OWASP Top 10}{\reset@font\mtcSfont 13}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}3}Gestion de la Surface d'Attaque (Attack Surface Management -- ASM)}{\reset@font\mtcSfont 14}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}3.1}D\'efinition}{\reset@font\mtcSSfont 14}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}3.2}Typologie des Surfaces d'Attaque}{\reset@font\mtcSSfont 14}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}3.3}Cycle de Vie du Processus ASM}{\reset@font\mtcSSfont 15}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}4}Outils de Reconnaissance et d'Audit de S\'ecurit\'e}{\reset@font\mtcSfont 15}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}4.1}Nmap (Network Mapper)}{\reset@font\mtcSSfont 15}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}4.2}Nuclei}{\reset@font\mtcSSfont 16}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}4.3}Gobuster}{\reset@font\mtcSSfont 16}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}4.4}Subfinder}{\reset@font\mtcSSfont 16}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}4.5}WPScan}{\reset@font\mtcSSfont 16}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}5}Le Paradigme DevSecOps}{\reset@font\mtcSfont 17}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}5.1}D\'efinition et Principes Directeurs}{\reset@font\mtcSSfont 17}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}5.2}\'Etapes d'un Pipeline DevSecOps}{\reset@font\mtcSSfont 17}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}6}Architecture en Microservices}{\reset@font\mtcSfont 18}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}6.1}D\'efinition et Principes}{\reset@font\mtcSSfont 18}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}6.2}Modes de Communication}{\reset@font\mtcSSfont 18}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}7}L'Intelligence Artificielle en Cybers\'ecurit\'e}{\reset@font\mtcSfont 19}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}7.1}Apport des Mod\`eles LLM dans la S\'ecurit\'e Offensive}{\reset@font\mtcSSfont 19}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}7.2}Inf\'erence Locale S\'ecuris\'ee avec Ollama}{\reset@font\mtcSSfont 19}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}8}Conteneurisation et Environnement Docker}{\reset@font\mtcSfont 20}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9}\'Etude Comparative et Justification des Choix Technologiques}{\reset@font\mtcSfont 20}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.1}Comparatif des Outils de Balayage de Ports}{\reset@font\mtcSSfont 20}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.2}Comparatif des Scanners de Vuln\'erabilit\'es}{\reset@font\mtcSSfont 21}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.3}Comparatif des Outils d'\'Enum\'eration Web}{\reset@font\mtcSSfont 21}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.4}Comparatif des Outils de D\'ecouverte de Sous-Domaines}{\reset@font\mtcSSfont 21}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.5}Comparatif des Frameworks Web Backend}{\reset@font\mtcSSfont 21}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.6}Comparatif des Frameworks de Microservices}{\reset@font\mtcSSfont 22}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.7}Comparatif des Moteurs d'IA Locale (LLM)}{\reset@font\mtcSSfont 23}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.8}S\'election de la Base de Donn\'ees, du Moteur de Graphe, du CI/CD et de la Surveillance}{\reset@font\mtcSSfont 24}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.9}Diagramme des \'Etapes du Pipeline DevSecOps}{\reset@font\mtcSSfont 24}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.10}Sch\'ema des Flux de Communication Inter-Microservices}{\reset@font\mtcSSfont 25}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.11}Cycle Continu de Gestion de la Surface d'Attaque (ASM)}{\reset@font\mtcSSfont 25}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {2.}9.12}Matrice des Risques OWASP Top 10}{\reset@font\mtcSSfont 25}{}}

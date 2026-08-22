@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>State Machine - Scan Lifecycle</title>
+<style>
+  @page { size: 1500px 800px; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2937; }
+  .canvas { position: relative; width: 1500px; height: 800px; background: #ffffff; }
+  .title { position:absolute; top:16px; left:0; width:100%; text-align:center; font-size:22px; font-weight:700; color:#111827; }
+  .subtitle { position:absolute; top:46px; left:0; width:100%; text-align:center; font-size:12.5px; color:#6b7280; }
+
+  svg.sm { position:absolute; top:0; left:0; width:1500px; height:800px; z-index:1; }
+
+  .state {
+    position:absolute; width:170px; height:108px;
+    border:2.5px solid; border-radius:14px;
+    background:#ffffff; z-index:2;
+    padding:6px 8px; box-sizing:border-box;
+    text-align:center;
+  }
+  .state .sn { font-size:14px; font-weight:700; }
+  .state .sa { font-size:10.5px; color:#374151; margin-top:4px; line-height:1.3; font-style:italic; }
+  .state .div { height:1px; background:#d1d5db; margin:4px 0; }
+
+  .init    { border-color:#10B981; background:#F0FDF4; }
+  .init .sn { color:#047857; }
+  .normal  { border-color:#3B82F6; background:#EFF6FF; }
+  .normal .sn { color:#1d4ed8; }
+  .terminal{ border-color:#6B7280; background:#F3F4F6; }
+  .terminal .sn { color:#374151; }
+  .error   { border-color:#EF4444; background:#FEE2E2; }
+  .error .sn { color:#b91c1c; }
+
+  .legend {
+    position:absolute; left:30px; top:720px; width:1440px; height:60px;
+    border:1px solid #e5e7eb; border-radius:6px; background:#fafafa;
+    z-index:2; padding:8px 12px; box-sizing:border-box;
+    display:flex; gap:20px; align-items:center; font-size:11.5px; flex-wrap:wrap;
+  }
+  .legend .li { display:flex; align-items:center; gap:6px; }
+  .legend .sw { width:14px; height:10px; border:1.5px solid; border-radius:3px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Figure 4.3 — Machine à états : cycle de vie d'un scan (UML 2.5)</div>
+  <div class="subtitle">États : pending → queued → running → completed | failed | cancelled — retries ×3 sur erreur</div>
+
+  <svg class="sm" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#374151"/>
+      </marker>
+      <marker id="aG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#10B981"/>
+      </marker>
+      <marker id="aB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#1d4ed8"/>
+      </marker>
+      <marker id="aR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#EF4444"/>
+      </marker>
+      <marker id="aGry" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#6B7280"/>
+      </marker>
+    </defs>
+
+    <!-- State box geometry (170x108). Centers:
+         pending(200,300) box(115-285, 246-354)
+         queued(500,300)  box(415-585, 246-354)
+         running(850,300) box(765-935, 246-354)
+         completed(1230,300) box(1145-1315, 246-354)
+         failed(700,580)  box(615-785, 526-634)
+         cancelled(1030,580) box(945-1115, 526-634) -->
+
+    <!-- Initial pseudo-state (filled circle) at (70, 300) -->
+    <circle cx="70" cy="300" r="11" fill="#1f2937"/>
+    <!-- Arrow to pending -->
+    <line x1="81" y1="300" x2="115" y2="300" stroke="#10B981" stroke-width="1.8" marker-end="url(#aG)"/>
+    <text x="98" y="292" text-anchor="middle" font-size="10.5" fill="#047857">create()</text>
+
+    <!-- 1. pending -> queued -->
+    <line x1="285" y1="300" x2="415" y2="300" stroke="#1d4ed8" stroke-width="1.8" marker-end="url(#aB)"/>
+    <text x="350" y="288" text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="600">publish()</text>
+    <text x="350" y="318" text-anchor="middle" font-size="10" fill="#374151">[target valid] / XADD scan:requests</text>
+
+    <!-- 2. queued -> running -->
+    <line x1="585" y1="300" x2="765" y2="300" stroke="#1d4ed8" stroke-width="1.8" marker-end="url(#aB)"/>
+    <text x="675" y="288" text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="600">claim()</text>
+    <text x="675" y="318" text-anchor="middle" font-size="10" fill="#374151">[worker picks up] / XACK + state=running</text>
+
+    <!-- 3. running -> completed -->
+    <line x1="935" y1="300" x2="1145" y2="300" stroke="#10B981" stroke-width="1.8" marker-end="url(#aG)"/>
+    <text x="1040" y="288" text-anchor="middle" font-size="11" fill="#047857" font-weight="600">success()</text>
+    <text x="1040" y="318" text-anchor="middle" font-size="10" fill="#374151">[no error] / commit findings + broadcast</text>
+
+    <!-- 4. running -> failed (down-left) -->
+    <path d="M 800,354 L 800,440 L 700,440 L 700,526" fill="none" stroke="#EF4444" stroke-width="1.8" marker-end="url(#aR)"/>
+    <text x="745" y="432" text-anchor="middle" font-size="11" fill="#b91c1c" font-weight="600">error()</text>
+    <text x="745" y="460" text-anchor="middle" font-size="10" fill="#374151">[attempts ≥ 3] / log + alert</text>
+
+    <!-- 5. running -> cancelled (down-right) -->
+    <path d="M 900,354 L 900,460 L 1030,460 L 1030,526" fill="none" stroke="#6B7280" stroke-width="1.8" marker-end="url(#aGry)"/>
+    <text x="965" y="452" text-anchor="middle" font-size="11" fill="#374151" font-weight="600">user_cancel()</text>
+    <text x="965" y="478" text-anchor="middle" font-size="10" fill="#6b7280">/ kill subprocess + cleanup</text>
+
+    <!-- 6. queued -> cancelled (long down-right) -->
+    <path d="M 500,354 L 500,500 L 945,500 L 945,540 L 980,540" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#aGry)"/>
+    <text x="660" y="494" text-anchor="middle" font-size="10.5" fill="#374151">user_cancel() [before start] / XACK + remove</text>
+
+    <!-- 7. failed -> queued (loop back, manual requeue) -->
+    <path d="M 615,580 L 380,580 L 380,300 L 415,300" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="6 3" marker-end="url(#aB)"/>
+    <text x="378" y="440" text-anchor="middle" font-size="11" fill="#b45309" font-weight="600" transform="rotate(-90 378 440)">requeue() [manual] / attempts++</text>
+
+    <!-- Final pseudo-state after completed -->
+    <circle cx="1355" cy="300" r="12" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <circle cx="1355" cy="300" r="6" fill="#1f2937"/>
+    <line x1="1315" y1="300" x2="1343" y2="300" stroke="#6B7280" stroke-width="1.6" marker-end="url(#aGry)"/>
+
+    <!-- Final pseudo-state after cancelled -->
+    <circle cx="1155" cy="580" r="12" fill="#ffffff" stroke="#1f2937" stroke-width="1.5"/>
+    <circle cx="1155" cy="580" r="6" fill="#1f2937"/>
+    <line x1="1115" y1="580" x2="1143" y2="580" stroke="#6B7280" stroke-width="1.6" marker-end="url(#aGry)"/>
+
+    <!-- Retry self-loop on running (curved) -->
+    <path d="M 850,246 C 850,200 950,200 950,246" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a)"/>
+    <text x="900" y="208" text-anchor="middle" font-size="10" fill="#b45309">retry (×3, backoff)</text>
+
+    <!-- Note: terminal state hint -->
+    <text x="1255" y="395" text-anchor="middle" font-size="10" fill="#6b7280" font-style="italic">état terminal</text>
+    <text x="1155" y="675" text-anchor="middle" font-size="10" fill="#6b7280" font-style="italic">état terminal</text>
+
+  </svg>
+
+  <!-- States -->
+  <div class="state init" style="left:115px; top:246px;">
+    <div class="sn">pending</div>
+    <div class="div"></div>
+    <div class="sa">entry / INSERT scans<br>state='pending'</div>
+  </div>
+
+  <div class="state normal" style="left:415px; top:246px;">
+    <div class="sn">queued</div>
+    <div class="div"></div>
+    <div class="sa">entry / XADD<br>scan:requests *</div>
+  </div>
+
+  <div class="state normal" style="left:765px; top:246px;">
+    <div class="sn">running</div>
+    <div class="div"></div>
+    <div class="sa">do / execute scan<br>(retry ×3, backoff)<br>exit / commit result</div>
+  </div>
+
+  <div class="state terminal" style="left:1145px; top:246px;">
+    <div class="sn">completed</div>
+    <div class="div"></div>
+    <div class="sa">entry / commit findings<br>+ broadcast(Echo)</div>
+  </div>
+
+  <div class="state error" style="left:615px; top:526px;">
+    <div class="sn">failed</div>
+    <div class="div"></div>
+    <div class="sa">entry / log error<br>+ security_alerts<br>+ audit_logs</div>
+  </div>
+
+  <div class="state terminal" style="left:945px; top:526px;">
+    <div class="sn">cancelled</div>
+    <div class="div"></div>
+    <div class="sa">entry / kill subprocess<br>+ cleanup temp<br>+ audit_logs</div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span style="font-weight:700; color:#374151;">Légende :</span>
+    <div class="li"><span class="sw" style="background:#F0FDF4;border-color:#10B981"></span>Initial / succès</div>
+    <div class="li"><span class="sw" style="background:#EFF6FF;border-color:#3B82F6"></span>État actif normal</div>
+    <div class="li"><span class="sw" style="background:#F3F4F6;border-color:#6B7280"></span>Terminal</div>
+    <div class="li"><span class="sw" style="background:#FEE2E2;border-color:#EF4444"></span>Erreur (récupérable)</div>
+    <span style="color:#6b7280;">● état initial &nbsp;·&nbsp; ◎ état terminal &nbsp;·&nbsp; transition : event [guard] / action</span>
+    <span style="color:#b45309;">— — pointillé orange = transition manuelle (requeue)</span>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Chatbot · CyberSec Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #0a0e1a;
+    --surface: #131826;
+    --primary: #7c3aed;
+    --secondary: #06b6d4;
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background-color: var(--background);
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(124, 58, 237, 0.08), transparent 42%),
+      radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.06), transparent 38%);
+    background-attachment: fixed;
+  }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 16rem;
+    background: var(--surface);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+  .brand {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .brand-logo {
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
+  }
+  .brand-logo .material-symbols-rounded { color: white; font-size: 1.25rem; }
+  .brand-text-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: white; font-size: 0.875rem; }
+  .brand-text-sub { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+  nav { flex: 1; overflow-y: auto; padding: 1rem 0.75rem; }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #9ca3af;
+    text-decoration: none;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+  }
+  .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
+  .nav-link.active { background: rgba(124, 58, 237, 0.15); color: white; border-left: 2px solid var(--primary); }
+  .nav-link .material-symbols-rounded { font-size: 1.25rem; }
+  .nav-link .badge { margin-left: auto; }
+  .badge-danger {
+    background: rgba(239, 68, 68, 0.10);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 500;
+  }
+  .admin-section-label {
+    padding: 1rem 0.75rem 0.25rem 0.75rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4b5563;
+  }
+  .user-info { padding: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); }
+  .user-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; }
+  .avatar {
+    height: 2.25rem; width: 2.25rem; border-radius: 9999px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 0.875rem;
+  }
+  .user-name { font-size: 0.875rem; font-weight: 500; color: white; }
+  .user-email { font-size: 0.6875rem; color: #6b7280; }
+  .role-badge {
+    background: rgba(124, 58, 237, 0.10);
+    color: #c4b5fd;
+    border: 1px solid rgba(124, 58, 237, 0.30);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(10, 14, 26, 0.80);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 0 1.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #9ca3af; }
+  .breadcrumb a { color: #9ca3af; text-decoration: none; }
+  .breadcrumb .sep { color: #4b5563; }
+  .breadcrumb .current { color: white; }
+  .search-box { position: relative; margin-left: auto; width: 18rem; }
+  .search-box .material-symbols-rounded {
+    position: absolute; left: 0.625rem; top: 50%; transform: translateY(-50%);
+    color: #6b7280; font-size: 1.125rem;
+  }
+  .search-input {
+    width: 100%;
+    background: rgba(10, 14, 26, 0.6);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem 0.375rem 2.25rem;
+    font-size: 0.875rem; color: white; font-family: inherit; outline: none;
+  }
+  .icon-btn {
+    background: transparent; border: none; color: #d1d5db;
+    padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; position: relative;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,0.05); }
+  .notif-badge {
+    position: absolute; top: 0; right: 0;
+    height: 1rem; min-width: 1rem; padding: 0 0.25rem;
+    border-radius: 9999px; background: var(--danger); color: white;
+    font-size: 0.625rem; display: flex; align-items: center; justify-content: center;
+  }
+  main { flex: 1; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+  .footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.75rem; color: #6b7280;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer .version { font-family: 'JetBrains Mono', monospace; }
+  .page-header {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 600; color: white; }
+  .page-subtitle { font-size: 0.875rem; color: #9ca3af; margin-top: 0.25rem; }
+  .chat-layout {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: 1rem;
+    flex: 1;
+    min-height: 920px;
+  }
+  .context-panel {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .context-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.875rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .context-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-top: 0.5rem;
+  }
+  .context-value {
+    font-size: 0.8125rem;
+    color: #d1d5db;
+  }
+  .context-value.mono { font-family: 'JetBrains Mono', monospace; color: #67e8f9; font-size: 0.75rem; }
+  .context-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .context-stat {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+  }
+  .context-stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 1.125rem; font-weight: 600; color: white; }
+  .context-stat .lbl { font-size: 0.6875rem; color: #6b7280; }
+  .chat-panel {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-header {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .chat-header-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9375rem;
+    color: white;
+  }
+  .chat-header-sub {
+    font-size: 0.6875rem;
+    color: #6b7280;
+  }
+  .ai-status {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: rgba(16, 185, 129, 0.10);
+    border: 1px solid rgba(16, 185, 129, 0.30);
+    color: var(--success);
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.25rem;
+    font-size: 0.6875rem;
+  }
+  .ai-status .dot {
+    width: 0.4375rem; height: 0.4375rem; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+  }
+  .chat-messages {
+    flex: 1;
+    padding: 1.25rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .msg { display: flex; gap: 0.75rem; }
+  .msg-avatar {
+    height: 2rem; width: 2rem; border-radius: 0.375rem;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 0.8125rem; flex-shrink: 0;
+  }
+  .msg.user .msg-avatar {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+  }
+  .msg.ai .msg-avatar {
+    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(124, 58, 237, 0.30);
+    color: #c4b5fd;
+  }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  .msg-meta .name { color: white; font-weight: 500; }
+  .msg-meta .role {
+    background: rgba(124, 58, 237, 0.10);
+    color: #c4b5fd;
+    border: 1px solid rgba(124, 58, 237, 0.30);
+    padding: 0.0625rem 0.375rem;
+    border-radius: 0.1875rem;
+    font-size: 0.625rem;
+  }
+  .msg-content {
+    font-size: 0.875rem;
+    color: #d1d5db;
+    line-height: 1.55;
+  }
+  .msg-content p { margin-bottom: 0.5rem; }
+  .msg-content p:last-child { margin-bottom: 0; }
+  .msg-content code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    background: rgba(255,255,255,0.06);
+    color: #67e8f9;
+    padding: 0.0625rem 0.3125rem;
+    border-radius: 0.1875rem;
+  }
+  .msg-content pre {
+    background: #0a0e1a;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: #d1d5db;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+    line-height: 1.5;
+  }
+  .msg-content pre .ok { color: var(--success); }
+  .msg-content pre .warn { color: var(--warning); }
+  .msg-content pre .crit { color: var(--danger); }
+  .msg-content pre .info { color: #67e8f9; }
+  .msg-content ul { margin: 0.375rem 0 0.5rem 1.25rem; }
+  .msg-content li { margin-bottom: 0.25rem; }
+  .msg-content strong { color: white; }
+  .citations {
+    margin-top: 0.75rem;
+    background: rgba(6, 182, 212, 0.06);
+    border: 1px solid rgba(6, 182, 212, 0.20);
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+  }
+  .citations-title {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #67e8f9;
+    margin-bottom: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .citation-list { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+  .citation-chip {
+    background: rgba(6, 182, 212, 0.08);
+    border: 1px solid rgba(6, 182, 212, 0.20);
+    color: #67e8f9;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 0.1875rem;
+    font-size: 0.6875rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .chat-input-bar {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 0.75rem 1rem;
+    background: rgba(10, 14, 26, 0.4);
+  }
+  .chat-input-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    background: rgba(10, 14, 26, 0.6);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.625rem;
+  }
+  .chat-input-wrap:focus-within { border-color: rgba(124, 58, 237, 0.50); }
+  .chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-family: inherit;
+    font-size: 0.875rem;
+    resize: none;
+    min-height: 1.5rem;
+    line-height: 1.5;
+  }
+  .chat-send-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chat-hints {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .hint-chip {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #9ca3af;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.25rem;
+    font-size: 0.6875rem;
+    cursor: pointer;
+  }
+  .hint-chip:hover { color: white; border-color: rgba(124, 58, 237, 0.40); }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><span class="material-symbols-rounded">shield</span></div>
+      <div>
+        <div class="brand-text-name">CyberSec</div>
+        <div class="brand-text-sub">Platform</div>
+      </div>
+    </div>
+    <nav>
+      <a class="nav-link"><span class="material-symbols-rounded">grid_view</span><span>Dashboard</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">folder</span><span>Projects</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">radar</span><span>Scans</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">description</span><span>Reports</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">notifications_active</span><span>Security Alerts</span><span class="badge badge-danger">7</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">monitoring</span><span>Monitoring</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">science</span><span>Sandbox</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">hub</span><span>Knowledge Graph</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">travel_explore</span><span>OSINT</span></a>
+      <a class="nav-link active"><span class="material-symbols-rounded">smart_toy</span><span>AI Chatbot</span></a>
+      <div class="admin-section-label">Administration</div>
+      <a class="nav-link"><span class="material-symbols-rounded">group</span><span>Users</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">receipt_long</span><span>Audit Logs</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">health_and_safety</span><span>System Health</span></a>
+    </nav>
+    <div class="user-info">
+      <div class="user-row">
+        <div class="avatar">A</div>
+        <div>
+          <div class="user-name">Aymen Azizi</div>
+          <div class="user-email">admin@cybersec.local</div>
+        </div>
+      </div>
+      <div class="role-badge">Admin</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header>
+      <nav class="breadcrumb">
+        <a href="#">Home</a>
+        <span class="sep">/</span>
+        <a href="#">Analysis</a>
+        <span class="sep">/</span>
+        <span class="current">AI Chatbot</span>
+      </nav>
+      <div class="search-box">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" class="search-input" placeholder="Search projects, scans…">
+      </div>
+      <button class="icon-btn">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="notif-badge">7</span>
+      </button>
+      <button class="icon-btn"><span class="material-symbols-rounded">dark_mode</span></button>
+    </header>
+
+    <main>
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">AI Chatbot</h1>
+          <p class="page-subtitle">Conversational analyst grounded in scan context — every answer cites the underlying finding.</p>
+        </div>
+        <div class="ai-status">
+          <span class="dot"></span>
+          <span>qwen2.5-coder:7b · Ollama connected</span>
+        </div>
+      </div>
+
+      <div class="chat-layout">
+        <!-- Context Panel -->
+        <aside class="context-panel">
+          <div class="context-title">
+            <span class="material-symbols-rounded" style="font-size:1.125rem;color:#c4b5fd">tune</span>
+            Conversation Context
+          </div>
+
+          <div>
+            <div class="context-label">Active Project</div>
+            <div class="context-value">TEK-UP External Perimeter</div>
+          </div>
+          <div>
+            <div class="context-label">Target</div>
+            <div class="context-value mono">https://www.ensit.tn</div>
+          </div>
+          <div>
+            <div class="context-label">Last Scan</div>
+            <div class="context-value mono">scan-7f3a2c91 · nuclei</div>
+            <div class="context-value" style="font-size:0.6875rem;color:#6b7280;margin-top:0.125rem">Completed 14 min ago</div>
+          </div>
+
+          <div class="context-stat-grid">
+            <div class="context-stat">
+              <div class="num" style="color:var(--danger)">3</div>
+              <div class="lbl">Critical</div>
+            </div>
+            <div class="context-stat">
+              <div class="num" style="color:var(--warning)">7</div>
+              <div class="lbl">High</div>
+            </div>
+            <div class="context-stat">
+              <div class="num" style="color:#facc15">12</div>
+              <div class="lbl">Medium</div>
+            </div>
+            <div class="context-stat">
+              <div class="num" style="color:#60a5fa">28</div>
+              <div class="lbl">Low / Info</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="context-label">Retrieved Context</div>
+            <div class="context-value" style="font-size:0.75rem;line-height:1.5;color:#9ca3af">
+              50 findings indexed via pgvector. Top-k=8 chunks retrieved per query (cosine similarity &gt; 0.78).
+            </div>
+          </div>
+
+          <div>
+            <div class="context-label">Token Usage</div>
+            <div class="context-value mono" style="font-size:0.6875rem">
+              prompt: 1,842 · completion: 612<br>
+              total: 2,454 / 8,192
+            </div>
+          </div>
+        </aside>
+
+        <!-- Chat Panel -->
+        <section class="chat-panel">
+          <div class="chat-header">
+            <span class="material-symbols-rounded" style="color:#c4b5fd">smart_toy</span>
+            <div>
+              <div class="chat-header-title">CyberSec Assistant</div>
+              <div class="chat-header-sub">Grounded on scan-7f3a2c91 · 50 findings · 8 citations retrieved</div>
+            </div>
+            <span class="ai-status">
+              <span class="dot"></span>
+              Online
+            </span>
+          </div>
+
+          <div class="chat-messages">
+            <!-- User Q1 -->
+            <div class="msg user">
+              <div class="msg-avatar">A</div>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="name">Aymen Azizi</span>
+                  <span class="role">Admin</span>
+                  <span>· 14:32</span>
+                </div>
+                <div class="msg-content">
+                  <p>Summarize the most critical findings from the last scan on <code>https://www.ensit.tn</code> and tell me which one I should remediate first.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI A1 -->
+            <div class="msg ai">
+              <div class="msg-avatar"><span class="material-symbols-rounded" style="font-size:1.125rem">smart_toy</span></div>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="name">CyberSec Assistant</span>
+                  <span class="role">qwen2.5-coder:7b</span>
+                  <span>· 14:32 · 1.8s</span>
+                </div>
+                <div class="msg-content">
+                  <p>Scan <code>scan-7f3a2c91</code> (nuclei, balanced profile) completed at 14:18 UTC against <code>https://www.ensit.tn</code> and surfaced <strong>3 critical</strong>, 7 high, 12 medium, and 28 low/info findings. The three critical findings, ranked by combined exploitability and impact, are:</p>
+                  <ul>
+                    <li><strong>CVE-2023-5678</strong> — WordPress Plugin SQL Injection in <code>contact-form-7 v5.5.4</code>. CVSS 9.8. Unauthenticated, allows <code>UNION</code>-based extraction of the <code>wp_users</code> table.</li>
+                    <li><strong>Git Config Exposure</strong> — <code>/.git/config</code> is publicly reachable and discloses the repository URL plus 312 committed objects, enabling full source-code reconstruction via <code>git-dumper</code>.</li>
+                    <li><strong>CVE-2024-1234</strong> — OpenSSL 1.1.1k on port 443 vulnerable to a pre-auth memory disclosure (CVSS 9.1).</li>
+                  </ul>
+                  <p><strong>Recommendation: remediate CVE-2023-5678 first.</strong> It is unauthenticated, remotely exploitable, and exposes the credential store — an attacker can pivot to admin takeover in under five minutes using publicly available PoCs. The Git exposure is severe but disclosure-only; the OpenSSL bug requires client-side interaction.</p>
+                  <div class="citations">
+                    <div class="citations-title">
+                      <span class="material-symbols-rounded" style="font-size:0.875rem">format_quote</span>
+                      Citations (8 retrieved)
+                    </div>
+                    <div class="citation-list">
+                      <span class="citation-chip">finding-3f9a · CVE-2023-5678</span>
+                      <span class="citation-chip">finding-4c12 · Git Config</span>
+                      <span class="citation-chip">finding-7d8e · CVE-2024-1234</span>
+                      <span class="citation-chip">scan-7f3a2c91</span>
+                      <span class="citation-chip">cvss-bundle-v4</span>
+                      <span class="citation-chip">wp-plugin-db</span>
+                      <span class="citation-chip">nuclei-template-0044</span>
+                      <span class="citation-chip">remediation-playbook-12</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Q2 -->
+            <div class="msg user">
+              <div class="msg-avatar">A</div>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="name">Aymen Azizi</span>
+                  <span class="role">Admin</span>
+                  <span>· 14:33</span>
+                </div>
+                <div class="msg-content">
+                  <p>Give me the exact bash command to verify CVE-2023-5678 manually, and the Ansible task to patch it.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI A2 -->
+            <div class="msg ai">
+              <div class="msg-avatar"><span class="material-symbols-rounded" style="font-size:1.125rem">smart_toy</span></div>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="name">CyberSec Assistant</span>
+                  <span class="role">qwen2.5-coder:7b</span>
+                  <span>· 14:33 · 2.3s</span>
+                </div>
+                <div class="msg-content">
+                  <p><strong>1. Manual verification (non-destructive, time-based blind SQLi proof):</strong></p>
+<pre><span class="info">$</span> curl -sk -o /dev/null -w "%{time_total}\n" \
+    "https://www.ensit.tn/?cf7_id=1&amp;cf7_name='||(SELECT IF(SUBSTRING(user_pass,1,1)='\$P',SLEEP(5),0) FROM wp_users WHERE ID=1)-- -"
+<span class="warn">5.0432</span>
+<span class="ok">$</span> <span class="info"># response took &gt;5s → SQL injection confirmed</span></pre>
+                  <p><strong>2. Ansible task to patch the plugin (idempotent, pinned to fixed version 5.6):</strong></p>
+<pre>- name: Patch Contact Form 7 to non-vulnerable version
+  ansible.builtin.command: >
+    wp plugin update contact-form-7
+    --version=5.6 --path=/var/www/wordpress
+  args:
+    chdir: /var/www/wordpress
+  register: cf7_patch
+  changed_when: "'Updated successfully' in cf7_patch.stdout"
+  become: yes
+  become_user: www-data
+
+- name: <span class="ok">Verify patch applied</span>
+  ansible.builtin.command: wp plugin list --path=/var/www/wordpress
+  register: wp_plugins
+  changed_when: false
+
+- name: Assert CF7 version &gt;= 5.6
+  ansible.builtin.assert:
+    that:
+      - "'contact-form-7 | 5.6' in wp_plugins.stdout or 'contact-form-7 | 5.7' in wp_plugins.stdout"
+    fail_msg: <span class="crit">"CF7 still vulnerable — patch failed"</span>
+    success_msg: <span class="ok">"CF7 patched successfully"</span></pre>
+                  <p>After applying, re-run <code>nuclei -t cves/2023/CVE-2023-5678.yaml</code> to confirm the finding is no longer reproducible. Expected scan output: <code>[inf] [CVE-2023-5678] No matching pattern found</code>.</p>
+                  <div class="citations">
+                    <div class="citations-title">
+                      <span class="material-symbols-rounded" style="font-size:0.875rem">format_quote</span>
+                      Citations (5 retrieved)
+                    </div>
+                    <div class="citation-list">
+                      <span class="citation-chip">finding-3f9a · CVE-2023-5678</span>
+                      <span class="citation-chip">remediation-playbook-12</span>
+                      <span class="citation-chip">nuclei-template-0044</span>
+                      <span class="citation-chip">wp-cve-feed</span>
+                      <span class="citation-chip">ansible-galaxy/wordpress-hardening</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Q3 -->
+            <div class="msg user">
+              <div class="msg-avatar">A</div>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="name">Aymen Azizi</span>
+                  <span class="role">Admin</span>
+                  <span>· 14:34</span>
+                </div>
+                <div class="msg-content">
+                  <p>What is the blast radius if CVE-2023-5678 is exploited? Show me the asset graph.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI A3 -->
+            <div class="msg ai">
+              <div class="msg-avatar"><span class="material-symbols-rounded" style="font-size:1.125rem">smart_toy</span></div>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="name">CyberSec Assistant</span>
+                  <span class="role">qwen2.5-coder:7b</span>
+                  <span>· 14:34 · 3.1s</span>
+                </div>
+                <div class="msg-content">
+                  <p>Querying the knowledge graph (Apache AGE) from asset <code>asset-www-ensit-tn</code> with a 3-hop BFS yields the following blast-radius:</p>
+<pre><span class="info">asset-www-ensit-tn</span> (host) ── hosts ──▶ <span class="warn">service-wp-5.5.4</span> (web-app)
+                                         └── has-vuln ──▶ <span class="crit">CVE-2023-5678</span> (vuln)
+                                                            │
+                                                            ▼
+                                              cred-leak-path ──▶ <span class="crit">asset-db-mysql-01</span> (db)
+                                                                   │
+                                                                   ├── trusts ──▶ <span class="warn">asset-bastion-01</span> (host)
+                                                                   │                └── exposes ──▶ service-ssh-22
+                                                                   │
+                                                                   └── hosts ──▶ <span class="warn">service-wp-cli</span>
+                                                                                  └── cred-reuse ──▶ <span class="crit">asset-prod-k8s</span> (cluster)</pre>
+                  <p><strong>Blast radius summary:</strong> 6 assets reachable within 3 hops. Two of them (<code>asset-db-mysql-01</code>, <code>asset-prod-k8s</code>) are production-tier. If <code>wp_users</code> is exfiltrated and the same MySQL root password is reused on the bastion (flagged by credential-reuse heuristic), the attacker reaches the Kubernetes cluster admin in &lt;2 hours of dwell time.</p>
+                  <p><strong>Mitigation priority:</strong></p>
+                  <ul>
+                    <li>Block <code>CF7</code> at WAF rule level immediately (less than 1 minute, no application change).</li>
+                    <li>Rotate MySQL root + WordPress admin credentials within 4 hours.</li>
+                    <li>Apply the Ansible patch from the previous turn within 24 hours.</li>
+                  </ul>
+                  <div class="citations">
+                    <div class="citations-title">
+                      <span class="material-symbols-rounded" style="font-size:0.875rem">format_quote</span>
+                      Citations (7 retrieved)
+                    </div>
+                    <div class="citation-list">
+                      <span class="citation-chip">asset-www-ensit-tn</span>
+                      <span class="citation-chip">asset-db-mysql-01</span>
+                      <span class="citation-chip">asset-bastion-01</span>
+                      <span class="citation-chip">asset-prod-k8s</span>
+                      <span class="citation-chip">blast-radius-graph</span>
+                      <span class="citation-chip">cred-reuse-heuristic-v2</span>
+                      <span class="citation-chip">finding-3f9a</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-bar">
+            <div class="chat-input-wrap">
+              <textarea class="chat-input" rows="1" placeholder="Ask about findings, remediation, blast radius…"></textarea>
+              <button class="chat-send-btn"><span class="material-symbols-rounded" style="font-size:1.125rem">send</span></button>
+            </div>
+            <div class="chat-hints">
+              <span class="hint-chip">Summarize all critical findings</span>
+              <span class="hint-chip">Generate remediation script for Git exposure</span>
+              <span class="hint-chip">Show blast radius of asset-db-mysql-01</span>
+              <span class="hint-chip">Export findings as PDF</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div class="footer">
+      <span>© 2026 CyberSec Platform — Final Year Project — TEK-UP</span>
+      <span class="version">CyberSec Platform v1.0 · qwen2.5-coder:7b</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

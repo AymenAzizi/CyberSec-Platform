@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch Scan · CyberSec Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #0a0e1a;
+    --surface: #131826;
+    --primary: #7c3aed;
+    --secondary: #06b6d4;
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background-color: var(--background);
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(124, 58, 237, 0.08), transparent 42%),
+      radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.06), transparent 38%);
+    background-attachment: fixed;
+  }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 16rem;
+    background: var(--surface);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+  .brand {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .brand-logo {
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
+  }
+  .brand-logo .material-symbols-rounded { color: white; font-size: 1.25rem; }
+  .brand-text-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: white; font-size: 0.875rem; }
+  .brand-text-sub { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+  nav { flex: 1; overflow-y: auto; padding: 1rem 0.75rem; }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #9ca3af;
+    text-decoration: none;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+  }
+  .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
+  .nav-link.active { background: rgba(124, 58, 237, 0.15); color: white; border-left: 2px solid var(--primary); }
+  .nav-link .material-symbols-rounded { font-size: 1.25rem; }
+  .nav-link .badge { margin-left: auto; }
+  .badge-danger {
+    background: rgba(239, 68, 68, 0.10);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 500;
+  }
+  .admin-section-label {
+    padding: 1rem 0.75rem 0.25rem 0.75rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4b5563;
+  }
+  .user-info { padding: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); }
+  .user-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; }
+  .avatar {
+    height: 2.25rem; width: 2.25rem; border-radius: 9999px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 0.875rem;
+  }
+  .user-name { font-size: 0.875rem; font-weight: 500; color: white; }
+  .user-email { font-size: 0.6875rem; color: #6b7280; }
+  .role-badge {
+    background: rgba(124, 58, 237, 0.10);
+    color: #c4b5fd;
+    border: 1px solid rgba(124, 58, 237, 0.30);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(10, 14, 26, 0.80);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 0 1.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #9ca3af; }
+  .breadcrumb a { color: #9ca3af; text-decoration: none; }
+  .breadcrumb .sep { color: #4b5563; }
+  .breadcrumb .current { color: white; }
+  .search-box { position: relative; margin-left: auto; width: 18rem; }
+  .search-box .material-symbols-rounded {
+    position: absolute; left: 0.625rem; top: 50%; transform: translateY(-50%);
+    color: #6b7280; font-size: 1.125rem;
+  }
+  .search-input {
+    width: 100%;
+    background: rgba(10, 14, 26, 0.6);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem 0.375rem 2.25rem;
+    font-size: 0.875rem; color: white; font-family: inherit; outline: none;
+  }
+  .icon-btn {
+    background: transparent; border: none; color: #d1d5db;
+    padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; position: relative;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,0.05); }
+  .notif-badge {
+    position: absolute; top: 0; right: 0;
+    height: 1rem; min-width: 1rem; padding: 0 0.25rem;
+    border-radius: 9999px; background: var(--danger); color: white;
+    font-size: 0.625rem; display: flex; align-items: center; justify-content: center;
+  }
+  main { flex: 1; padding: 1.5rem; }
+  .footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.75rem; color: #6b7280;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer .version { font-family: 'JetBrains Mono', monospace; }
+  .page-header { margin-bottom: 1.5rem; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 600; color: white; }
+  .page-subtitle { font-size: 0.875rem; color: #9ca3af; margin-top: 0.25rem; }
+  .form-container { max-width: 64rem; margin: 0 auto; }
+  .card {
+    background: var(--surface);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.125rem; color: white; margin-bottom: 1rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { margin-bottom: 1rem; }
+  .label {
+    display: block; font-size: 0.75rem; font-weight: 500;
+    color: #9ca3af; margin-bottom: 0.375rem;
+  }
+  .input, select.input {
+    width: 100%;
+    background: rgba(10, 14, 26, 0.6);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem; color: white; font-family: inherit; outline: none;
+  }
+  .auth-status { font-size: 0.75rem; color: #34d399; margin-top: 0.25rem; }
+  .group-label {
+    font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em;
+    color: #6b7280; margin-bottom: 0.5rem;
+  }
+  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+  .type-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .type-card.selected {
+    border-color: var(--primary);
+    background: rgba(124, 58, 237, 0.10);
+  }
+  .type-card .name { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: white; }
+  .type-card .desc { font-size: 0.6875rem; color: #6b7280; margin-top: 0.125rem; }
+  .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .profile-card.selected {
+    border-color: var(--primary);
+    background: rgba(124, 58, 237, 0.10);
+  }
+  .profile-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .profile-header .material-symbols-rounded { font-size: 1.25rem; }
+  .profile-header .name { font-weight: 500; color: white; }
+  .profile-card .desc { font-size: 0.75rem; color: #6b7280; }
+  .cyan-text { color: #22d3ee; }
+  .violet-text { color: #c4b5fd; }
+  .red-text { color: #fca5a5; }
+  .aggressive-warning {
+    display: flex; align-items: flex-start; gap: 0.5rem;
+    background: rgba(245, 158, 11, 0.10);
+    border: 1px solid rgba(245, 158, 11, 0.30);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    color: #fde68a;
+    font-size: 0.875rem;
+  }
+  .aggressive-warning input { margin-top: 0.25rem; accent-color: var(--accent); }
+  .advanced-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.75rem 0.75rem 0 0;
+    cursor: pointer;
+    color: white; font-weight: 500;
+  }
+  .advanced-toggle .material-symbols-rounded { color: #9ca3af; }
+  .advanced-content {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-top: none;
+    border-radius: 0 0 0.75rem 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .form-actions {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 0.75rem; margin-top: 1.5rem;
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem; padding: 0.5rem 1rem;
+    border-radius: 0.5rem; font-weight: 500; font-size: 0.875rem;
+    border: none; cursor: pointer; font-family: inherit; text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-outline {
+    background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb;
+  }
+  .chatbot-fab {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 40;
+    height: 3rem; width: 3rem; border-radius: 9999px;
+    background: var(--primary); color: white; border: none; cursor: pointer;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
+    display: flex; align-items: center; justify-content: center;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><span class="material-symbols-rounded">shield</span></div>
+      <div>
+        <div class="brand-text-name">CyberSec</div>
+        <div class="brand-text-sub">Platform</div>
+      </div>
+    </div>
+    <nav>
+      <a class="nav-link"><span class="material-symbols-rounded">grid_view</span><span>Dashboard</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">folder</span><span>Projects</span></a>
+      <a class="nav-link active"><span class="material-symbols-rounded">radar</span><span>Scans</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">description</span><span>Reports</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">notifications_active</span><span>Security Alerts</span><span class="badge badge-danger">7</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">monitoring</span><span>Monitoring</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">science</span><span>Sandbox</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">hub</span><span>Knowledge Graph</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">travel_explore</span><span>OSINT</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">smart_toy</span><span>AI Chatbot</span></a>
+      <div class="admin-section-label">Administration</div>
+      <a class="nav-link"><span class="material-symbols-rounded">group</span><span>Users</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">receipt_long</span><span>Audit Logs</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">health_and_safety</span><span>System Health</span></a>
+    </nav>
+    <div class="user-info">
+      <div class="user-row">
+        <div class="avatar">A</div>
+        <div>
+          <div class="user-name">Aymen Azizi</div>
+          <div class="user-email">admin@cybersec.local</div>
+        </div>
+      </div>
+      <div class="role-badge">Admin</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header>
+      <nav class="breadcrumb">
+        <a href="#">Home</a>
+        <span class="sep">/</span>
+        <a href="#">Scans</a>
+        <span class="sep">/</span>
+        <span class="current">New</span>
+      </nav>
+      <div class="search-box">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" class="search-input" placeholder="Search projects, scans…">
+      </div>
+      <button class="icon-btn">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="notif-badge">7</span>
+      </button>
+      <button class="icon-btn"><span class="material-symbols-rounded">dark_mode</span></button>
+    </header>
+
+    <main>
+      <div class="form-container">
+        <div class="page-header">
+          <h1 class="page-title">Launch Scan</h1>
+          <p class="page-subtitle">Select a target and a scan type. Profiles enforce rate limits and jitter.</p>
+        </div>
+
+        <form>
+          <div class="card">
+            <h2 class="card-title">Target</h2>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="label">Project *</label>
+                <select class="input">
+                  <option selected>Tek-Up External Pentest Q4 2026</option>
+                  <option>Internal Lab Reconnaissance</option>
+                  <option>OSINT Coverage Check</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="label">Target *</label>
+                <select class="input">
+                  <option selected>tekup.tn (https://tekup.tn)</option>
+                </select>
+                <div class="auth-status">✓ Target is authorized for scanning.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Scan Type</h2>
+            <div style="margin-bottom:1rem">
+              <div class="group-label">Reconnaissance</div>
+              <div class="type-grid">
+                <div class="type-card selected"><div class="name">nmap</div><div class="desc">Port & service discovery</div></div>
+                <div class="type-card"><div class="name">nuclei</div><div class="desc">Vulnerability templates</div></div>
+                <div class="type-card"><div class="name">gobuster</div><div class="desc">Directory/file brute force</div></div>
+                <div class="type-card"><div class="name">subfinder</div><div class="desc">Passive subdomain enumeration</div></div>
+                <div class="type-card"><div class="name">wpscan</div><div class="desc">WordPress enumeration</div></div>
+              </div>
+            </div>
+            <div style="margin-bottom:1rem">
+              <div class="group-label">Security Testing</div>
+              <div class="type-grid">
+                <div class="type-card"><div class="name">attack_detect</div><div class="desc">Headers, methods, sensitive paths</div></div>
+                <div class="type-card"><div class="name">injection_full</div><div class="desc">SQL + Command + XSS combined</div></div>
+                <div class="type-card"><div class="name">injection_sql</div><div class="desc">SQL injection payloads</div></div>
+                <div class="type-card"><div class="name">injection_cmd</div><div class="desc">OS command injection</div></div>
+                <div class="type-card"><div class="name">injection_xss</div><div class="desc">Cross-site scripting payloads</div></div>
+                <div class="type-card"><div class="name">waf_detect</div><div class="desc">WAF fingerprinting</div></div>
+                <div class="type-card"><div class="name">prevention_check</div><div class="desc">Defense verification</div></div>
+                <div class="type-card"><div class="name">osint</div><div class="desc">Passive OSINT collection</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="group-label">Sandbox Testing</div>
+              <div class="type-grid">
+                <div class="type-card"><div class="name">sandbox_full</div><div class="desc">Full sandboxed exploit suite</div></div>
+                <div class="type-card"><div class="name">sandbox_sqli</div><div class="desc">Sandboxed SQLi validation</div></div>
+                <div class="type-card"><div class="name">sandbox_cmdi</div><div class="desc">Sandboxed command injection</div></div>
+                <div class="type-card"><div class="name">sandbox_xss</div><div class="desc">Sandboxed XSS validation</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Profile</h2>
+            <div class="profile-grid">
+              <div class="profile-card">
+                <div class="profile-header">
+                  <span class="material-symbols-rounded cyan-text">visibility_off</span>
+                  <span class="name">Silent</span>
+                </div>
+                <p class="desc">IDS-evasion · 1–2 req/s, 500–2000ms jitter, 1200s timeout</p>
+              </div>
+              <div class="profile-card selected">
+                <div class="profile-header">
+                  <span class="material-symbols-rounded violet-text">balance</span>
+                  <span class="name">Balanced</span>
+                </div>
+                <p class="desc">Default · 8 req/s, 100–500ms jitter, 600s timeout</p>
+              </div>
+              <div class="profile-card">
+                <div class="profile-header">
+                  <span class="material-symbols-rounded red-text">whatshot</span>
+                  <span class="name">Aggressive</span>
+                </div>
+                <p class="desc">Requires approval · 25 req/s, 0–100ms jitter, 300s timeout — INTERNAL USE ONLY</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="advanced-toggle">
+              <span style="display:flex;align-items:center;gap:0.5rem">
+                <span class="material-symbols-rounded" style="font-size:1.125rem">tune</span> Advanced configuration
+              </span>
+              <span class="material-symbols-rounded">chevron_right</span>
+            </div>
+            <div class="advanced-content">
+              <div class="form-group">
+                <label class="label">Custom ports (comma-separated)</label>
+                <input type="text" class="input" style="font-family:'JetBrains Mono',monospace" placeholder="80,443,8080-8090">
+              </div>
+              <div class="form-group">
+                <label class="label">Excluded paths (one per line)</label>
+                <textarea class="input" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;min-height:90px" placeholder="/admin&#10;/backup"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="label">Custom tool flags</label>
+                <input type="text" class="input" style="font-family:'JetBrains Mono',monospace" placeholder="--script=vuln --version-intensity=5">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <a href="#" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <span class="material-symbols-rounded" style="font-size:1rem">rocket_launch</span> Launch Scan
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <div class="footer">
+      <span>© 2026 CyberSec Platform — Final Year Project — TEK-UP</span>
+      <span class="version">CyberSec Platform v1.0</span>
+    </div>
+  </div>
+</div>
+<button class="chatbot-fab" aria-label="Open chatbot">
+  <span class="material-symbols-rounded">smart_toy</span>
+</button>
+</body>
+</html>

@@ -1,0 +1,177 @@
+\chapter{Cadre G\'en\'eral du Projet}
+
+\section*{Introduction}
+\par Ce premier chapitre pose le cadre m\'ethodologique, industriel et op\'erationnel de notre projet de fin d'\'etudes. Nous commen\c{c}ons par pr\'esenter l'organisme d'accueil, \textbf{Designet Web Agency}, ainsi que son positionnement sur le march\'e des technologies de l'information. Nous d\'ecrivons ensuite le contexte industriel marqu\'e par l'expansion exponentielle des cybermenaces ciblant les surfaces d'attaque externes. Nous dressons un \'etat des lieux critique des proc\'edures d'audit traditionnelles et une analyse comparative approfondie des solutions du march\'e, avant de formaliser la probl\'ematique, la solution propos\'ee, les objectifs g\'en\'eraux et sp\'ecifiques ainsi que le p\'erim\`etre d'application du projet. Enfin, nous d\'etaillons la m\'ethodologie Agile Scrum retenue, ses art\'efacts, et le calendrier complet des r\'ealisations.
+
+\section{Pr\'esentation de l'Organisme d'Accueil}
+\subsection{Identit\'e et Domaines d'Activit\'e}
+\par \textbf{Designet Web Agency} est une entreprise d'ing\'enierie logicielle et de services num\'eriques bas\'ee \`a Menzel Temime (Tunisie). Fond\'ee par des experts en technologies web et infrastructures r\'eseaux, l'agence s'est forg\'ee une solide r\'eputation dans le d\'eveloppement de plateformes critiques sur mesure, l'infog\'erance Cloud, et le conseil en cybers\'ecurit\'e op\'erationnelle. Elle accompagne un portefeuille diversifi\'e de clients (entreprises priv\'ees, \'etablissements financiers, collectivit\'es) dans la transformation et la s\'ecurisation de leurs actifs num\'eriques.
+\par Les activit\'es principales de la soci\'et\'e s'articulent autour de quatre p\^oles d'excellence :
+\begin{itemize}
+    \item \textbf{Ing\'enierie Logicielle \& Web Avanc\'e :} Conception d'architectures applicatives complexes sous des frameworks modernes (Laravel, Node.js, Python), int\'egrant des exigences \'elev\'ees de mont\'ee en charge et d'ergonomie utilisateur.
+    \item \textbf{Administration Syst\`eme \& Cloud DevOps :} D\'eploiement, orchestration de conteneurs (Docker, Kubernetes) et automatisation de pipelines d'int\'egration et de livraison continues.
+    \item \textbf{Audit \& Conseil en Cybers\'ecurit\'e :} R\'ealisation de tests d'intrusion (\textit{pentesting}), revues de code source, \'evaluations de conformit\'e et r\'eponse \`a incidents.
+    \item \textbf{Solutions M\'etier et R\&D :} D\'eveloppement d'outils internes visant \`a automatiser les processus op\'erationnels et \`a r\'eduire les d\'elais de livraison des prestations d'audit.
+\end{itemize}
+
+\subsection{Cadre Institutionnel du Stage}
+\par Ce Projet de Fin d'\'Etudes (PFE) s'inscrit dans le cadre de l'obtention du Dipl\^ome National d'Ing\'enieur en Sciences Appliqu\'ees et Technologiques, sp\'ecialit\'e S\'ecurit\'e des Syst\`emes Informatiques et R\'eseaux (SSIR), au sein de l'\'Ecole Sup\'erieure Priv\'ee de Technologies et d'Ing\'enierie (\textbf{TEK-UP}).
+\par Le stage s'est d\'eroul\'e sur une p\'eriode de cinq mois, du \textbf{2 f\'evrier 2026 au 2 juillet 2026}. L'encadrement industriel a \'et\'e assur\'e par \textbf{M. Ali DORBOZ}, Directeur Technique (CTO) de Designet Web Agency, tandis que l'encadrement p\'edagogique a \'et\'e confi\'e \`a \textbf{Mme Sonia BEN AISSA}, Enseignante-chercheuse \`a l'\'Ecole TEK-UP.
+
+\section{Contexte Industriel et Motivations}
+\par La g\'en\'eralisation des mod\`eles d'infrastructure hybrides et multi-cloud a fragment\'e les p\'erim\`etres r\'eseaux des organisations. Contrairement aux mod\`eles informatiques classiques o\`u la s\'ecurit\'e reposait sur une d\'efense p\'erim\'etrique cloisonn\'ee (\textit{Castle-and-Moat}), les entreprises modernes exploitent des centaines d'actifs expos\'es : applications web, interfaces de programmation (API), passerelles distantes, sous-domaines temporaires de test et services SaaS.
+\par Dans ce contexte, la gestion continue de la surface d'attaque externe (\textit{External Attack Surface Management} -- EASM) r\'epond \`a un imp\'eratif strat\'egique : d\'ecouvrir et auditer en permanence l'ensemble des actifs accessibles depuis l'Internet public avant qu'un attaquant ne puisse identifier et exploiter une faille. Selon les observations r\'ecentes du secteur, une vuln\'erabilit\'e critique est souvent exploit\'ee par des acteurs malveillants dans les heures suivant sa divulgation, ce qui rend obsol\`etes les audits manuels espac\'es dans le temps.
+
+\section{\'Etude de l'Existant et Analyse Critique}
+\subsection{Proc\'edure d'Audit Traditionnelle}
+\par L'analyse des pratiques d'audit observ\'ees chez Designet Web Agency et dans l'industrie r\'ev\`ele une forte d\'ependance \`a des processus manuels s\'equentiels :
+\begin{enumerate}
+    \item L'auditeur ex\'ecute manuellement un ensemble d'outils CLI sur son terminal local (Nmap pour la cartographie des ports, Subfinder pour l'OSINT, Gobuster pour l'\'enum\'eration web, Nuclei pour les signatures de vuln\'erabilit\'es).
+    \item Chaque outil g\'en\`ere des fichiers de sortie bruts h\'et\'erog\`enes (XML, JSON, CSV ou texte brut non structur\'e).
+    \item L'auditeur lit, filtre et interpr\`ete manuellement ces donn\'ees pour \'eliminer les faux positifs.
+    \item Les r\'esultats sont ensuite transcrits manuellement dans un document traitement de texte ou un tableur afin de r\'ediger le rapport d'expertise remis au client.
+\end{enumerate}
+
+\subsection{Limites de la D\'emarche Traditionnelle}
+\par Ce mode op\'eratoire pr\'esente cinq limites fondamentales :
+\begin{itemize}
+    \item \textbf{Lenteur et co\^ut op\'erationnel \'elev\'e :} Le temps consacr\'e \`a la saisie et au filtrage manuel r\'eduit le temps r\'eellement d\'edi\'e \`a l'analyse approfondie des risques.
+    \item \textbf{Absence de corr\'elation transverse :} Les outils fonctionnant en silos, il est tr\`es difficile de visualiser les liens de d\'ependance entre un domaine, une adresse IP, un port, un service applicatif et une faille sous-jacente.
+    \item \textbf{Latence de la rem\'ediation (MTTR \'elev\'e) :} La r\'edaction manuelle des proc\'edures de durcissement ralentit le traitement des incidents.
+    \item \textbf{Risque de faux positifs et d'incoh\'erences :} L'absence de normalisation automatique augmente le risque d'erreurs d'interpr\'etation humaine.
+    \item \textbf{Manque d'encadrement l\'egal int\'egr\'e :} Aucun m\'ecanisme automatis\'e n'emp\^eche l'ex\'ecution d'un scan sur une cible pour laquelle aucun mandat formel n'a \'et\'e \'etabli.
+\end{itemize}
+
+\subsection{Comparatif des Solutions Existantes sur le March\'e}
+\par Pour positionner notre projet, nous avons analys\'e les solutions logicielles d'audit et d'ASM existantes, qu'elles soient open-source ou commerciales. Le tableau~\ref{tab:existing_solutions} synth\'etise cette \'etude comparative.
+
+\begin{table}[H]
+\centering
+\caption{Analyse Comparative des Solutions d'Audit et de Gestion de Surface d'Attaque}
+\label{tab:existing_solutions}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|C|C|C|C|C|C|}
+\hline
+\textbf{Crit\`ere d'\'Evaluation} & \textbf{Shodan} & \textbf{OWASP Amass} & \textbf{SpiderFoot} & \textbf{Intruder.io} & \textbf{Recon-ng} & \textbf{Notre Plateforme} \\
+\hline
+Type d'Audit & Passif uniquement & Passif / Actif DNS & Passif / OSINT & Actif Cloud & Passif OSINT & \textbf{Passif + Actif Unifi\'e} \\
+\hline
+Mod\'elisation en Graphe & Non & Graphe local (d3) & Graphe basique & Non & Non & \textbf{PostgreSQL + Apache AGE} \\
+\hline
+Calcul de Rayon d'Impact & Non & Non & Non & Non & Non & \textbf{Oui (BFS NetworkX)} \\
+\hline
+G\'en\'eration Remediation IA & Non & Non & Non & Recommandations fixes & Non & \textbf{Oui (LLM Local Contraint)} \\
+\hline
+Contr\^ole L\'egal (PoA requis) & Non & Non & Non & Manuel (d\'eclaratif) & Non & \textbf{Bloquant Logiciel Obligatoire} \\
+\hline
+Bac \`a Sable (Sandbox Isol\'ee) & Non & Non & Non & Non & Non & \textbf{Oui (Docker Socket Proxy)} \\
+\hline
+Cha\^ine DevSecOps Int\'egr\'ee & Non & Non & Non & Non & Non & \textbf{Oui (SAST/SCA/SBOM/Cosign)} \\
+\hline
+Mod\`ele de D\'eploiement & SaaS Externe & CLI Local & Web Auto-h\'eberg\'e & SaaS Propri\'etaire & CLI Local & \textbf{Web Auto-h\'eberg\'e / VPS} \\
+\hline
+Confidentialit\'e des Donn\'ees & Donn\'ees publiques & Locale & Locale & Donn\'ees Cloud tiers & Locale & \textbf{Traitement 100\,\% Local} \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\section{Probl\'ematique}
+\par \`A la lumi\`ere des limites identifi\'ees et des lacunes des solutions existantes, la probl\'ematique centrale de ce travail d'ing\'enierie s'\'enonce ainsi :
+\begin{center}
+\textit{\og Comment concevoir et d\'evelopper une plateforme web unifi\'ee capable d'orchestrer automatiquement les outils de reconnaissance de s\'ecurit\'e, de corr\'eler les constats h\'et\'erog\`enes via un graphe de connaissances, et d'assister la d\'ecision gr\^ace \`a une IA locale contrainte dans un cadre l\'egal et DevSecOps rigoureux ? \fg}
+\end{center}
+
+\section{Solution Propos\'ee}
+\par Pour r\'epondre \`a cette probl\'ematique, nous proposons la r\'ealisation d'une \textbf{plateforme web semi-agentique de reconnaissance de surface d'attaque}. La solution s'appuie sur une architecture microservices d\'ecoupl\'ee associant :
+\begin{itemize}
+    \item Un portail web applicatif d\'evelopp\'e sous **Laravel 11** assurant l'authentification s\'ecuris\'ee, le contr\^ole d'acc\`es RBAC granulaire, la gestion des projets et le rendu ergonomique.
+    \item Cinq microservices sp\'ecialis\'es en **Python Flask** (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, renseignement passif OSINT, moteur IA contraint, passerelle d'API).
+    \item Un moteur d'ex\'ecution asynchrone pilot\'e par **Redis Streams** garantissant la r\'esilience, la tol\'erance aux pannes et le passage \`a l'\'echelle.
+    \item Une base de donn\'ees unifi\'ee sous **PostgreSQL 16** avec l'extension **Apache AGE** permettant la persistance relationnelle et le requ\^etage openCypher du graphe de connaissances.
+    \item Un moteur d'inf\'erence locale (**Ollama**) h\'ebergeant le mod\`ele \texttt{qwen2.5-coder} pour la synth\`ese contextuelle et la production de code de rem\'ediation (\textit{Remediation-as-Code}).
+    \item Une cha\^ine **DevSecOps** automatis\'ee sous GitHub Actions assurant la s\'ecurit\'e intrins\`eque du code source et des conteneurs de production.
+\end{itemize}
+
+\section{Objectifs du Projet}
+\subsection{Objectif G\'en\'eral}
+\par L'objectif g\'en\'eral consiste \`a \textbf{automatiser et s\'ecuriser l'int\'egralit\'e du cycle de reconnaissance et d'audit de surface d'attaque}, de l'ingestion d'une cible l\'egalement autoris\'ee jusqu'\`a la g\'en\'eration d'un rapport certifi\'e enrichi d'une cartographie relationnelle et de scripts de rem\'ediation directement exploitables.
+
+\subsection{Objectifs Sp\'ecifiques}
+\par Cet objectif principal se structure en six objectifs sp\'ecifiques :
+\begin{enumerate}
+    \item \textbf{Orchestration automatis\'ee multi-scanners :} Encapsuler Nmap, Nuclei, Gobuster, Subfinder et WPScan dans des adaptateurs modulaires avec gestion de profils d'intensit\'e (Silent, Balanced, Aggressive) et injection de d\'elais al\'eatoires (\textit{jitter}).
+    \item \textbf{Normalisation et d\'edoublonnage universel :} D\'evelopper un module (\textit{ResultParser}) transformant les sorties disparates en entit\'es normalis\'ees \textit{Finding} avec score CVSS et r\'ef\'erences CVE/CWE.
+    \item \textbf{Mod\'elisation en graphe et calcul de blast radius :} Repr\'esenter la topologie sous forme de sommets et d'ar\^etes typ\'ees, et \'evaluer le rayon d'impact des failles via l'algorithme BFS sous NetworkX.
+    \item \textbf{Assistance IA locale contrainte :} Int\'egrer un LLM local op\'erant sans d\'ependance \`a un fournisseur externe pour contribuer \`a pr\'eserver la confidentialit\'e des donn\'ees, avec r\'eduction du risque d'hallucination via des citations obligatoires vers les logs bruts.
+    \item \textbf{Encadrement l\'egal et bac \`a sable isol\'e :} Imposer la validation d'une preuve d'autorisation (PoA) pour chaque projet et piloter les bacs \`a sable vuln\'erables (DVWA, SQLi-Labs) via un proxy s\'ecuris\'e filtrant les commandes dangereuses.
+    \item \textbf{S\'ecurit\'e intrins\`eque DevSecOps :} Appliquer une cha\^ine de validation logicielle bloquante (SAST, SCA, SBOM CycloneDX, scans Trivy et signature Cosign).
+\end{enumerate}
+
+\section{P\'erim\`etre du Projet (Scope)}
+\subsection{P\'erim\`etre Inclus}
+\begin{itemize}
+    \item Renseignement passif OSINT (DNS structur\'e, certificats SSL/TLS via \texttt{crt.sh}, requ\^etes WHOIS).
+    \item D\'ecouverte active des ports, d\'etection des services r\'eseau et versions logicielles associ\'ees.
+    \item \'Evaluation automatis\'ee des vuln\'erabilit\'es applicatives par mod\`eles YAML et analyse de CMS (WordPress).
+    \item Tests d'injections applicatives non destructives (SQL, commandes, XSS).
+    \item Pilotage de conteneurs vuln\'erables isol\'es pour la validation des techniques d'audit.
+    \item Visualisation dynamique du graphe et export des rapports d'expertise (PDF sign\'e, HTML, JSON).
+\end{itemize}
+
+\subsection{P\'erim\`etre Exclu (par conception)}
+\begin{itemize}
+    \item Exploitation offensive destructrice ou maintien d'acc\`es persistant (\textit{backdoors}) sur les cibles.
+    \item Attaques par d\'eni de service (DoS / DDoS) ou saturation intentionnelle des liens r\'eseau.
+    \item Exfiltration de bases de donn\'ees sensibles ou alt\'eration de contenus sur des serveurs tiers.
+\end{itemize}
+
+\section{M\'ethodologie de Travail et Conduite du Projet}
+\subsection{Justification de la D\'emarche Agile}
+\par La complexit\'e inh\'erente \`a l'int\'egration de multiples outils d'audit h\'et\'erog\`enes, de technologies de bases de donn\'ees hybrides et de mod\`eles d'IA justifie le recours \`a une d\'emarche Agile. Contrairement aux cycles de d\'eveloppement traditionnels en cascade (\textit{Waterfall}) o\`u les sp\'ecifications sont fig\'ees d\`es le d\'epart, la m\'ethodologie Agile autorise une r\'e\'evaluation continue des priorit\'es techniques au fur et \`a mesure des r\'esultats d'exp\'erimentation.
+
+\subsection{Le Cadre M\'ethodologique Scrum}
+\par Nous avons adopt\'e le cadre \textbf{Scrum}, formalis\'e par des r\^oles, des c\'er\'emonies et des art\'efacts clairs :
+\begin{itemize}
+    \item \textbf{R\^oles du Projet :} Le Directeur Technique (CTO) a incarn\'e le r\^ole de \textit{Product Owner}, d\'efinissant les fonctionnalit\'es prioritaires et validant les d\'emonstrations. L'\'etudiant stagiaire a combin\'e les fonctions de \textit{Scrum Master} (veillant au respect du cadre m\'ethodologique) et de \textit{Development Team} (r\'ealisant l'int\'egralit\'e des conceptions, d\'eveloppements et tests).
+    \item \textbf{Art\'efacts Scrum :} Gestion du \textit{Product Backlog} dans GitHub Projects, d\'ecomposition en \textit{Sprint Backlogs}, et formalisation de crit\`eres d'acceptation rigoureux (\textit{Definition of Done} -- DoD : code test\'e unitairement, document\'e, valid\'e par les gates DevSecOps et valid\'e en environnement de d\'eveloppement).
+    \item \textbf{C\'er\'emonies Scrum :} S\'eances de \textit{Sprint Planning} au d\'ebut de chaque it\'eration, r\'eunions d'alignement hebdomadaires (\textit{Weekly Sync}), et revues / r\'etrospectives de fin de sprint.
+\end{itemize}
+
+\subsection{Planification des Sprints et Calendrier Global}
+\par Le projet s'est articul\'e autour de 6 Sprints successifs de deux \`a trois semaines, suivis d'une phase finale de recette et de validation exp\'erimentale sur la p\'eriode du 2 f\'evrier au 2 juillet 2026.
+
+\begin{table}[H]
+\centering
+\caption{Planification D\'etaill\'ee des Sprints Scrum et Calendrier des R\'ealisations}
+\label{tab:sprint_planning}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|L|}
+\hline
+\textbf{Sprint / Phase} & \textbf{P\'eriode} & \textbf{Livrables Majeurs} & \textbf{Revue et Validation} \\
+\hline
+Sprint 1 & 2 f\'ev. -- 22 f\'ev. & Cahier des charges, mod\'elisation UML/ERD, socle Laravel 11 et Flask & Validation de l'architecture avec le CTO \\
+\hline
+Sprint 2 & 23 f\'ev. -- 15 mar. & Microservice reconnaissance (Nmap, Nuclei, Gobuster, Subfinder, WPScan) & D\'emonstration d'ex\'ecution des scanners \\
+\hline
+Sprint 3 & 16 mar. -- 5 avr. & Microservice s\'ecurit\'e, tests d'injections, proxy sandbox Docker & Validation des tests sur DVWA et SQLi-Labs \\
+\hline
+Sprint 4 & 6 avr. -- 26 avr. & Microservice IA (Ollama), normalisation des failles, Remediation-as-Code & \'Evaluation de la pertinence des scripts IA \\
+\hline
+Sprint 5 & 27 avr. -- 17 mai & IHM web (dashboard, scans, rapports, graphe Cytoscape.js, OSINT) & Validation de l'ergonomie utilisateur \\
+\hline
+Sprint 6 & 18 mai -- 1\textsuperscript{er} juin & Passerelle API, worker Redis Streams, durcissement TLS et d\'eploiement & D\'eploiement de l'instance de production \\
+\hline
+Recette \& Cl\^oture & 2 juin -- 2 juil. & Tests de charge Locust, audits Trivy/Cosign, documentation et rapport de PFE & Validation finale du projet \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/scrum-process.jpg}
+    \caption{Vue d'Ensemble du Processus Scrum Appliqu\'e au Projet}
+    \label{fig:scrum-process}
+\end{figure}
+
+\section*{Conclusion}
+\par Ce premier chapitre a permis d'exposer le cadre g\'en\'eral du projet, en d\'emontrant par une analyse comparative approfondie les lacunes des outils existants et l'int\'er\^et d'une approche unifi\'ee semi-agentique. Nous avons d\'efini la probl\'ematique, les objectifs, les p\'erim\`etres et la m\'ethodologie de conduite Agile Scrum. Le chapitre suivant d\'eveloppe l'\'etat de l'art scientifique et l'\'etude comparative des technologies de r\'ef\'erence.

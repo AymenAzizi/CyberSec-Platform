@@ -1,0 +1,575 @@
+# =============================================================================
+# Docker Compose — PFE Cybersecurity Platform
+# Final CDC compliant: worker isolation, network segmentation, egress control
+# =============================================================================
+# All services run as non-root with read_only rootfs and cap_drop ALL where
+# possible. Internal services are on an isolated bridge network with no
+# external egress. Only nginx is reachable from the host.
+# =============================================================================
+
+name: cybersec-platform
+
+# -----------------------------------------------------------------------------
+# Shared security anchors (YAML 2.4 merge keys)
+# -----------------------------------------------------------------------------
+# Defined as anchors to keep each service block readable while guaranteeing
+# every worker gets the same hardening profile.
+# -----------------------------------------------------------------------------
+x-worker-security: &worker-security
+  read_only: true
+  tmpfs:
+    - /tmp:noexec,nosuid,nodev,size=64m
+    - /var/tmp:noexec,nosuid,nodev,size=32m
+    - /run:noexec,nosuid,nodev,size=8m
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  user: "1001:1001"
+  # Workers may not mount the docker socket, host network or host PID
+  pid: "service:backend"
+  networks:
+    - cybersec-internal
+  restart: unless-stopped
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 30s
+
+# -----------------------------------------------------------------------------
+# Services
+# -----------------------------------------------------------------------------
+services:
+
+  # ---------------------------------------------------------------------------
+  # nginx — reverse proxy, only service exposed to the host
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: cybersec-nginx
+    depends_on:
+      backend:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - backend-storage:/var/www/html/storage/app/public:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - nginx-cache:/var/cache/nginx
+      - nginx-run:/var/run
+    networks:
+      - cybersec-external
+      - cybersec-internal
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=16m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+    security_opt:
+      - no-new-privileges:true
+    user: "101:101"  # nginx user in alpine image
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "wget -qO- http://127.0.0.1/healthz || curl -sf http://127.0.0.1/healthz || exit 1"
+      start_period: 10s
+    mem_limit: 256m
+    mem_reservation: 128m
+    cpus: 0.5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # backend — Laravel 11 PHP-FPM
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    image: cybersec/backend:${TAG:-latest}
+    container_name: cybersec-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - QUEUE_CONNECTION=redis
+      - SESSION_DRIVER=database
+    expose:
+      - "9000"
+    ports:
+      # Exposed only for local dev; comment out for production
+      - "${BACKEND_DEV_PORT:-8000}:9000"
+    volumes:
+      - backend-storage:/var/www/html/storage
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/zz-cybersec.ini:ro
+    user: "www-data:www-data"
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=128m
+      - /var/run:noexec,nosuid,nodev,size=8m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - cybersec-internal
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "php artisan db:monitor --json || php -r 'try{new PDO(\"pgsql:host=postgres;dbname=$$DB_DATABASE\",$$DB_USERNAME,$$DB_PASSWORD);exit(0);}catch(\\Exception $$e){exit(1);}'"
+      start_period: 60s
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # reconnaissance — Flask, depends on redis
+  # ---------------------------------------------------------------------------
+  reconnaissance:
+    build:
+      context: ./microservices/reconnaissance
+      dockerfile: Dockerfile
+    image: cybersec/reconnaissance:${TAG:-latest}
+    container_name: cybersec-recon
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5000
+      - REDIS_URL=redis://redis:6379/0
+    expose:
+      - "5000"
+    volumes:
+      - scan-results:/app/results
+      - wordlists:/app/wordlists:ro
+    <<: *worker-security
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/health',timeout=3).status==200 else 1)\""
+      start_period: 20s
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
+
+  # ---------------------------------------------------------------------------
+  # security — Flask, needs NET_RAW for nmap -sS (syn scan) optional modes
+  # ---------------------------------------------------------------------------
+  security:
+    build:
+      context: ./microservices/security
+      dockerfile: Dockerfile
+    image: cybersec/security:${TAG:-latest}
+    container_name: cybersec-security
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5001
+      - REDIS_URL=redis://redis:6379/0
+      - DOCKER_HOST=tcp://socket-proxy:2375
+      - DOCKER_PROXY_READONLY=true
+    expose:
+      - "5001"
+    volumes:
+      - scan-results:/app/results
+    <<: *worker-security
+    cap_add:
+      - NET_RAW
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5001/health',timeout=3).status==200 else 1)\""
+      start_period: 20s
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
+
+  # ---------------------------------------------------------------------------
+  # osint — Flask, no external deps
+  # ---------------------------------------------------------------------------
+  osint:
+    build:
+      context: ./microservices/osint
+      dockerfile: Dockerfile
+    image: cybersec/osint:${TAG:-latest}
+    container_name: cybersec-osint
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5002
+      - REDIS_URL=redis://redis:6379/0
+    expose:
+      - "5002"
+    volumes:
+      - scan-results:/app/results
+    <<: *worker-security
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5002/health',timeout=3).status==200 else 1)\""
+      start_period: 20s
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # ai — Flask, calls ollama
+  # ---------------------------------------------------------------------------
+  ai:
+    build:
+      context: ./microservices/ai
+      dockerfile: Dockerfile
+    image: cybersec/ai:${TAG:-latest}
+    container_name: cybersec-ai
+    depends_on:
+      ollama:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5003
+      - OLLAMA_HOST=http://ollama:11434
+      - REDIS_URL=redis://redis:6379/0
+    expose:
+      - "5003"
+    <<: *worker-security
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5003/health',timeout=3).status==200 else 1)\""
+      start_period: 20s
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
+
+  # ---------------------------------------------------------------------------
+  # api-gateway — Flask 8080, single entrypoint for service mesh
+  # ---------------------------------------------------------------------------
+  api-gateway:
+    build:
+      context: ./microservices/api-gateway
+      dockerfile: Dockerfile
+    image: cybersec/api-gateway:${TAG:-latest}
+    container_name: cybersec-api-gateway
+    depends_on:
+      reconnaissance:
+        condition: service_healthy
+      security:
+        condition: service_healthy
+      osint:
+        condition: service_healthy
+      ai:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=8080
+      - REDIS_URL=redis://redis:6379/0
+      - LARAVEL_URL=http://backend:9000
+      - LARAVEL_API_TOKEN=${SERVICE_MESH_TOKEN:-changeme-service-mesh-token}
+    expose:
+      - "8080"
+    <<: *worker-security
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=3).status==200 else 1)\""
+      start_period: 30s
+    mem_limit: 256m
+    mem_reservation: 128m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # worker — Python queue consumer (RQ / Celery)
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: ./microservices/worker
+      dockerfile: Dockerfile
+    image: cybersec/worker:${TAG:-latest}
+    container_name: cybersec-worker
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - QUEUE_NAME=default
+      - LARAVEL_URL=http://backend:9000
+      - LARAVEL_API_TOKEN=${SERVICE_MESH_TOKEN:-changeme-service-mesh-token}
+    volumes:
+      - scan-results:/app/results
+    <<: *worker-security
+    # No healthcheck — worker has no listening port; rely on supervisor
+    healthcheck:
+      <<: *healthcheck-defaults
+      test:
+        - CMD-SHELL
+        - "python -c 'import os,signal; os.kill(1,0)' || exit 1"
+      start_period: 30s
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+
+  # ---------------------------------------------------------------------------
+  # postgres — primary datastore
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: cybersec-postgres
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-cybersec}
+      POSTGRES_USER: ${DB_USERNAME:-cybersec}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    expose:
+      - "5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    user: "70:70"  # postgres alpine
+    read_only: false  # postgresql needs to write to data dir & /tmp
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=64m
+      - /var/run/postgresql:noexec,nosuid,nodev,size=8m
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+      - FOWNER
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - cybersec-internal
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      start_period: 30s
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # redis — queue + cache
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: cybersec-redis
+    # Use shell form so $REDIS_PASSWORD is expanded at container runtime
+    # from the env_file (avoids leaking the password through `docker inspect`
+    # command-line args at compose-parse time when --env-file is not used).
+    entrypoint:
+      - sh
+      - -c
+      - |
+        exec redis-server \
+          --maxmemory 256mb \
+          --maxmemory-policy allkeys-lru \
+          --appendonly yes \
+          --appendfsync everysec \
+          --requirepass "$${REDIS_PASSWORD:-changeme}" \
+          --rename-command FLUSHALL "" \
+          --rename-command FLUSHDB "" \
+          --rename-command CONFIG ""
+    expose:
+      - "6379"
+    volumes:
+      - redis-data:/data
+    user: "999:1000"  # redis alpine
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=16m
+      - /run:noexec,nosuid,nodev,size=4m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - cybersec-internal
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      start_period: 10s
+    mem_limit: 256m
+    mem_reservation: 128m
+    cpus: 0.5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # socket-proxy — restricted Docker API access for the security service's
+  # sandbox feature. Only safe endpoints are exposed (containers list/create/
+  # stop, no images, no volumes, no exec attach).
+  # ---------------------------------------------------------------------------
+  socket-proxy:
+    image: tecnativa/docker-socket-proxy:0.1.1
+    container_name: cybersec-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - CONTAINERS=1
+      - IMAGES=0
+      - VOLUMES=0
+      - NETWORKS=0
+      - NODES=0
+      - PLUGINS=0
+      - SECRETS=0
+      - SERVICES=0
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=0
+      - EXEC=0
+      - POST=1
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - cybersec-internal
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=8m
+    mem_limit: 64m
+    mem_reservation: 32m
+    cpus: 0.25
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # ollama — local LLM (qwen2.5-coder:7b)
+  # ---------------------------------------------------------------------------
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cybersec-ollama
+    expose:
+      - "11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+    # GPU passthrough — uncomment if NVIDIA runtime available
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - cybersec-internal
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      start_period: 60s
+    mem_limit: 4g
+    mem_reservation: 2g
+    cpus: 2.0
+    restart: unless-stopped
+
+# -----------------------------------------------------------------------------
+# Networks
+# -----------------------------------------------------------------------------
+networks:
+  # External-facing bridge — only nginx attaches here
+  cybersec-external:
+    driver: bridge
+    name: cybersec-external
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+  # Internal-only bridge — no egress to host network
+  cybersec-internal:
+    driver: bridge
+    name: cybersec-internal
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
+
+# -----------------------------------------------------------------------------
+# Volumes
+# -----------------------------------------------------------------------------
+volumes:
+  postgres-data:
+    name: cybersec-postgres-data
+    driver: local
+  redis-data:
+    name: cybersec-redis-data
+    driver: local
+  ollama-data:
+    name: cybersec-ollama-data
+    driver: local
+  backend-storage:
+    name: cybersec-backend-storage
+    driver: local
+  scan-results:
+    name: cybersec-scan-results
+    driver: local
+  wordlists:
+    name: cybersec-wordlists
+    driver: local
+  letsencrypt:
+    name: cybersec-letsencrypt
+    driver: local
+  nginx-cache:
+    name: cybersec-nginx-cache
+    driver: local
+  nginx-run:
+    name: cybersec-nginx-run
+    driver: local

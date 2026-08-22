@@ -1,0 +1,183 @@
+\chapter*{Annexe A : Interfaces Compl\'ementaires}
+\addcontentsline{toc}{chapter}{Annexe A : Interfaces Compl\'ementaires}
+\markboth{Annexe A : Interfaces Compl\'ementaires}{Annexe A : Interfaces Compl\'ementaires}
+
+\par Cette premi\`ere annexe regroupe les vues et interfaces compl\'ementaires de la plateforme d\'edi\'ees \`a la gestion des projets, au renseignement passif OSINT, \`a la consultation des rapports, au co-pilote conversationnel d'analyse, \`a l'administration des utilisateurs et \`a la surveillance des pistes d'audit.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{img/projects.png}
+    \caption{Interface de Gestion des Projets et des Cibles d'Audit}
+    \label{fig:annexe_projects}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{img/osint.png}
+    \caption{Module OSINT -- Renseignement Passif Structur\'e sur Cinq Onglets}
+    \label{fig:annexe_osint}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{img/reports.png}
+    \caption{Module de G\'en\'eration et Export Multi-Format des Rapports d'Audit}
+    \label{fig:annexe_reports}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{img/chat.png}
+    \caption{Assistant Conversationnel d'Analyse de S\'ecurit\'e Assist\'e par IA}
+    \label{fig:annexe_chat}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{img/admin_users.png}
+    \caption{Module d'Administration des Utilisateurs et Attribution des R\^oles RBAC}
+    \label{fig:annexe_admin_users}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{img/audit_logs.png}
+    \caption{Journalisation d'Audit Immuable pour la Tra\c{c}abilit\'e des \'Ev\'enements}
+    \label{fig:annexe_audit_logs}
+\end{figure}
+
+\clearpage
+
+\chapter*{Annexe B : Extraits Techniques et Sp\'ecifications}
+\addcontentsline{toc}{chapter}{Annexe B : Extraits Techniques et Sp\'ecifications}
+\markboth{Annexe B : Extraits Techniques et Sp\'ecifications}{Annexe B : Extraits Techniques et Sp\'ecifications}
+
+\par Cette deuxi\`eme annexe documente les art\'efacts d'infrastructure, de d\'eveloppement et de configuration s\'ecuris\'ee r\'ealis\'es dans le cadre du projet.
+
+\section*{B.1 Extrait de Configuration Docker Compose Durcie}
+\par L'extrait suivant illustre la d\'eclaration s\'ecuris\'ee du microservice de reconnaissance au sein de \texttt{docker-compose.prod.yml}, appliquant le principe de moindre privil\`ege (non-root, syst\`eme de fichiers en lecture seule, r\'eseaux isol\'es) :
+\begin{verbatim}
+services:
+  recon-service:
+    image: ghcr.io/aymenazizi/cybersec-recon:v1.0.0
+    container_name: cybersec-recon
+    restart: unless-stopped
+    user: "1001:1001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=128M,noexec,nosuid,nodev
+    networks:
+      - cybersec-internal
+    environment:
+      - FLASK_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DB_HOST=postgres
+      - DB_NAME=cybersec_db
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1024M
+\end{verbatim}
+
+\section*{B.2 Workflow DevSecOps sous GitHub Actions}
+\par L'extrait suivant pr\'esente la structure du pipeline CI/CD automatis\'e dans \texttt{.github/workflows/devsecops.yml} assurant l'ex\'ecution des portes de s\'ecurit\'e :
+\begin{verbatim}
+name: DevSecOps Pipeline
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sast-sca-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP Static Analysis (Psalm)
+        run: ./vendor/bin/psalm --config=psalm.xml --level=3
+      - name: Python Static Analysis (Bandit)
+        run: bandit -r ./services/ -ll -ii
+      - name: Software Composition Analysis (Trivy FS)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+      - name: Generate CycloneDX SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+
+  build-sign-deploy:
+    needs: sast-sca-sbom
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Push OCI Image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ghcr.io/aymenazizi/cybersec-platform:latest
+      - name: Sign Container Image (Cosign)
+        run: cosign sign --yes ghcr.io/aymenazizi/cybersec-platform:latest
+\end{verbatim}
+
+\section*{B.3 Sch\'ema JSON Strict pour l'IA Contrainte (Pydantic)}
+\par La structure de donn\'ees impos\'ee au mod\`ele de langage pour la g\'en\'eration de Rem\'ediation est d\'efinie en Python sous forme de mod\`ele Pydantic :
+\begin{verbatim}
+class RemediationOutputSchema(BaseModel):
+    finding_id: int = Field(..., description="ID unique du constat normalisé")
+    remediation_type: Literal["bash", "ansible", "dockerfile", "terraform"]
+    summary: str = Field(..., max_length=255, description="Titre du correctif")
+    risk_mitigated: str = Field(..., description="Risque sécuritaire atténué")
+    script_content: str = Field(..., description="Code source exécutable du correctif")
+    evidence: EvidenceCitationSchema = Field(..., description="Citations traçables")
+    safety_notes: Optional[str] = Field(None, description="Avertissements de production")
+\end{verbatim}
+
+\section*{B.4 Exemples de Requ\^etes openCypher dans Apache AGE}
+\par La requ\^ete suivante permet d'extraire le chemin d'attaque complet reliant un actif cible \`a un port expos\'e pr\'esentant une vuln\'erabilit\'e de criticit\'e critique :
+\begin{verbatim}
+SELECT * FROM cypher('cybersec_graph', $$
+  MATCH path = (t:Target)-[:RESOLVES_TO]->(a:Asset)-[:HOSTS]->(p:Port)
+               -[:RUNS]->(s:Service)-[:HAS_VULN]->(v:Vulnerability)
+  WHERE v.severity = 'CRITICAL'
+  RETURN t.name, a.name, p.number, s.name, v.cve_id, v.cvss_score
+  ORDER BY v.cvss_score DESC
+$$) as (target varchar, asset varchar, port int, service varchar, cve varchar, cvss float);
+\end{verbatim}
+
+\section*{B.5 Exemple de Playbook Ansible de Rem\'ediation G\'en\'er\'e par l'IA}
+\par L'extrait ci-dessous repr\'esente un correctif d'assainissement g\'en\'er\'e et valid\'e pour neutraliser une mauvaise configuration de serveur SSH (port 22) :
+\begin{verbatim}
+---
+- name: Hardening Configuration SSH Serveur
+  hosts: all
+  become: yes
+  tasks:
+    - name: Désactiver l'authentification par mot de passe
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+
+    - name: Interdire la connexion directe du compte root
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+        state: present
+
+    - name: Redémarrer le démon SSH de façon sécurisée
+      service:
+        name: sshd
+        state: restarted
+\end{verbatim}

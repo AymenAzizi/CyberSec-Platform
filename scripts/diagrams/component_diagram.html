@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Component Diagram - Microservices Architecture</title>
+<style>
+  @page { size: 1700px 1000px; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2937; }
+  .canvas { position: relative; width: 1700px; height: 1000px; background: #ffffff; }
+  .title { position:absolute; top:16px; left:0; width:100%; text-align:center; font-size:22px; font-weight:700; color:#111827; }
+  .subtitle { position:absolute; top:46px; left:0; width:100%; text-align:center; font-size:12.5px; color:#6b7280; }
+
+  /* Network zones */
+  .zone-ext {
+    position:absolute; left:30px; top:70px; width:280px; height:340px;
+    border:1.5px dashed #3B82F6; border-radius:8px; background: rgba(219,234,254,0.35);
+    z-index:0;
+  }
+  .zone-ext .zl {
+    position:absolute; top:-12px; left:14px; background:#ffffff; padding:0 6px;
+    font-size:11px; font-weight:700; color:#1d4ed8;
+  }
+  .zone-int {
+    position:absolute; left:30px; top:430px; width:1640px; height:480px;
+    border:1.5px dashed #6B7280; border-radius:8px; background: rgba(243,244,246,0.5);
+    z-index:0;
+  }
+  .zone-int .zl {
+    position:absolute; top:-12px; left:14px; background:#ffffff; padding:0 6px;
+    font-size:11px; font-weight:700; color:#4b5563;
+  }
+  .zone-mid {
+    position:absolute; left:330px; top:300px; width:1340px; height:120px;
+    border:1px dotted #10B981; border-radius:8px; background: rgba(240,253,244,0.35);
+    z-index:0;
+  }
+  .zone-mid .zl {
+    position:absolute; top:-12px; left:14px; background:#ffffff; padding:0 6px;
+    font-size:11px; font-weight:700; color:#047857;
+  }
+
+  svg.conn { position:absolute; top:0; left:0; width:1700px; height:1000px; z-index:1; }
+
+  .box {
+    position:absolute; width:200px; height:90px;
+    border:2px solid; border-radius:6px; background:#ffffff;
+    z-index:2; box-shadow:0 1px 2px rgba(0,0,0,0.05);
+    padding:6px 8px; box-sizing:border-box;
+  }
+  .box .bn { font-size:14px; font-weight:700; }
+  .box .bs { font-size:11px; color:#374151; margin-top:2px; }
+  .box .bp { font-size:11px; color:#6b7280; margin-top:4px; }
+
+  .pres  { border-color:#3B82F6; background:#EFF6FF; }
+  .pres .bn { color:#1d4ed8; }
+  .app   { border-color:#10B981; background:#F0FDF4; }
+  .app .bn { color:#047857; }
+  .work  { border-color:#F59E0B; background:#FEF3C7; }
+  .work .bn { color:#b45309; }
+  .data  { border-color:#8B5CF6; background:#F3E8FF; }
+  .data .bn { color:#6d28d9; }
+  .tool  { border-color:#EF4444; background:#FEE2E2; }
+  .tool .bn { color:#b91c1c; }
+  .ext   { border-color:#6B7280; background:#F3F4F6; border-style:dashed; }
+  .ext .bn { color:#374151; }
+
+  .legend {
+    position:absolute; left:30px; top:930px; width:1640px; height:50px;
+    border:1px solid #e5e7eb; border-radius:6px; background:#fafafa;
+    z-index:2; padding:6px 12px; box-sizing:border-box;
+    display:flex; gap:24px; align-items:center; font-size:11.5px;
+  }
+  .legend .li { display:flex; align-items:center; gap:6px; }
+  .legend .sw { width:14px; height:10px; border:1px solid; border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Figure 3.2 — Diagramme de composants : architecture microservices (12 conteneurs Docker)</div>
+  <div class="subtitle">Réseaux : cybersec-external (Nginx seul) / cybersec-internal (reste) — tous non-root, readOnlyRootfs, cap_drop ALL</div>
+
+  <div class="zone-ext"><span class="zl">cybersec-external (bridge)</span></div>
+  <div class="zone-mid"><span class="zl">couche présentation/app</span></div>
+  <div class="zone-int"><span class="zl">cybersec-internal (bridge, isolé du host)</span></div>
+
+  <svg class="conn" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#374151"/>
+      </marker>
+      <marker id="aA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#F59E0B"/>
+      </marker>
+      <marker id="aP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#8B5CF6"/>
+      </marker>
+      <marker id="aR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#EF4444"/>
+      </marker>
+    </defs>
+
+    <!-- Box geometry (200x90). Centers:
+         User(160,115) Nginx(160,255)
+         Laravel(340,395) APIGW(680,395) Worker(1020,395)
+         Recon(340,555) Security(680,555) OSINT(1020,555) AI(1360,555)
+         Postgres(680,715) Redis(1020,715)
+         Ollama(1360,715) docker-proxy(340,715)
+         Edges: left=box.x, right=box.x+200, top=box.y, bottom=box.y+90 -->
+
+    <!-- 1. User -> Nginx : 443 -->
+    <line x1="160" y1="160" x2="160" y2="210" stroke="#374151" stroke-width="1.6" marker-end="url(#a)"/>
+    <rect x="172" y="178" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="200" y="190" text-anchor="middle" font-size="10.5" fill="#374151">HTTPS 443</text>
+
+    <!-- 2. Nginx -> Laravel : 8000 -->
+    <line x1="260" y1="255" x2="340" y2="395" stroke="#374151" stroke-width="1.6" marker-end="url(#a)"/>
+    <rect x="276" y="312" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="304" y="324" text-anchor="middle" font-size="10.5" fill="#374151">HTTP 8000</text>
+
+    <!-- 3. Laravel -> API Gateway : 8080 -->
+    <line x1="540" y1="395" x2="680" y2="395" stroke="#374151" stroke-width="1.6" marker-end="url(#a)"/>
+    <rect x="582" y="378" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="610" y="390" text-anchor="middle" font-size="10.5" fill="#374151">HTTP 8080</text>
+
+    <!-- 4. Laravel -> PostgreSQL : 5432 -->
+    <line x1="440" y1="440" x2="680" y2="715" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aP)"/>
+    <rect x="510" y="560" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="538" y="572" text-anchor="middle" font-size="10.5" fill="#6d28d9">pg 5432</text>
+
+    <!-- 5. Laravel -> Redis : 6379 (sessions/cache) -->
+    <line x1="500" y1="440" x2="1020" y2="715" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aP)"/>
+    <rect x="730" y="560" width="64" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="762" y="572" text-anchor="middle" font-size="10.5" fill="#6d28d9">redis 6379</text>
+
+    <!-- 6. API Gateway -> Recon : 5000 -->
+    <line x1="730" y1="440" x2="400" y2="510" stroke="#374151" stroke-width="1.5" marker-end="url(#a)"/>
+    <rect x="528" y="466" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="556" y="478" text-anchor="middle" font-size="10.5" fill="#374151">:5000</text>
+
+    <!-- 7. API Gateway -> Security : 5001 -->
+    <line x1="760" y1="440" x2="710" y2="510" stroke="#374151" stroke-width="1.5" marker-end="url(#a)"/>
+    <rect x="708" y="462" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="736" y="474" text-anchor="middle" font-size="10.5" fill="#374151">:5001</text>
+
+    <!-- 8. API Gateway -> OSINT : 5002 -->
+    <line x1="820" y1="440" x2="1020" y2="510" stroke="#374151" stroke-width="1.5" marker-end="url(#a)"/>
+    <rect x="892" y="462" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="920" y="474" text-anchor="middle" font-size="10.5" fill="#374151">:5002</text>
+
+    <!-- 9. API Gateway -> AI : 5003 -->
+    <line x1="880" y1="440" x2="1330" y2="510" stroke="#374151" stroke-width="1.5" marker-end="url(#a)"/>
+    <rect x="1080" y="462" width="56" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="1108" y="474" text-anchor="middle" font-size="10.5" fill="#374151">:5003</text>
+
+    <!-- 10. Worker -> Redis Streams : 6379 (XREADGROUP) -->
+    <line x1="1060" y1="440" x2="1060" y2="715" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#aA)"/>
+    <rect x="1004" y="560" width="120" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="1064" y="572" text-anchor="middle" font-size="10.5" fill="#b45309">streams 6379</text>
+
+    <!-- 11. Worker -> Recon/Security/OSINT/AI (bus, single line down then split) -->
+    <line x1="980" y1="440" x2="980" y2="475" stroke="#F59E0B" stroke-width="1.5"/>
+    <line x1="400" y1="475" x2="1360" y2="475" stroke="#F59E0B" stroke-width="1.5"/>
+    <line x1="400" y1="475" x2="400" y2="510" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#aA)"/>
+    <line x1="710" y1="475" x2="710" y2="510" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#aA)"/>
+    <line x1="1020" y1="475" x2="1020" y2="510" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#aA)"/>
+    <line x1="1360" y1="475" x2="1360" y2="510" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#aA)"/>
+    <rect x="690" y="456" width="180" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="780" y="468" text-anchor="middle" font-size="10.5" fill="#b45309">Worker consume (HTTP)</text>
+
+    <!-- 12. AI MS -> Ollama : 11434 -->
+    <line x1="1360" y1="600" x2="1360" y2="715" stroke="#EF4444" stroke-width="1.5" marker-end="url(#aR)"/>
+    <rect x="1372" y="650" width="64" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="1404" y="662" text-anchor="middle" font-size="10.5" fill="#b91c1c">:11434</text>
+
+    <!-- 13. Security MS -> docker-socket-proxy : 2375 -->
+    <line x1="680" y1="600" x2="440" y2="715" stroke="#EF4444" stroke-width="1.5" marker-end="url(#aR)"/>
+    <rect x="500" y="640" width="64" height="16" rx="3" fill="#ffffff" stroke="#9ca3af" stroke-width="0.7"/>
+    <text x="532" y="652" text-anchor="middle" font-size="10.5" fill="#b91c1c">:2375</text>
+
+    <!-- 14. Worker -> PostgreSQL (write findings via API, indirect — dashed) -->
+    <line x1="1020" y1="440" x2="780" y2="715" stroke="#8B5CF6" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#aP)"/>
+    <text x="838" y="600" font-size="10" fill="#6d28d9" transform="rotate(48 838 600)">via API → pg</text>
+
+  </svg>
+
+  <!-- External + Presentation -->
+  <div class="box ext" style="left:60px; top:70px;">
+    <div class="bn">User (analyst)</div>
+    <div class="bs">Browser + Laravel Echo</div>
+    <div class="bp">WebSocket / HTTPS</div>
+  </div>
+  <div class="box pres" style="left:60px; top:210px;">
+    <div class="bn">Nginx</div>
+    <div class="bs">Reverse-proxy TLS 1.3</div>
+    <div class="bp">:80 / :443 — cap_drop ALL</div>
+  </div>
+
+  <!-- Application -->
+  <div class="box app" style="left:240px; top:350px;">
+    <div class="bn">Laravel Backend</div>
+    <div class="bs">PHP 8.3 / Laravel 11</div>
+    <div class="bp">:8000 — FPM</div>
+  </div>
+  <div class="box app" style="left:580px; top:350px;">
+    <div class="bn">API Gateway</div>
+    <div class="bs">Flask — rate-limit + routing</div>
+    <div class="bp">:8080</div>
+  </div>
+  <div class="box work" style="left:920px; top:350px;">
+    <div class="bn">Worker</div>
+    <div class="bs">Python — Redis consumer</div>
+    <div class="bp">XREADGROUP g=scan-workers</div>
+  </div>
+
+  <!-- Microservices -->
+  <div class="box app" style="left:240px; top:510px;">
+    <div class="bn">Recon MS</div>
+    <div class="bs">Flask — nmap/masscan</div>
+    <div class="bp">:5000</div>
+  </div>
+  <div class="box app" style="left:580px; top:510px;">
+    <div class="bn">Security MS</div>
+    <div class="bs">Flask — sandbox + detect</div>
+    <div class="bp">:5001</div>
+  </div>
+  <div class="box app" style="left:920px; top:510px;">
+    <div class="bn">OSINT MS</div>
+    <div class="bs">Flask — whois/dns/crt.sh</div>
+    <div class="bp">:5002</div>
+  </div>
+  <div class="box app" style="left:1260px; top:510px;">
+    <div class="bn">AI MS</div>
+    <div class="bs">Flask — Remediation-as-Code</div>
+    <div class="bp">:5003</div>
+  </div>
+
+  <!-- Data -->
+  <div class="box data" style="left:580px; top:670px;">
+    <div class="bn">PostgreSQL 16</div>
+    <div class="bs">Apache AGE (graphe)</div>
+    <div class="bp">:5432 — 14 tables</div>
+  </div>
+  <div class="box data" style="left:920px; top:670px;">
+    <div class="bn">Redis 7</div>
+    <div class="bs">Streams + cache + sessions</div>
+    <div class="bp">:6379</div>
+  </div>
+
+  <!-- Security tools -->
+  <div class="box tool" style="left:240px; top:670px;">
+    <div class="bn">docker-socket-proxy</div>
+    <div class="bs">Sandbox — filtered Docker API</div>
+    <div class="bp">:2375 (read-only)</div>
+  </div>
+  <div class="box tool" style="left:1260px; top:670px;">
+    <div class="bn">Ollama</div>
+    <div class="bs">Local LLM (no network egress)</div>
+    <div class="bp">:11434 — qwen2.5-coder:7b</div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span style="font-weight:700; color:#374151;">Légende :</span>
+    <div class="li"><span class="sw" style="background:#EFF6FF;border-color:#3B82F6"></span>Présentation (blue)</div>
+    <div class="li"><span class="sw" style="background:#F0FDF4;border-color:#10B981"></span>Application (green)</div>
+    <div class="li"><span class="sw" style="background:#FEF3C7;border-color:#F59E0B"></span>Worker (amber)</div>
+    <div class="li"><span class="sw" style="background:#F3E8FF;border-color:#8B5CF6"></span>Données (purple)</div>
+    <div class="li"><span class="sw" style="background:#FEE2E2;border-color:#EF4444"></span>Outils sécurité (red)</div>
+    <div class="li"><span class="sw" style="background:#F3F4F6;border-color:#6B7280;border-style:dashed"></span>Entité externe</div>
+    <span style="color:#6b7280;">— flèches pleines : appels synchrones ; pointillées : accès données</span>
+  </div>
+</div>
+</body>
+</html>

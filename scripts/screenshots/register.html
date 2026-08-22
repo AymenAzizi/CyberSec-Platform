@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create account · CyberSec Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #0a0e1a;
+    --surface: #131826;
+    --primary: #7c3aed;
+    --secondary: #06b6d4;
+    --danger: #ef4444;
+    --high: #f97316;
+    --medium: #f59e0b;
+    --low: #06b6d4;
+    --success: #10b981;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+    background-color: var(--background);
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(124, 58, 237, 0.08), transparent 42%),
+      radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.06), transparent 38%);
+    background-attachment: fixed;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.30) 0%, var(--background) 50%, rgba(6, 182, 212, 0.20) 100%);
+    z-index: -1;
+  }
+  .container { width: 100%; max-width: 28rem; position: relative; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 3.5rem;
+    width: 3.5rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
+    margin-bottom: 1rem;
+  }
+  .logo .material-symbols-rounded { color: white; font-size: 1.875rem; }
+  .header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+  }
+  .header p { font-size: 0.875rem; color: #9ca3af; margin-top: 0.25rem; }
+  .card {
+    background: var(--surface);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    padding: 2rem;
+  }
+  .form-group { margin-bottom: 1rem; }
+  .label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #9ca3af;
+    margin-bottom: 0.375rem;
+  }
+  .input {
+    width: 100%;
+    background: rgba(10, 14, 26, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: white;
+    font-family: inherit;
+    outline: none;
+  }
+  .input::placeholder { color: #6b7280; }
+  .pwd-strength { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+  .pwd-bar-bg { flex: 1; height: 0.375rem; border-radius: 9999px; background: rgba(255,255,255,0.05); overflow: hidden; }
+  .pwd-bar { height: 100%; width: 80%; background: var(--low); transition: all 0.2s; }
+  .pwd-label { font-size: 0.6875rem; color: #6b7280; width: 4rem; text-align: right; }
+  .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #d1d5db;
+    cursor: pointer;
+    user-select: none;
+    margin: 1rem 0;
+    line-height: 1.4;
+  }
+  .checkbox-row input { margin-top: 0.25rem; accent-color: var(--primary); }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .first-admin {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6b7280;
+    padding-top: 0.5rem;
+  }
+  .footer-text {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    margin-top: 0.5rem;
+  }
+  .footer-text a { color: #22d3ee; text-decoration: none; }
+  .monitoring-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 1.5rem;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <span class="material-symbols-rounded">shield</span>
+      </div>
+      <h1>CyberSec Platform</h1>
+      <p>Create a new analyst account</p>
+    </div>
+
+    <div class="card">
+      <form>
+        <div class="form-group">
+          <label for="name" class="label">Full name</label>
+          <input id="name" type="text" class="input" placeholder="Jane Doe" value="Aymen Azizi">
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="label">Email address</label>
+          <input id="email" type="email" class="input" placeholder="you@example.com" value="aymen.azizi@tekup.tn">
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="label">Password</label>
+          <input id="password" type="password" class="input" placeholder="At least 8 characters" value="CyberSec2026!">
+          <div class="pwd-strength">
+            <div class="pwd-bar-bg"><div class="pwd-bar"></div></div>
+            <span class="pwd-label">Strong</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password_confirmation" class="label">Confirm password</label>
+          <input id="password_confirmation" type="password" class="input" placeholder="Repeat password" value="CyberSec2026!">
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" checked>
+          <span>I agree to the platform terms of use and accept that all activity is logged for audit purposes.</span>
+        </label>
+
+        <button type="submit" class="btn-primary">
+          <span class="material-symbols-rounded" style="font-size:1rem">person_add</span>
+          Create Account
+        </button>
+
+        <p class="first-admin">First account becomes admin</p>
+        <p class="footer-text">
+          Already registered?
+          <a href="#">Sign in</a>
+        </p>
+      </form>
+    </div>
+
+    <p class="monitoring-note">All activities are monitored and logged</p>
+  </div>
+</body>
+</html>

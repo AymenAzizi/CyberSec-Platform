@@ -1,0 +1,5 @@
+/wp-admin             (Status: 301) [Size: 238] [--> https://ensit.tn:443/wp-admin/]
+/wp-login             (Status: 200) [Size: 7373]
+/wp-login.php         (Status: 200) [Size: 7373]
+/.env                 (Status: 403) [Size: 4704]
+/server-status        (Status: 403) [Size: 199]

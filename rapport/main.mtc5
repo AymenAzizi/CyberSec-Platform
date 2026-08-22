@@ -1,0 +1,39 @@
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {3.}1}Analyse des Besoins}{\reset@font\mtcSfont 28}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}1.1}Identification des Acteurs}{\reset@font\mtcSSfont 28}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}1.2}Sp\'ecification des Besoins}{\reset@font\mtcSSfont 28}{}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}1.2.1}Besoins Fonctionnels}{\reset@font\mtcSSSfont 28}{}}
+{\reset@font\mtcSSSfont\mtc@string\contentsline{subsubsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}1.2.2}Besoins Non Fonctionnels}{\reset@font\mtcSSSfont 29}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {3.}2}Mod\'elisation des Cas d'Utilisation}{\reset@font\mtcSfont 30}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}2.1}Diagramme Global des Cas d'Utilisation}{\reset@font\mtcSSfont 30}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}2.2}Diagramme des Cas d'Utilisation de l'Analyste}{\reset@font\mtcSSfont 31}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}2.3}Diagramme des Cas d'Utilisation de l'Administrateur}{\reset@font\mtcSSfont 31}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {3.}3}Architecture Globale du Syst\`eme}{\reset@font\mtcSfont 32}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}3.1}Description des Composants Architecturaux}{\reset@font\mtcSSfont 33}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 1. Backend Applicatif Web (Laravel 11, Port 8000) :}{\reset@font\mtcPfont 33}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 2. Microservice de Reconnaissance (Flask, Port 5000) :}{\reset@font\mtcPfont 33}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 3. Microservice de S\'ecurit\'e Offensive (Flask, Port 5001) :}{\reset@font\mtcPfont 33}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 4. Microservice OSINT (Flask, Port 5002) :}{\reset@font\mtcPfont 33}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 5. Microservice d'IA Contrainte (Flask, Port 5003) :}{\reset@font\mtcPfont 34}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 6. Passerelle d'API (API Gateway, Flask, Port 8080) :}{\reset@font\mtcPfont 34}{}}
+{\reset@font\mtcPfont\mtc@string\contentsline{paragraph}{\noexpand \leavevmode 7. Worker Asynchrone (Consommateur Redis Streams) :}{\reset@font\mtcPfont 34}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}3.2}R\'ecapitulatif de la Pile Technologique}{\reset@font\mtcSSfont 34}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {3.}4}Conception de la Base de Donn\'ees}{\reset@font\mtcSfont 35}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}4.1}Mod\`ele Entit\'e-Association (ERD)}{\reset@font\mtcSSfont 35}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}4.2}Diagramme de Classes du Domaine}{\reset@font\mtcSSfont 36}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}4.3}Dictionnaire des Tables de la Base de Donn\'ees}{\reset@font\mtcSSfont 38}{}}
+{\reset@font\mtcSfont\mtc@string\contentsline{section}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5}Architecture de S\'ecurit\'e Multicouche}{\reset@font\mtcSfont 38}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.1}Authentification et Contr\^ole d'Acc\`es}{\reset@font\mtcSSfont 38}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.2}Validation et Assainissement des Entr\'ees}{\reset@font\mtcSSfont 38}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.3}Limitation de D\'ebit et Protection Anti-Abus}{\reset@font\mtcSSfont 39}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.4}Journalisation d'Audit Immuable}{\reset@font\mtcSSfont 39}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.5}S\'ecurit\'e R\'eseau et Isolation}{\reset@font\mtcSSfont 39}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.6}D\'eroulement S\'equentiel d'une Campagne d'Audit}{\reset@font\mtcSSfont 39}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.7}Diagramme de Flux de Donn\'ees (DFD)}{\reset@font\mtcSSfont 41}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.8}Architecture de D\'eploiement Docker Durcie}{\reset@font\mtcSSfont 42}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.9}Diagramme de Topologie de D\'eploiement}{\reset@font\mtcSSfont 42}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.10}Zones de S\'ecurit\'e R\'eseau et D\'efense en Profondeur}{\reset@font\mtcSSfont 42}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.11}Hi\'erarchie et Matrice des Permissions RBAC}{\reset@font\mtcSSfont 43}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.12}Machine \`a \'Etats des Profils de Scan}{\reset@font\mtcSSfont 44}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.13}Cycle de Vie et Classification des Donn\'ees}{\reset@font\mtcSSfont 44}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.14}Routage par la Passerelle d'API}{\reset@font\mtcSSfont 45}{}}
+{\reset@font\mtcSSfont\mtc@string\contentsline{subsection}{\noexpand \leavevmode \numberline {\filterminitoc {3.}5.15}Catalogue des Points d'Entr\'ee API (Routes Principales)}{\reset@font\mtcSSfont 45}{}}

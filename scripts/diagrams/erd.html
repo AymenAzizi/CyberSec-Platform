@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ERD - CyberSec Platform</title>
+<style>
+  @page { size: 1600px 1020px; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+  }
+  .canvas {
+    position: relative;
+    width: 1600px;
+    height: 1020px;
+    background: #ffffff;
+  }
+  .title {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: 0.3px;
+  }
+  .subtitle {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  svg.connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1600px;
+    height: 1020px;
+    z-index: 1;
+  }
+  .card {
+    position: absolute;
+    width: 240px;
+    height: 168px;
+    border: 2px solid;
+    border-radius: 6px;
+    background: #ffffff;
+    z-index: 2;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .card .hdr {
+    padding: 6px 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+  }
+  .card .body {
+    padding: 6px 10px 8px 10px;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  .card .row {
+    display: flex;
+    justify-content: space-between;
+    color: #1f2937;
+  }
+  .card .row .col { color: #374151; }
+  .card .row .typ { color: #6b7280; font-size: 11px; }
+  .card .pk { font-weight: 700; color: #111827; }
+  .card .pk .col::before { content: "PK "; color: #b45309; font-weight: 700; font-size: 10px; }
+  .card .fk .col::before { content: "FK "; color: #1d4ed8; font-weight: 700; font-size: 10px; }
+
+  /* Domain colors */
+  .auth   { border-color: #3B82F6; }
+  .auth .hdr { background: #3B82F6; }
+  .auth .body { background: #EFF6FF; }
+
+  .proj   { border-color: #10B981; }
+  .proj .hdr { background: #10B981; }
+  .proj .body { background: #F0FDF4; }
+
+  .scan   { border-color: #F59E0B; }
+  .scan .hdr { background: #F59E0B; }
+  .scan .body { background: #FEF3C7; }
+
+  .find   { border-color: #EF4444; }
+  .find .hdr { background: #EF4444; }
+  .find .body { background: #FEE2E2; }
+
+  .audit  { border-color: #6B7280; }
+  .audit .hdr { background: #6B7280; }
+  .audit .body { background: #F3F4F6; }
+
+  .legend {
+    position: absolute;
+    left: 1280px;
+    top: 540px;
+    width: 240px;
+    height: 168px;
+    border: 1px dashed #9ca3af;
+    border-radius: 6px;
+    background: #fafafa;
+    z-index: 2;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+  .legend .lh {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+  .legend .li { display: flex; align-items: center; margin: 3px 0; }
+  .legend .sw { width: 14px; height: 10px; border:1px solid; display:inline-block; margin-right: 6px; border-radius:2px; }
+  .legend .note { font-size: 10.5px; color: #6b7280; margin-top: 6px; line-height: 1.4; }
+  .legend .crow { display:inline-block; margin-left: 6px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Figure 3.1 — Diagramme Entité-Association (14 tables)</div>
+  <div class="subtitle">PostgreSQL 16 + Apache AGE — coloration par domaine fonctionnel</div>
+
+  <svg class="connections" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- "one" notation: short perpendicular bar -->
+      <marker id="one" viewBox="0 0 10 12" refX="5" refY="6" markerWidth="10" markerHeight="12" orient="auto">
+        <line x1="5" y1="0" x2="5" y2="12" stroke="#374151" stroke-width="1.6"/>
+      </marker>
+      <!-- "many" notation: crow's foot -->
+      <marker id="many" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="14" markerHeight="14" orient="auto">
+        <path d="M 0,1 L 11,6 L 0,11 M 11,6 L 0,6" fill="none" stroke="#374151" stroke-width="1.4"/>
+      </marker>
+      <!-- N:M both sides many -->
+      <marker id="manyStart" viewBox="0 0 12 12" refX="1" refY="6" markerWidth="14" markerHeight="14" orient="auto">
+        <path d="M 12,1 L 1,6 L 12,11 M 1,6 L 12,6" fill="none" stroke="#374151" stroke-width="1.4"/>
+      </marker>
+    </defs>
+
+    <!-- Row 1 (y top=100 bottom=268): users, permissions, projects, targets, scan_profiles -->
+    <!-- Row 2 (y top=320 bottom=488): scans, findings, assets, asset_relations, remediation_scripts -->
+    <!-- Row 3 (y top=540 bottom=708): reports, security_alerts, audit_logs, chat_sessions -->
+
+    <!-- 1. users(1) -> projects(N)  [route below row1, y=294] -->
+    <path d="M 200,268 L 200,294 L 800,294 L 800,268"
+          fill="none" stroke="#3B82F6" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 2. users(1) -> scans(N) [vertical col1, row1->row2] -->
+    <path d="M 200,268 L 200,320"
+          fill="none" stroke="#3B82F6" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 3. users(1) -> audit_logs(N) [route left gutter, down to row3] -->
+    <path d="M 80,180 L 50,180 L 50,620 L 680,620"
+          fill="none" stroke="#3B82F6" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 4. users(1) -> chat_sessions(N) [route far left, down, then right] -->
+    <path d="M 80,210 L 30,210 L 30,648 L 980,648"
+          fill="none" stroke="#3B82F6" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 5. users(N) <-> permissions(M) [adjacent col1-col2 row1] -->
+    <path d="M 320,180 L 380,180"
+          fill="none" stroke="#3B82F6" stroke-width="1.6"
+          marker-start="url(#manyStart)" marker-end="url(#many)"/>
+
+    <!-- 6. projects(1) -> targets(N) [col3-col4 row1] -->
+    <path d="M 920,180 L 980,180"
+          fill="none" stroke="#10B981" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 7. projects(1) -> scans(N) [row1 col3 -> row2 col1, route via gutter y=294] -->
+    <path d="M 760,268 L 760,300 L 200,300 L 200,320"
+          fill="none" stroke="#10B981" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 8. projects(1) -> reports(N) [row1 col3 -> row3 col1, route right side of projects down] -->
+    <path d="M 840,268 L 840,520 L 200,520 L 200,540"
+          fill="none" stroke="#10B981" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 9. targets(1) -> scans(N) [row1 col4 -> row2 col1, route through gutter] -->
+    <path d="M 1040,268 L 1040,308 L 260,308 L 260,320"
+          fill="none" stroke="#10B981" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 10. scan_profiles(1) -> scans(N) [row1 col5 -> row2 col1, long route top] -->
+    <path d="M 1400,100 L 1400,84 L 140,84 L 140,320"
+          fill="none" stroke="#F59E0B" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 11. scans(1) -> findings(N) [row2 col1-col2] -->
+    <path d="M 320,400 L 380,400"
+          fill="none" stroke="#F59E0B" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 12. scans(1) -> assets(N) [row2 col1 -> col3, route above row2 y=300] -->
+    <path d="M 260,320 L 260,300 L 800,300 L 800,320"
+          fill="none" stroke="#F59E0B" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 13. scans(1) -> security_alerts(N) [row2 col1 -> row3 col2, route left gutter] -->
+    <path d="M 80,400 L 60,400 L 60,572 L 500,572 L 500,540"
+          fill="none" stroke="#F59E0B" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 14. findings(1) -> remediation_scripts(N) [row2 col2 -> col5, route below row2 y=510] -->
+    <path d="M 500,488 L 500,510 L 1400,510 L 1400,488"
+          fill="none" stroke="#EF4444" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 15. findings(1) -> security_alerts(N) [row2 col2 -> row3 col2 vertical] -->
+    <path d="M 500,488 L 500,540"
+          fill="none" stroke="#EF4444" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+
+    <!-- 16. assets(N) <-> asset_relations(M) [row2 col3-col4] -->
+    <path d="M 920,400 L 980,400"
+          fill="none" stroke="#EF4444" stroke-width="1.6"
+          marker-start="url(#manyStart)" marker-end="url(#many)"/>
+
+    <!-- 17. assets self-loop target side via asset_relations (depicted as label) -->
+
+    <!-- 18. scans(1) -> reports(N) [row2 col1 -> row3 col1 vertical col1] -->
+    <path d="M 200,488 L 200,540"
+          fill="none" stroke="#F59E0B" stroke-width="1.6"
+          marker-start="url(#one)" marker-end="url(#many)"/>
+  </svg>
+
+  <!-- Row 1 -->
+  <div class="card auth" style="left:80px; top:100px;">
+    <div class="hdr">users</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row"><span class="col">name</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">email</span><span class="typ">unique</span></div>
+      <div class="row"><span class="col">role</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">password_hash</span><span class="typ">char</span></div>
+    </div>
+  </div>
+
+  <div class="card auth" style="left:380px; top:100px;">
+    <div class="hdr">permissions (RBAC)</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">bigint</span></div>
+      <div class="row"><span class="col">name</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">guard_name</span><span class="typ">varchar</span></div>
+      <div class="row fk"><span class="col">model_has_roles</span><span class="typ">pivot</span></div>
+      <div class="row fk"><span class="col">role_has_permissions</span><span class="typ">pivot</span></div>
+    </div>
+  </div>
+
+  <div class="card proj" style="left:680px; top:100px;">
+    <div class="hdr">projects</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">owner_id</span><span class="typ">users.id</span></div>
+      <div class="row"><span class="col">name</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">scope</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">status</span><span class="typ">enum</span></div>
+    </div>
+  </div>
+
+  <div class="card proj" style="left:980px; top:100px;">
+    <div class="hdr">targets</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">project_id</span><span class="typ">projects</span></div>
+      <div class="row"><span class="col">host</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">type</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">poa</span><span class="typ">jsonb</span></div>
+    </div>
+  </div>
+
+  <div class="card scan" style="left:1280px; top:100px;">
+    <div class="hdr">scan_profiles</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row"><span class="col">name</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">timing</span><span class="typ">-T2/-T3/-T4</span></div>
+      <div class="row"><span class="col">max_rate</span><span class="typ">int</span></div>
+      <div class="row"><span class="col">jitter_ms</span><span class="typ">int</span></div>
+    </div>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="card scan" style="left:80px; top:320px;">
+    <div class="hdr">scans</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">target_id</span><span class="typ">targets</span></div>
+      <div class="row fk"><span class="col">profile_id</span><span class="typ">profiles</span></div>
+      <div class="row fk"><span class="col">user_id</span><span class="typ">users</span></div>
+      <div class="row"><span class="col">state</span><span class="typ">enum</span></div>
+    </div>
+  </div>
+
+  <div class="card find" style="left:380px; top:320px;">
+    <div class="hdr">findings</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">scan_id</span><span class="typ">scans</span></div>
+      <div class="row fk"><span class="col">asset_id</span><span class="typ">assets</span></div>
+      <div class="row"><span class="col">cve</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">cvss</span><span class="typ">float</span></div>
+    </div>
+  </div>
+
+  <div class="card find" style="left:680px; top:320px;">
+    <div class="hdr">assets</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">scan_id</span><span class="typ">scans</span></div>
+      <div class="row"><span class="col">kind</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">value</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">graph_id</span><span class="typ">AGE node</span></div>
+    </div>
+  </div>
+
+  <div class="card find" style="left:980px; top:320px;">
+    <div class="hdr">asset_relations</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">source_id</span><span class="typ">assets</span></div>
+      <div class="row fk"><span class="col">target_id</span><span class="typ">assets</span></div>
+      <div class="row"><span class="col">edge_type</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">weight</span><span class="typ">float</span></div>
+    </div>
+  </div>
+
+  <div class="card find" style="left:1280px; top:320px;">
+    <div class="hdr">remediation_scripts</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">finding_id</span><span class="typ">findings</span></div>
+      <div class="row"><span class="col">language</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">body</span><span class="typ">text</span></div>
+      <div class="row"><span class="col">citations</span><span class="typ">jsonb</span></div>
+    </div>
+  </div>
+
+  <!-- Row 3 -->
+  <div class="card proj" style="left:80px; top:540px;">
+    <div class="hdr">reports</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">project_id</span><span class="typ">projects</span></div>
+      <div class="row fk"><span class="col">scan_id</span><span class="typ">scans</span></div>
+      <div class="row"><span class="col">pdf_path</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">sig (cosign)</span><span class="typ">text</span></div>
+    </div>
+  </div>
+
+  <div class="card find" style="left:380px; top:540px;">
+    <div class="hdr">security_alerts</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">scan_id</span><span class="typ">scans</span></div>
+      <div class="row fk"><span class="col">finding_id</span><span class="typ">findings</span></div>
+      <div class="row"><span class="col">severity</span><span class="typ">enum</span></div>
+      <div class="row"><span class="col">acknowledged</span><span class="typ">bool</span></div>
+    </div>
+  </div>
+
+  <div class="card audit" style="left:680px; top:540px;">
+    <div class="hdr">audit_logs</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">bigint</span></div>
+      <div class="row fk"><span class="col">user_id</span><span class="typ">users</span></div>
+      <div class="row"><span class="col">action</span><span class="typ">varchar</span></div>
+      <div class="row"><span class="col">payload</span><span class="typ">jsonb</span></div>
+      <div class="row"><span class="col">at</span><span class="typ">timestamptz</span></div>
+    </div>
+  </div>
+
+  <div class="card find" style="left:980px; top:540px;">
+    <div class="hdr">chat_sessions</div>
+    <div class="body">
+      <div class="row pk"><span class="col">id</span><span class="typ">uuid</span></div>
+      <div class="row fk"><span class="col">user_id</span><span class="typ">users</span></div>
+      <div class="row fk"><span class="col">project_id</span><span class="typ">projects</span></div>
+      <div class="row"><span class="col">messages</span><span class="typ">jsonb</span></div>
+      <div class="row"><span class="col">model</span><span class="typ">qwen2.5-coder</span></div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="lh">Légende</div>
+    <div class="li"><span class="sw" style="background:#EFF6FF;border-color:#3B82F6"></span>Auth &amp; RBAC</div>
+    <div class="li"><span class="sw" style="background:#F0FDF4;border-color:#10B981"></span>Projects &amp; Reports</div>
+    <div class="li"><span class="sw" style="background:#FEF3C7;border-color:#F59E0B"></span>Scans &amp; Profiles</div>
+    <div class="li"><span class="sw" style="background:#FEE2E2;border-color:#EF4444"></span>Findings &amp; Assets</div>
+    <div class="li"><span class="sw" style="background:#F3F4F6;border-color:#6B7280"></span>Audit (immutable)</div>
+    <div class="note">
+      PK = clé primaire &nbsp;·&nbsp; FK = clé étrangère<br>
+      Cardinalité: une barre = 1, fourche = N<br>
+      PostgreSQL 16 + extension Apache AGE (graphe)
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

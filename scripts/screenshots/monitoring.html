@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoring · CyberSec Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #0a0e1a;
+    --surface: #131826;
+    --primary: #7c3aed;
+    --secondary: #06b6d4;
+    --accent: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background-color: var(--background);
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(124, 58, 237, 0.08), transparent 42%),
+      radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.06), transparent 38%);
+    background-attachment: fixed;
+  }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 16rem; background: var(--surface);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; flex-shrink: 0;
+  }
+  .brand { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 0.625rem; }
+  .brand-logo { height: 2.25rem; width: 2.25rem; border-radius: 0.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(124, 58, 237, 0.35); }
+  .brand-logo .material-symbols-rounded { color: white; font-size: 1.25rem; }
+  .brand-text-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: white; font-size: 0.875rem; }
+  .brand-text-sub { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+  nav { flex: 1; overflow-y: auto; padding: 1rem 0.75rem; }
+  .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: #9ca3af; text-decoration: none; margin-bottom: 0.25rem; cursor: pointer; }
+  .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
+  .nav-link.active { background: rgba(124, 58, 237, 0.15); color: white; border-left: 2px solid var(--primary); }
+  .nav-link .material-symbols-rounded { font-size: 1.25rem; }
+  .nav-link .badge { margin-left: auto; }
+  .badge-danger { background: rgba(239, 68, 68, 0.10); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.30); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.625rem; font-weight: 500; }
+  .admin-section-label { padding: 1rem 0.75rem 0.25rem 0.75rem; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; color: #4b5563; }
+  .user-info { padding: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); }
+  .user-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; }
+  .avatar { height: 2.25rem; width: 2.25rem; border-radius: 9999px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem; }
+  .user-name { font-size: 0.875rem; font-weight: 500; color: white; }
+  .user-email { font-size: 0.6875rem; color: #6b7280; }
+  .role-badge { background: rgba(124, 58, 237, 0.10); color: #c4b5fd; border: 1px solid rgba(124, 58, 237, 0.30); padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; text-align: center; margin-top: 0.5rem; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header { position: sticky; top: 0; z-index: 20; background: rgba(10, 14, 26, 0.80); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 0 1.5rem; height: 3.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #9ca3af; }
+  .breadcrumb a { color: #9ca3af; text-decoration: none; }
+  .breadcrumb .sep { color: #4b5563; }
+  .breadcrumb .current { color: white; }
+  .search-box { position: relative; margin-left: auto; width: 18rem; }
+  .search-box .material-symbols-rounded { position: absolute; left: 0.625rem; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 1.125rem; }
+  .search-input { width: 100%; background: rgba(10, 14, 26, 0.6); border: 1px solid rgba(255,255,255,0.10); border-radius: 0.5rem; padding: 0.375rem 0.75rem 0.375rem 2.25rem; font-size: 0.875rem; color: white; font-family: inherit; outline: none; }
+  .icon-btn { background: transparent; border: none; color: #d1d5db; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; position: relative; }
+  .icon-btn:hover { background: rgba(255,255,255,0.05); }
+  .notif-badge { position: absolute; top: 0; right: 0; height: 1rem; min-width: 1rem; padding: 0 0.25rem; border-radius: 9999px; background: var(--danger); color: white; font-size: 0.625rem; display: flex; align-items: center; justify-content: center; }
+  main { flex: 1; padding: 1.5rem; }
+  .footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; color: #6b7280; display: flex; justify-content: space-between; align-items: center; }
+  .footer .version { font-family: 'JetBrains Mono', monospace; }
+  .page-header { display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 600; color: white; }
+  .page-subtitle { font-size: 0.875rem; color: #9ca3af; margin-top: 0.25rem; }
+  .live-badge { display: inline-flex; align-items: center; gap: 0.375rem; background: rgba(16, 185, 129, 0.10); border: 1px solid rgba(16, 185, 129, 0.30); color: var(--success); padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; }
+  .live-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .kpi-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 1.125rem; }
+  .kpi-label { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.375rem; }
+  .kpi-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: white; line-height: 1; }
+  .kpi-value.danger { color: var(--danger); }
+  .kpi-value.warning { color: var(--warning); }
+  .kpi-value.success { color: var(--success); }
+  .kpi-trend { font-size: 0.6875rem; color: #6b7280; margin-top: 0.375rem; display: flex; align-items: center; gap: 0.25rem; }
+  .kpi-trend.up { color: var(--danger); }
+  .kpi-trend.down { color: var(--success); }
+  .panel-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .card { background: var(--surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 0.75rem; overflow: hidden; }
+  .card-header { padding: 0.875rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.9375rem; color: white; display: flex; align-items: center; gap: 0.5rem; }
+  .card-actions { display: flex; gap: 0.375rem; }
+  .chip { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #9ca3af; padding: 0.1875rem 0.5rem; border-radius: 0.25rem; font-size: 0.6875rem; cursor: pointer; }
+  .chip.active { background: rgba(124, 58, 237, 0.15); border-color: rgba(124, 58, 237, 0.40); color: white; }
+  .events-stream { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 1.6; padding: 0.75rem 1rem; max-height: 520px; overflow-y: auto; background: #0a0e1a; }
+  .event-row { display: grid; grid-template-columns: 4.5rem 6rem 1fr 5.5rem; gap: 0.75rem; padding: 0.375rem 0; border-bottom: 1px dashed rgba(255,255,255,0.03); align-items: start; }
+  .event-time { color: #6b7280; }
+  .event-level { font-weight: 500; }
+  .event-level.info { color: #67e8f9; }
+  .event-level.warn { color: var(--warning); }
+  .event-level.error { color: var(--danger); }
+  .event-level.crit { color: var(--danger); background: rgba(239, 68, 68, 0.10); padding: 0 0.375rem; border-radius: 0.1875rem; display: inline-block; }
+  .event-msg { color: #d1d5db; word-break: break-word; }
+  .event-msg .src { color: #c4b5fd; }
+  .event-msg .num { color: #facc15; }
+  .event-msg .ok { color: var(--success); }
+  .event-source { color: #6b7280; font-size: 0.6875rem; }
+  .alert-list { padding: 0.5rem 0; }
+  .alert-item { padding: 0.625rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 0.25rem; }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-row1 { display: flex; align-items: center; gap: 0.5rem; }
+  .alert-sev { font-size: 0.625rem; font-weight: 600; padding: 0.125rem 0.375rem; border-radius: 0.1875rem; }
+  .alert-sev.critical { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.40); }
+  .alert-sev.high { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.40); }
+  .alert-sev.medium { background: rgba(250, 204, 21, 0.10); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.30); }
+  .alert-title { font-size: 0.8125rem; color: white; flex: 1; }
+  .alert-time { font-size: 0.6875rem; color: #6b7280; font-family: 'JetBrains Mono', monospace; }
+  .alert-meta { font-size: 0.6875rem; color: #9ca3af; font-family: 'JetBrains Mono', monospace; }
+  .chart-card { margin-bottom: 1.5rem; }
+  .chart-area { padding: 1rem; }
+  .bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+  .bar-row { display: grid; grid-template-columns: 7rem 1fr 4rem; align-items: center; gap: 0.75rem; font-size: 0.75rem; }
+  .bar-label { color: #d1d5db; }
+  .bar-track { background: rgba(255,255,255,0.04); height: 1rem; border-radius: 0.1875rem; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 0.1875rem; }
+  .bar-fill.crit { background: linear-gradient(90deg, #ef4444, #dc2626); }
+  .bar-fill.high { background: linear-gradient(90deg, #f59e0b, #d97706); }
+  .bar-fill.med { background: linear-gradient(90deg, #facc15, #eab308); }
+  .bar-fill.low { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+  .bar-fill.info { background: linear-gradient(90deg, #67e8f9, #06b6d4); }
+  .bar-count { color: white; font-weight: 500; text-align: right; font-family: 'JetBrains Mono', monospace; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><span class="material-symbols-rounded">shield</span></div>
+      <div>
+        <div class="brand-text-name">CyberSec</div>
+        <div class="brand-text-sub">Platform</div>
+      </div>
+    </div>
+    <nav>
+      <a class="nav-link"><span class="material-symbols-rounded">grid_view</span><span>Dashboard</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">folder</span><span>Projects</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">radar</span><span>Scans</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">description</span><span>Reports</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">notifications_active</span><span>Security Alerts</span><span class="badge badge-danger">7</span></a>
+      <a class="nav-link active"><span class="material-symbols-rounded">monitoring</span><span>Monitoring</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">science</span><span>Sandbox</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">hub</span><span>Knowledge Graph</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">travel_explore</span><span>OSINT</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">smart_toy</span><span>AI Chatbot</span></a>
+      <div class="admin-section-label">Administration</div>
+      <a class="nav-link"><span class="material-symbols-rounded">group</span><span>Users</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">receipt_long</span><span>Audit Logs</span></a>
+      <a class="nav-link"><span class="material-symbols-rounded">health_and_safety</span><span>System Health</span></a>
+    </nav>
+    <div class="user-info">
+      <div class="user-row">
+        <div class="avatar">A</div>
+        <div>
+          <div class="user-name">Aymen Azizi</div>
+          <div class="user-email">admin@cybersec.local</div>
+        </div>
+      </div>
+      <div class="role-badge">Admin</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header>
+      <nav class="breadcrumb">
+        <a href="#">Home</a>
+        <span class="sep">/</span>
+        <a href="#">Operations</a>
+        <span class="sep">/</span>
+        <span class="current">Monitoring</span>
+      </nav>
+      <div class="search-box">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" class="search-input" placeholder="Search projects, scans…">
+      </div>
+      <button class="icon-btn">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="notif-badge">7</span>
+      </button>
+      <button class="icon-btn"><span class="material-symbols-rounded">dark_mode</span></button>
+    </header>
+
+    <main>
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Security Monitoring</h1>
+          <p class="page-subtitle">Real-time event stream from all microservices via Redis Streams · 1.2k events/min sustained</p>
+        </div>
+        <div class="live-badge">
+          <span class="live-dot"></span>
+          LIVE · Stream: cybersec.events
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Events / Min</div>
+          <div class="kpi-value">1,247</div>
+          <div class="kpi-trend up"><span class="material-symbols-rounded" style="font-size:0.75rem">trending_up</span> +18% vs baseline</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Open Alerts</div>
+          <div class="kpi-value danger">22</div>
+          <div class="kpi-trend up"><span class="material-symbols-rounded" style="font-size:0.75rem">priority_high</span> 3 critical · 7 high</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Active Scans</div>
+          <div class="kpi-value warning">4</div>
+          <div class="kpi-trend">2 nuclei · 1 nmap · 1 osint</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Queue Depth</div>
+          <div class="kpi-value success">38</div>
+          <div class="kpi-trend down"><span class="material-symbols-rounded" style="font-size:0.75rem">trending_down</span> -22% in 5 min</div>
+        </div>
+      </div>
+
+      <!-- Event Stream + Alerts -->
+      <div class="panel-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="material-symbols-rounded" style="font-size:1.125rem;color:#67e8f9">stream</span>
+              Live Event Stream
+            </div>
+            <div class="card-actions">
+              <span class="chip active">all</span>
+              <span class="chip">scan</span>
+              <span class="chip">alert</span>
+              <span class="chip">system</span>
+            </div>
+          </div>
+          <div class="events-stream">
+            <div class="event-row">
+              <span class="event-time">14:34:21</span>
+              <span class="event-level crit">CRIT</span>
+              <span class="event-msg"><span class="src">scan.recon</span> · finding-3f9a raised: <span class="num">CVE-2023-5678</span> (CVSS 9.8) on asset-www-ensit-tn — unauthenticated SQLi in contact-form-7</span>
+              <span class="event-source">recon-ms · pod-2</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:34:18</span>
+              <span class="event-level error">ERR</span>
+              <span class="event-msg"><span class="src">waf.detect</span> · HSTS header missing on <span class="num">https://www.ensit.tn</span> — auto-remediation playbook queued (pb-12)</span>
+              <span class="event-source">security-ms · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:34:15</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">scan.nmap</span> · host 196.20.94.22 reachable, 7 ports open: <span class="num">22, 80, 443, 3306, 5432, 6379, 8080</span></span>
+              <span class="event-source">recon-ms · pod-2</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:34:11</span>
+              <span class="event-level warn">WARN</span>
+              <span class="event-msg"><span class="src">osint.dns</span> · subdomain discovery found <span class="num">14</span> new hosts (total: 38) — re-scoping perimeter</span>
+              <span class="event-source">osint-ms · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:34:08</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">ai.assistant</span> · chat completion served (<span class="num">612</span> tokens, 1.8s latency, citations: 8)</span>
+              <span class="event-source">ai-ms · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:34:04</span>
+              <span class="event-level error">ERR</span>
+              <span class="event-msg"><span class="src">scan.nuclei</span> · CVE-2024-1234 confirmed on <span class="num">:443</span> — OpenSSL 1.1.1k pre-auth memory disclosure</span>
+              <span class="event-source">recon-ms · pod-3</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:34:01</span>
+              <span class="event-level crit">CRIT</span>
+              <span class="event-msg"><span class="src">git.audit</span> · <span class="num">/.git/config</span> publicly exposed on <span class="num">www.ensit.tn</span> — 312 objects downloadable</span>
+              <span class="event-source">security-ms · pod-2</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:57</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">scan.nmap</span> · OS fingerprint: Linux 5.x (Ubuntu 22.04), TTL 64 — confidence 96%</span>
+              <span class="event-source">recon-ms · pod-2</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:53</span>
+              <span class="event-level warn">WARN</span>
+              <span class="event-msg"><span class="src">sandbox.spawn</span> · DVWA container started on <span class="num">0.0.0.0:8181</span>, isolation: net-sandbox-iso</span>
+              <span class="event-source">api-gw · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:48</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">db.age</span> · knowledge graph node inserted: <span class="num">CVE-2023-5678 → asset-www-ensit-tn</span> (blast-radius 6 assets)</span>
+              <span class="event-source">laravel-app · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:45</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">queue.redis</span> · stream cybersec.events trimmed to max-len 10000, oldest msg 14:24:11</span>
+              <span class="event-source">api-gw · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:41</span>
+              <span class="event-level error">ERR</span>
+              <span class="event-msg"><span class="src">scan.nuclei</span> · CSP header missing on <span class="num">/login</span> — XSS surface increased</span>
+              <span class="event-source">recon-ms · pod-3</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:38</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">scan.osint</span> · WHOIS for ensit.tn: registrar <span class="num">IPv4 Management</span>, created 2012-04-18, expires 2027-04-18</span>
+              <span class="event-source">osint-ms · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:34</span>
+              <span class="event-level warn">WARN</span>
+              <span class="event-msg"><span class="src">osint.ssl</span> · TLS cert chain incomplete on <span class="num">:443</span> — missing intermediate, affects ~12% of clients</span>
+              <span class="event-source">osint-ms · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:30</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">ai.embeddings</span> · pgvector upsert: 50 findings embedded into <span class="num">cybersec_embeddings</span> (1536-dim)</span>
+              <span class="event-source">ai-ms · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:27</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">scan.recon</span> · nuclei template load: <span class="num">7,842</span> templates loaded (cves/, exposures/, misconfig/)</span>
+              <span class="event-source">recon-ms · pod-3</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:23</span>
+              <span class="event-level error">ERR</span>
+              <span class="event-msg"><span class="src">scan.nuclei</span> · exposed .env file at <span class="num">/.env</span> — APP_KEY, DB_PASSWORD, REDIS_PASSWORD leaked</span>
+              <span class="event-source">recon-ms · pod-2</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:19</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">scan.nmap</span> · service probe on :80 → nginx 1.18.0 (Ubuntu), :443 → nginx 1.18.0 + OpenSSL 1.1.1k</span>
+              <span class="event-source">recon-ms · pod-2</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:14</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">queue.redis</span> · XADD scan.start scan_id=7f3a2c91 tool=nuclei target=https://www.ensit.tn profile=balanced</span>
+              <span class="event-source">api-gw · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:08</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">api.gateway</span> · POST /api/scans 201 — user=admin@cybersec.local ip=10.0.0.42 latency=87ms</span>
+              <span class="event-source">api-gw · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:33:02</span>
+              <span class="event-level warn">WARN</span>
+              <span class="event-msg"><span class="src">auth.rbac</span> · user analyst@cybersec.local attempted DELETE /api/projects/3 — denied (role=analyst)</span>
+              <span class="event-source">laravel-app · pod-1</span>
+            </div>
+            <div class="event-row">
+              <span class="event-time">14:32:58</span>
+              <span class="event-level info">INFO</span>
+              <span class="event-msg"><span class="src">db.pg</span> · NOTIFY scan.completed scan_id=7f3a2c91 duration=42s findings=50 — listener ai-ms reacted</span>
+              <span class="event-source">laravel-app · pod-1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="material-symbols-rounded" style="font-size:1.125rem;color:var(--danger)">notifications_active</span>
+              Top Active Alerts
+            </div>
+            <span class="chip" style="background:rgba(239,68,68,0.10);border-color:rgba(239,68,68,0.30);color:var(--danger)">22 open</span>
+          </div>
+          <div class="alert-list">
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev critical">CRITICAL</span>
+                <span class="alert-title">CVE-2023-5678 — CF7 SQL Injection</span>
+                <span class="alert-time">2m ago</span>
+              </div>
+              <div class="alert-meta">asset-www-ensit-tn · CVSS 9.8 · unauthenticated</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev critical">CRITICAL</span>
+                <span class="alert-title">Git Config Exposure</span>
+                <span class="alert-time">3m ago</span>
+              </div>
+              <div class="alert-meta">/.git/config · 312 objects leaked</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev critical">CRITICAL</span>
+                <span class="alert-title">.env File Publicly Accessible</span>
+                <span class="alert-time">4m ago</span>
+              </div>
+              <div class="alert-meta">/.env · APP_KEY + DB_PASSWORD exposed</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev high">HIGH</span>
+                <span class="alert-title">CVE-2024-1234 — OpenSSL Memory Disclosure</span>
+                <span class="alert-time">5m ago</span>
+              </div>
+              <div class="alert-meta">:443 · OpenSSL 1.1.1k · CVSS 9.1</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev high">HIGH</span>
+                <span class="alert-title">MySQL Port 3306 Internet-Exposed</span>
+                <span class="alert-time">8m ago</span>
+              </div>
+              <div class="alert-meta">196.20.94.22:3306 · weak-auth allowed</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev high">HIGH</span>
+                <span class="alert-title">HSTS Header Missing</span>
+                <span class="alert-time">10m ago</span>
+              </div>
+              <div class="alert-meta">https://www.ensit.tn · SSL strip risk</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev high">HIGH</span>
+                <span class="alert-title">TLS Certificate Chain Incomplete</span>
+                <span class="alert-time">12m ago</span>
+              </div>
+              <div class="alert-meta">:443 · intermediate missing</div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-row1">
+                <span class="alert-sev medium">MEDIUM</span>
+                <span class="alert-title">CSP Header Missing on /login</span>
+                <span class="alert-time">14m ago</span>
+              </div>
+              <div class="alert-meta">/login · XSS surface increased</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events by Type Chart -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="material-symbols-rounded" style="font-size:1.125rem;color:#c4b5fd">bar_chart</span>
+            Events by Category · Last 60 Minutes
+          </div>
+          <div class="card-actions">
+            <span class="chip active">1h</span>
+            <span class="chip">24h</span>
+            <span class="chip">7d</span>
+          </div>
+        </div>
+        <div class="chart-area">
+          <div class="bar-chart">
+            <div class="bar-row">
+              <span class="bar-label">scan.finding</span>
+              <div class="bar-track"><div class="bar-fill crit" style="width:84%"></div></div>
+              <span class="bar-count">847</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">scan.start</span>
+              <div class="bar-track"><div class="bar-fill info" style="width:28%"></div></div>
+              <span class="bar-count">142</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">alert.raise</span>
+              <div class="bar-track"><div class="bar-fill high" style="width:42%"></div></div>
+              <span class="bar-count">218</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">osint.discovery</span>
+              <div class="bar-track"><div class="bar-fill low" style="width:34%"></div></div>
+              <span class="bar-count">176</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">ai.completion</span>
+              <div class="bar-track"><div class="bar-fill med" style="width:22%"></div></div>
+              <span class="bar-count">112</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">auth.rbac</span>
+              <div class="bar-track"><div class="bar-fill low" style="width:14%"></div></div>
+              <span class="bar-count">71</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">sandbox.spawn</span>
+              <div class="bar-track"><div class="bar-fill info" style="width:9%"></div></div>
+              <span class="bar-count">44</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">system.error</span>
+              <div class="bar-track"><div class="bar-fill crit" style="width:6%"></div></div>
+              <span class="bar-count">29</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer">
+      <span>© 2026 CyberSec Platform — Final Year Project — TEK-UP</span>
+      <span class="version">CyberSec Platform v1.0 · stream Lag: 0ms</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

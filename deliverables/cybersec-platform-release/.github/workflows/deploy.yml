@@ -1,0 +1,245 @@
+# =============================================================================
+# Deploy — push images to GHCR + SSH deploy to production
+# =============================================================================
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI / DevSecOps"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
+      tag:
+        description: 'Image tag to deploy (sha or semantic)'
+        required: false
+        default: 'latest'
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/cybersec
+  SSH_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+  SSH_USER: ${{ secrets.DEPLOY_SSH_USER }}
+  DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/opt/cybersec-platform' }}
+
+permissions:
+  contents: read
+  packages: read
+  id-token: write
+
+jobs:
+  # ===========================================================================
+  # 1. Confirm CI succeeded, then build+push to GHCR
+  # ===========================================================================
+  push-images:
+    name: Push images to GHCR
+    runs-on: ubuntu-24.04
+    # Only run if upstream CI workflow succeeded
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        image: [backend, reconnaissance, security, osint, ai, api-gateway, worker]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.image == 'backend' && './platform' || format('./platform/microservices/{0}', matrix.image) }}
+          file: ${{ matrix.image == 'backend' && './platform/docker/backend.Dockerfile' || format('./platform/microservices/{0}/Dockerfile', matrix.image) }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: true
+          sbom: true
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.4.1'
+
+      - name: Verify image signature
+        run: |
+          cosign verify \
+            --certificate-identity-regexp "https://github.com/${{ github.repository }}/.github/.+" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.image }}@${{ steps.build.outputs.digest }} \
+            || { echo "::error::Signature verification failed"; exit 1; }
+
+      - name: Output digest
+        run: echo "${{ matrix.image }}=${{ steps.build.outputs.digest }}" >> $GITHUB_ENV
+
+  # ===========================================================================
+  # 2. SSH to production + run deploy script
+  # ===========================================================================
+  deploy:
+    name: Deploy on server
+    runs-on: ubuntu-24.04
+    needs: [push-images]
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ secrets.PRODUCTION_URL || 'https://cybersec.example.com' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ssh-agent
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y openssh-client
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ env.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          cat > ~/.ssh/config <<EOF
+          Host prod
+            HostName ${{ env.SSH_HOST }}
+            User ${{ env.SSH_USER }}
+            IdentityFile ~/.ssh/id_ed25519
+            StrictHostKeyChecking yes
+            IdentitiesOnly yes
+            ServerAliveInterval 30
+            ServerAliveCountMax 3
+          EOF
+
+      - name: Sync compose + config
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='storage/framework/cache/data/*' \
+            --exclude='storage/logs/*' \
+            platform/docker-compose.yml \
+            platform/docker \
+            platform/scripts \
+            platform/.env.docker \
+            prod:${DEPLOY_PATH}/
+
+      - name: Pull latest images
+        run: |
+          ssh prod "cd ${DEPLOY_PATH} && docker compose pull"
+
+      - name: Run migrations (safe, non-destructive)
+        run: |
+          ssh prod "cd ${DEPLOY_PATH} && \
+            docker compose --env-file .env.docker up -d postgres redis && \
+            sleep 10 && \
+            docker compose --env-file .env.docker up -d backend && \
+            sleep 30 && \
+            docker compose exec -T backend php artisan migrate --force"
+
+      - name: Roll services
+        run: |
+          ssh prod "cd ${DEPLOY_PATH} && \
+            docker compose --env-file .env.docker up -d --no-deps --force-recreate \
+              backend reconnaissance security osint ai api-gateway worker nginx"
+
+      - name: Warm caches
+        run: |
+          ssh prod "cd ${DEPLOY_PATH} && \
+            docker compose exec -T backend php artisan config:cache && \
+            docker compose exec -T backend php artisan route:cache && \
+            docker compose exec -T backend php artisan view:cache && \
+            docker compose exec -T backend php artisan event:cache"
+
+  # ===========================================================================
+  # 3. Verify deployment health
+  # ===========================================================================
+  verify:
+    name: Verify deployment
+    runs-on: ubuntu-24.04
+    needs: [deploy]
+    timeout-minutes: 10
+    steps:
+      - name: Wait for services to be ready
+        run: sleep 30
+
+      - name: Check nginx health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "${{ secrets.PRODUCTION_URL || 'http://localhost' }}/healthz" | grep -q ok; then
+              echo "✓ nginx healthy"
+              exit 0
+            fi
+            echo "  attempt ${i}/30: waiting..."
+            sleep 10
+          done
+          echo "::error::nginx did not become healthy"
+          exit 1
+
+      - name: Check backend health
+        run: |
+          for i in $(seq 1 20); do
+            status=$(ssh -o StrictHostKeyChecking=no prod \
+              "cd ${DEPLOY_PATH} && docker compose ps backend --format json" 2>/dev/null \
+              | jq -r '.Health // .Status' 2>/dev/null || echo "unknown")
+            if echo "${status}" | grep -qi "healthy"; then
+              echo "✓ backend healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::backend did not become healthy"
+          exit 1
+
+      - name: Check all containers
+        run: |
+          ssh -o StrictHostKeyChecking=no prod "cd ${DEPLOY_PATH} && docker compose ps"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "::warning::Deployment failed — initiating rollback"
+          ssh -o StrictHostKeyChecking=no prod "cd ${DEPLOY_PATH} && \
+            docker compose --env-file .env.docker rollback || \
+            docker compose --env-file .env.docker up -d --no-deps --force-recreate backend nginx"
+          echo "::warning::Rolled back to previous version"
+
+      - name: Send notification
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          if [[ "${STATUS}" == "success" ]]; then
+            echo "✅ Deployment succeeded at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          else
+            echo "❌ Deployment failed at $(date -u +'%Y-%m-%dT%H:%M:%SZ') — check logs"
+          fi

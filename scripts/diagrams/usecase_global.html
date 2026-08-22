@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Global Use Case Diagram</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1480px; height: 1000px;
+    background: #ffffff;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    padding: 32px 40px 24px 40px;
+    position: relative;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 18px;
+  }
+  .canvas { position: relative; width: 100%; height: 900px; }
+
+  .boundary {
+    position: absolute;
+    top: 0; left: 200px;
+    width: 1080px; height: 880px;
+    border: 2px dashed #1e40af;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+  .boundary-label {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    padding: 0 14px;
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .actor {
+    position: absolute;
+    width: 110px;
+    text-align: center;
+  }
+  .actor .figure {
+    width: 56px; height: 92px;
+    margin: 0 auto 6px;
+    position: relative;
+  }
+  .actor .figure::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 22px; height: 22px;
+    border: 2.5px solid #0f172a;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+  .actor .figure::after {
+    content: '';
+    position: absolute;
+    top: 22px; left: 50%;
+    transform: translateX(-50%);
+    width: 2.5px; height: 38px;
+    background: #0f172a;
+  }
+  .actor .arms {
+    position: absolute;
+    top: 32px; left: 50%;
+    transform: translateX(-50%);
+    width: 44px; height: 2.5px;
+    background: #0f172a;
+  }
+  .actor .legs {
+    position: absolute;
+    top: 60px; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 28px;
+  }
+  .actor .legs::before, .actor .legs::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 2.5px; height: 28px;
+    background: #0f172a;
+    transform-origin: top center;
+  }
+  .actor .legs::before { left: 4px; transform: rotate(18deg); }
+  .actor .legs::after  { right: 4px; transform: rotate(-18deg); }
+  .actor .name { font-size: 14px; font-weight: 700; }
+  .actor .role { font-size: 11px; color: #475569; margin-top: 2px; }
+
+  .uc {
+    position: absolute;
+    min-width: 175px;
+    padding: 10px 18px;
+    border-radius: 100px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    border: 2px solid;
+    background: #ffffff;
+    line-height: 1.25;
+    z-index: 2;
+  }
+  .uc.general { background: #dbeafe; border-color: #1e40af; color: #1e3a8a; }
+  .uc.security { background: #fee2e2; border-color: #b91c1c; color: #7f1d1d; }
+  .uc.admin { background: #fef3c7; border-color: #b45309; color: #78350f; }
+  .uc.governance { background: #dcfce7; border-color: #15803d; color: #14532d; }
+
+  svg.lines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .legend {
+    position: absolute;
+    bottom: -32px; left: 0;
+    display: flex;
+    gap: 18px;
+    font-size: 12px;
+    color: #475569;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid; }
+  .ld-general { background: #dbeafe; border-color: #1e40af; }
+  .ld-security { background: #fee2e2; border-color: #b91c1c; }
+  .ld-admin { background: #fef3c7; border-color: #b45309; }
+  .ld-governance { background: #dcfce7; border-color: #15803d; }
+</style>
+</head>
+<body>
+  <h1>Global Use Case Diagram &mdash; CyberSec Platform</h1>
+  <div class="canvas">
+    <div class="boundary">
+      <div class="boundary-label">CyberSec Platform</div>
+
+      <!-- Column 1 (left): General use cases - paired with Analyst actor on the left -->
+      <div class="uc general" style="top: 40px;  left: 50px;">Authenticate</div>
+      <div class="uc general" style="top: 110px; left: 50px;">Manage Projects</div>
+      <div class="uc general" style="top: 180px; left: 50px;">View Scan Results</div>
+      <div class="uc general" style="top: 250px; left: 50px;">Generate Report</div>
+      <div class="uc general" style="top: 320px; left: 50px;">Export Report</div>
+      <div class="uc general" style="top: 390px; left: 50px;">View Alerts</div>
+      <div class="uc general" style="top: 460px; left: 50px;">Acknowledge Alert</div>
+      <div class="uc general" style="top: 530px; left: 50px;">Launch Scan</div>
+      <div class="uc general" style="top: 600px; left: 50px;">Chat with AI Co-pilot</div>
+      <div class="uc general" style="top: 670px; left: 50px;">View Knowledge Graph</div>
+
+      <!-- Column 2: Security testing use cases -->
+      <div class="uc security" style="top: 80px;  left: 360px;">Reconnaissance Scan</div>
+      <div class="uc security" style="top: 170px; left: 360px;">Injection Testing</div>
+      <div class="uc security" style="top: 260px; left: 360px;">Sandbox Testing</div>
+      <div class="uc security" style="top: 350px; left: 360px;">OSINT Module</div>
+      <div class="uc security" style="top: 440px; left: 360px;">AI Remediation</div>
+
+      <!-- Column 3: Admin-only use cases -->
+      <div class="uc admin" style="top: 80px;  left: 660px;">Manage Users</div>
+      <div class="uc admin" style="top: 170px; left: 660px;">Assign Roles</div>
+      <div class="uc admin" style="top: 260px; left: 660px;">Configure Quotas</div>
+      <div class="uc admin" style="top: 350px; left: 660px;">Override Rate Limit</div>
+
+      <!-- Column 4: Governance use cases -->
+      <div class="uc governance" style="top: 530px; left: 660px;">View Audit Log</div>
+      <div class="uc governance" style="top: 620px; left: 660px;">View System Health</div>
+      <div class="uc governance" style="top: 710px; left: 660px;">Export Audit Report</div>
+    </div>
+
+    <!-- Actors - layout strategy:
+         Analyst (top-left) -> general + security columns (short lines)
+         Admin (top-right) -> admin + governance columns (short lines), inherits Analyst via dashed arrow
+         Client (bottom-left) -> general column view-only use cases
+         Auditor (bottom-right) -> governance column + Authenticate -->
+
+    <div class="actor" style="top: 60px; left: 20px;">
+      <div class="figure"><div class="arms"></div><div class="legs"></div></div>
+      <div class="name">Analyst</div>
+      <div class="role">Scan execution</div>
+    </div>
+
+    <div class="actor" style="top: 60px; right: 20px;">
+      <div class="figure"><div class="arms"></div><div class="legs"></div></div>
+      <div class="name">Admin</div>
+      <div class="role">Full access</div>
+    </div>
+
+    <div class="actor" style="top: 600px; left: 20px;">
+      <div class="figure"><div class="arms"></div><div class="legs"></div></div>
+      <div class="name">Client</div>
+      <div class="role">Read-only</div>
+    </div>
+
+    <div class="actor" style="top: 600px; right: 20px;">
+      <div class="figure"><div class="arms"></div><div class="legs"></div></div>
+      <div class="name">Auditor</div>
+      <div class="role">Compliance</div>
+    </div>
+
+    <svg class="lines" xmlns="http://www.w3.org/2000/svg">
+      <!--
+        Routing strategy:
+        - Analyst (left, top) -> security column only (the analyst's primary role)
+          plus Authenticate + Launch Scan (the 2 most important general use cases)
+        - Admin (right, top) -> admin col + governance col, and inherits all Analyst
+          use cases via a dashed generalization arrow
+        - Client (left, bottom) -> Authenticate + View Scan Results + Generate Report
+          + Export Report + View Alerts + Acknowledge Alert + Chat with AI + View KG
+        - Auditor (right, bottom) -> governance col + Authenticate
+      -->
+
+      <!-- Analyst -> key general use cases -->
+      <line x1="140" y1="110" x2="290" y2="60"  stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="110" x2="290" y2="550" stroke="#0f172a" stroke-width="1.4"/>
+      <!-- Analyst -> security column (left side ~x=580) -->
+      <line x1="140" y1="110" x2="580" y2="100" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="110" x2="580" y2="190" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="110" x2="580" y2="280" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="110" x2="580" y2="370" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="110" x2="580" y2="460" stroke="#0f172a" stroke-width="1.4"/>
+
+      <!-- Admin -> admin column (right side ~x=835) -->
+      <line x1="1340" y1="110" x2="835" y2="100" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="110" x2="835" y2="190" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="110" x2="835" y2="280" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="110" x2="835" y2="370" stroke="#0f172a" stroke-width="1.4"/>
+      <!-- Admin -> governance column (right side ~x=835) -->
+      <line x1="1340" y1="110" x2="835" y2="550" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="110" x2="835" y2="640" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="110" x2="835" y2="730" stroke="#0f172a" stroke-width="1.4"/>
+
+      <!-- Client -> view-only use cases in general col -->
+      <line x1="140" y1="650" x2="290" y2="60"  stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="200" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="270" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="340" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="410" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="480" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="620" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="140" y1="650" x2="290" y2="690" stroke="#0f172a" stroke-width="1.4"/>
+
+      <!-- Auditor -> governance column (right side ~x=835) -->
+      <line x1="1340" y1="650" x2="835" y2="550" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="650" x2="835" y2="640" stroke="#0f172a" stroke-width="1.4"/>
+      <line x1="1340" y1="650" x2="835" y2="730" stroke="#0f172a" stroke-width="1.4"/>
+
+      <!-- Dashed inheritance arrow: Admin (right) inherits from Analyst (left) -->
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+        </marker>
+      </defs>
+      <!-- Arrow goes FROM Admin TO Analyst (open triangle = generalization) -->
+      <line x1="1230" y1="105" x2="250" y2="105"
+            stroke="#475569" stroke-width="1.6" stroke-dasharray="8 4"
+            marker-end="url(#arrow)"/>
+      <text x="740" y="98" font-size="12" fill="#475569" font-style="italic" text-anchor="middle">
+        &laquo;inherit&raquo; Admin inherits all Analyst use cases
+      </text>
+    </svg>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot ld-general"></span>General use cases</div>
+      <div class="legend-item"><span class="legend-dot ld-security"></span>Security testing</div>
+      <div class="legend-item"><span class="legend-dot ld-admin"></span>Admin only</div>
+      <div class="legend-item"><span class="legend-dot ld-governance"></span>Governance / compliance</div>
+    </div>
+  </div>
+</body>
+</html>

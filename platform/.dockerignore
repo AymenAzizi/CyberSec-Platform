@@ -1,0 +1,32 @@
+# Secrets and local config — never bake into images
+.env
+.env.docker
+.env.local
+.env.*.local
+
+# Vendor and generated dirs
+vendor/
+node_modules/
+bootstrap/cache/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+
+# Dev artifacts
+.git/
+.gitignore
+*.md
+*.sh
+tests/
+docker/
+microservices/
+scripts/
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

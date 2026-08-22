@@ -1,0 +1,64 @@
+# Node & Composer
+node_modules/
+vendor/
+npm-debug.log
+yarn-error.log
+
+# Environment & Credentials
+.env
+.env.backup
+.env.production
+*.env.local
+
+# Build artifacts & caches
+public/hot
+public/storage
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+!storage/framework/.gitignore
+!storage/logs/.gitignore
+
+# Testing & E2E
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+env/
+ENV/
+
+# LaTeX build temp files (keep main.pdf)
+rapport/*.aux
+rapport/*.bcf
+rapport/*.blg
+rapport/*.fdb_latexmk
+rapport/*.fls
+rapport/*.log
+rapport/*.out
+rapport/*.run.xml
+rapport/*.synctex.gz
+rapport/*.toc
+rapport/*.lof
+rapport/*.lot
+rapport/*.nlo
+rapport/*.nls
+rapport/*.ilg
+
+# Reference external PDFs
+PFE_Khalil_current_main-2.pdf
+internship-report-1599-1.pdf
+
+# OS Files
+.DS_Store
+Thumbs.db

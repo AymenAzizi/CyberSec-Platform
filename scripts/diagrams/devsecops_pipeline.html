@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DevSecOps Pipeline</title>
+<style>
+  @page { size: 1800px 700px; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2937; }
+  .canvas { position: relative; width: 1800px; height: 700px; background: #ffffff; }
+  .title { position:absolute; top:14px; left:0; width:100%; text-align:center; font-size:22px; font-weight:700; color:#111827; }
+  .subtitle { position:absolute; top:44px; left:0; width:100%; text-align:center; font-size:12.5px; color:#6b7280; }
+
+  svg.flow { position:absolute; top:0; left:0; width:1800px; height:700px; z-index:1; }
+
+  .stage {
+    position:absolute; width:300px; height:300px;
+    border:2.5px solid; border-radius:8px;
+    background:#ffffff; z-index:2;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+    overflow:hidden;
+  }
+  .stage .sh {
+    padding:8px 10px; color:#ffffff; font-size:14px; font-weight:700;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .stage .sh .num {
+    background:rgba(255,255,255,0.25); border-radius:4px;
+    padding:1px 8px; font-size:11px; font-weight:700;
+  }
+  .stage .sb { padding:8px 10px; font-size:11.5px; line-height:1.55; }
+  .stage .sb .it {
+    display:flex; align-items:flex-start; gap:6px; margin:3px 0;
+  }
+  .stage .sb .it .dot {
+    width:6px; height:6px; border-radius:50%; margin-top:6px; flex-shrink:0;
+  }
+  .stage .sb .it .tx { color:#1f2937; }
+  .stage .sb .it .tx b { color:#111827; }
+  .stage .art {
+    position:absolute; bottom:6px; left:10px; right:10px;
+    border-top:1px dashed #d1d5db; padding-top:4px;
+    font-size:10.5px; color:#6b7280;
+  }
+  .stage .art b { color:#374151; }
+
+  .pass  { border-color:#10B981; }
+  .pass .sh { background:#10B981; }
+  .pass .dot { background:#10B981; }
+  .pass .sb { background:#F0FDF4; }
+
+  .gate  { border-color:#EF4444; }
+  .gate .sh { background:#EF4444; }
+  .gate .dot { background:#EF4444; }
+  .gate .sb { background:#FEE2E2; }
+
+  .rel   { border-color:#3B82F6; }
+  .rel .sh { background:#3B82F6; }
+  .rel .dot { background:#3B82F6; }
+  .rel .sb { background:#EFF6FF; }
+
+  .block {
+    position:absolute; width:300px; height:60px;
+    border:2px dashed #EF4444; border-radius:6px; background:#FEE2E2;
+    z-index:2; padding:6px 10px; box-sizing:border-box;
+    text-align:center;
+  }
+  .block .bt { font-size:13px; font-weight:700; color:#991b1b; }
+  .block .bs { font-size:10.5px; color:#7f1d1d; }
+
+  .reg {
+    position:absolute; width:80px; height:80px;
+    border:2px solid #6B7280; border-radius:6px; background:#F3F4F6;
+    z-index:2; padding:6px; box-sizing:border-box; text-align:center;
+  }
+  .reg .rn { font-size:11px; font-weight:700; color:#374151; }
+  .reg .rs { font-size:9.5px; color:#6b7280; margin-top:2px; line-height:1.2; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Figure 5.1 — Pipeline DevSecOps (GitHub Actions) — shift-left, SAST/SCA/SBOM/DAST, signature Cosign</div>
+  <div class="subtitle">Stages : Pre-commit → CI (SAST + SCA + SBOM + Trivy + Tests) → Security Gate → CD Staging (DAST) → Release (Cosign + GHCR)</div>
+
+  <svg class="flow" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="aG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#10B981"/>
+      </marker>
+      <marker id="aB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#3B82F6"/>
+      </marker>
+      <marker id="aR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#EF4444"/>
+      </marker>
+      <marker id="aGry" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#6B7280"/>
+      </marker>
+    </defs>
+
+    <!-- Stage geometry: 300x300, top=180. Centers y=330. Right edges: 340, 680, 1020, 1360, 1700 -->
+    <!-- S1 Pre-commit (40-340) | S2 CI (380-680) | S3 Gate (720-1020) | S4 CD (1060-1360) | S5 Release (1400-1700) -->
+
+    <!-- S1 -> S2 -->
+    <line x1="340" y1="330" x2="380" y2="330" stroke="#10B981" stroke-width="2" marker-end="url(#aG)"/>
+    <text x="360" y="322" text-anchor="middle" font-size="10" fill="#047857">push</text>
+
+    <!-- S2 -> S3 -->
+    <line x1="680" y1="330" x2="720" y2="330" stroke="#10B981" stroke-width="2" marker-end="url(#aG)"/>
+    <text x="700" y="322" text-anchor="middle" font-size="10" fill="#047857">artifacts</text>
+
+    <!-- S3 -> S4 (PASS, green) -->
+    <line x1="1020" y1="330" x2="1060" y2="330" stroke="#10B981" stroke-width="2" marker-end="url(#aG)"/>
+    <text x="1040" y="322" text-anchor="middle" font-size="10" fill="#047857" font-weight="700">PASS</text>
+
+    <!-- S4 -> S5 -->
+    <line x1="1360" y1="330" x2="1400" y2="330" stroke="#3B82F6" stroke-width="2" marker-end="url(#aB)"/>
+    <text x="1380" y="322" text-anchor="middle" font-size="10" fill="#1d4ed8">approved</text>
+
+    <!-- S5 -> GHCR -->
+    <line x1="1700" y1="330" x2="1740" y2="330" stroke="#3B82F6" stroke-width="2" marker-end="url(#aB)"/>
+    <text x="1758" y="322" text-anchor="middle" font-size="10" fill="#1d4ed8">push</text>
+
+    <!-- S3 -> Block (FAIL, red, down) -->
+    <line x1="870" y1="480" x2="870" y2="540" stroke="#EF4444" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#aR)"/>
+    <text x="930" y="515" font-size="11" fill="#b91c1c" font-weight="700">FAIL — High/Critical</text>
+
+    <!-- Octagon STOP icon inside S3 gate header area (drawn via polygon) -->
+    <polygon points="940,200 980,200 1000,220 1000,250 980,270 940,270 920,250 920,220"
+             fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5" opacity="0.9"/>
+    <text x="960" y="244" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="700">STOP</text>
+
+    <!-- Trigger label (left of S1) -->
+    <circle cx="20" cy="330" r="8" fill="#1f2937"/>
+    <line x1="28" y1="330" x2="40" y2="330" stroke="#1f2937" stroke-width="2" marker-end="url(#aGry)"/>
+    <text x="20" y="318" text-anchor="middle" font-size="10" fill="#374151">git push</text>
+
+    <!-- Feedback loop: Block -> back to S1 (dashed red) -->
+    <path d="M 720,570 L 30,570 L 30,360" fill="none" stroke="#EF4444" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#aR)"/>
+    <text x="380" y="562" text-anchor="middle" font-size="10" fill="#b91c1c" font-style="italic">notify maintainer — fix &amp; re-push</text>
+
+  </svg>
+
+  <!-- S1 Pre-commit -->
+  <div class="stage pass" style="left:40px; top:180px;">
+    <div class="sh"><span>Pre-commit (hook)</span><span class="num">01</span></div>
+    <div class="sb">
+      <div class="it"><span class="dot"></span><span class="tx"><b>Pint</b> — format PHP (Laravel)</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>ruff</b> — lint Python (microservices)</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>gitleaks</b> — scan secrets / tokens</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>pre-commit hooks</b> — YAML/JSON validate</span></div>
+    </div>
+    <div class="art"><b>Artifact :</b> lint report (local, blocking)</div>
+  </div>
+
+  <!-- S2 CI -->
+  <div class="stage pass" style="left:380px; top:180px;">
+    <div class="sh"><span>CI — build &amp; analyze</span><span class="num">02</span></div>
+    <div class="sb">
+      <div class="it"><span class="dot"></span><span class="tx"><b>psalm</b> — SAST PHP (taint analysis)</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>bandit</b> — SAST Python</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>npm audit</b> + <b>composer audit</b> — SCA</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Syft</b> → CycloneDX — SBOM</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Trivy</b> — scan image Docker</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>PHPUnit</b> + <b>pytest</b> — tests</span></div>
+    </div>
+    <div class="art"><b>Artifacts :</b> SARIF, sbom.cyclonedx.json, test-report.xml</div>
+  </div>
+
+  <!-- S3 Security Gate -->
+  <div class="stage gate" style="left:720px; top:180px;">
+    <div class="sh"><span>Security Gate</span><span class="num">03</span></div>
+    <div class="sb">
+      <div class="it"><span class="dot"></span><span class="tx">Policy : <b>BLOCK</b> if High/Critical</span></div>
+      <div class="it"><span class="dot"></span><span class="tx">Inputs : Trivy + psalm + bandit + audit</span></div>
+      <div class="it"><span class="dot"></span><span class="tx">Decision : <b>PASS</b> / <b>FAIL</b></span></div>
+      <div class="it"><span class="dot"></span><span class="tx">On fail : stop pipeline + alert</span></div>
+    </div>
+    <div class="art"><b>Gate :</b> quality + security threshold (no CVE ≥ 7.0)</div>
+  </div>
+
+  <!-- S4 CD Staging -->
+  <div class="stage pass" style="left:1060px; top:180px;">
+    <div class="sh"><span>CD — Staging</span><span class="num">04</span></div>
+    <div class="sb">
+      <div class="it"><span class="dot"></span><span class="tx"><b>Deploy</b> — docker compose up (staging)</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>OWASP ZAP</b> — DAST sur la plateforme</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Smoke tests</b> — endpoints critiques</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Trivy</b> — re-scan image déployée</span></div>
+    </div>
+    <div class="art"><b>Artifacts :</b> zap-report.html, smoke.log</div>
+  </div>
+
+  <!-- S5 Release -->
+  <div class="stage rel" style="left:1400px; top:180px;">
+    <div class="sh"><span>Release</span><span class="num">05</span></div>
+    <div class="sb">
+      <div class="it"><span class="dot"></span><span class="tx"><b>Cosign sign</b> — images (keyless OIDC)</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Cosign attest</b> — SBOM (in-toto)</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Push to GHCR</b> — signed + attested</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>Tag</b> — semver (v1.2.3) + git tag</span></div>
+      <div class="it"><span class="dot"></span><span class="tx"><b>GitHub Release</b> — notes auto</span></div>
+    </div>
+    <div class="art"><b>Artifacts :</b> signed image, attestation, release notes</div>
+  </div>
+
+  <!-- Block terminal -->
+  <div class="block" style="left:720px; top:540px;">
+    <div class="bt">Block deployment</div>
+    <div class="bs">pipeline interrompu — notification mainteneur</div>
+  </div>
+
+  <!-- GHCR registry -->
+  <div class="reg" style="left:1740px; top:290px;">
+    <div class="rn">GHCR</div>
+    <div class="rs">signed images<br>+ attestations</div>
+  </div>
+
+  <!-- Trigger label -->
+  <div style="position:absolute; left:0; top:340px; width:40px; text-align:center; font-size:10px; color:#6b7280; z-index:2;">trigger</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DFD - Data Flow Diagram</title>
+<style>
+  @page { size: 1700px 1000px; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2937; }
+  .canvas { position: relative; width: 1700px; height: 1000px; background: #ffffff; }
+  .title { position:absolute; top:16px; left:0; width:100%; text-align:center; font-size:22px; font-weight:700; color:#111827; }
+  .subtitle { position:absolute; top:46px; left:0; width:100%; text-align:center; font-size:12.5px; color:#6b7280; }
+
+  svg.conn { position:absolute; top:0; left:0; width:1700px; height:1000px; z-index:1; }
+
+  /* Process: rounded rect */
+  .proc {
+    position:absolute; width:200px; height:80px;
+    border:2px solid #10B981; border-radius:38px;
+    background:#F0FDF4; z-index:2;
+    padding:6px 10px; box-sizing:border-box;
+    text-align:center;
+  }
+  .proc .pn { font-size:12px; font-weight:700; color:#047857; }
+  .proc .pd { font-size:11px; color:#374151; margin-top:2px; line-height:1.25; }
+  .proc .pid { position:absolute; top:4px; left:10px; font-size:10.5px; color:#6b7280; font-weight:700; }
+
+  /* External entity: square */
+  .ext {
+    position:absolute; width:140px; height:80px;
+    border:2px solid #6B7280; background:#F3F4F6;
+    z-index:2; padding:8px 10px; box-sizing:border-box;
+    text-align:center;
+  }
+  .ext .en { font-size:13px; font-weight:700; color:#374151; }
+  .ext .es { font-size:10.5px; color:#6b7280; margin-top:4px; }
+
+  /* Data store: open rectangle (top+bottom lines only) */
+  .store {
+    position:absolute; width:200px; height:56px;
+    border-top:2px solid #8B5CF6; border-bottom:2px solid #8B5CF6;
+    background:#F3E8FF; z-index:2;
+    padding:6px 10px 6px 28px; box-sizing:border-box;
+  }
+  .store .sid {
+    position:absolute; left:6px; top:50%; transform:translateY(-50%);
+    font-size:12px; font-weight:700; color:#6d28d9;
+  }
+  .store .sname { font-size:12px; font-weight:700; color:#4c1d95; }
+  .store .sdesc { font-size:10.5px; color:#5b21b6; margin-top:1px; }
+
+  /* Subprocess / tool box */
+  .tool {
+    position:absolute; width:160px; height:54px;
+    border:2px solid #EF4444; background:#FEE2E2; border-radius:4px;
+    z-index:2; padding:5px 8px; box-sizing:border-box; text-align:center;
+  }
+  .tool .tn { font-size:12px; font-weight:700; color:#b91c1c; }
+  .tool .td { font-size:10.5px; color:#7f1d1d; margin-top:2px; }
+
+  .legend {
+    position:absolute; left:30px; top:930px; width:1640px; height:50px;
+    border:1px solid #e5e7eb; border-radius:6px; background:#fafafa;
+    z-index:2; padding:6px 12px; box-sizing:border-box;
+    display:flex; gap:24px; align-items:center; font-size:11.5px;
+  }
+  .legend .li { display:flex; align-items:center; gap:6px; }
+  .legend .sw { width:14px; height:10px; border:1px solid; border-radius:2px; }
+  .legend .sw-open { width:14px; height:10px; border-top:2px solid #8B5CF6; border-bottom:2px solid #8B5CF6; border-left:0; border-right:0; background:#F3E8FF; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Figure 4.2 — Diagramme de flux de données (DFD) de la plateforme</div>
+  <div class="subtitle">Processus numérotés, magasins de données (D1–D8), entités externes — format des données étiqueté sur chaque flux</div>
+
+  <svg class="conn" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#374151"/>
+      </marker>
+      <marker id="aV" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#8B5CF6"/>
+      </marker>
+      <marker id="aG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#10B981"/>
+      </marker>
+      <marker id="aR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#EF4444"/>
+      </marker>
+    </defs>
+
+    <!-- Process center xs: P1=360 P2=600 P3=840 P4=1080 P5=1320 P6=1560  (boxes 200w, top=120, bottom=200) -->
+    <!-- User center x=130 -->
+    <!-- Stores at y=270 (top) -->
+
+    <!-- User -> P1 -->
+    <line x1="200" y1="160" x2="360" y2="160" stroke="#374151" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="280" y="152" text-anchor="middle" font-size="11" fill="#374151">URL + PoA (JSON)</text>
+
+    <!-- P1 -> D1 -->
+    <line x1="460" y1="200" x2="460" y2="270" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="468" y="240" font-size="11" fill="#6d28d9">projects, targets</text>
+
+    <!-- D1 -> P2 -->
+    <line x1="560" y1="298" x2="600" y2="200" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="582" y="252" font-size="11" fill="#6d28d9">target + profile</text>
+
+    <!-- P2 -> D2 -->
+    <line x1="700" y1="200" x2="700" y2="270" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="708" y="240" font-size="11" fill="#6d28d9">XADD scan:requests</text>
+
+    <!-- D2 -> P3 -->
+    <line x1="800" y1="298" x2="840" y2="200" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="822" y="252" font-size="11" fill="#6d28d9">scan job (Stream)</text>
+
+    <!-- P3 -> Tool (nmap) -->
+    <line x1="840" y1="200" x2="780" y2="370" stroke="#EF4444" stroke-width="1.5" marker-end="url(#aR)"/>
+    <text x="755" y="288" font-size="11" fill="#b91c1c">exec args</text>
+
+    <!-- Tool -> P3 (return) -->
+    <line x1="900" y1="370" x2="900" y2="200" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#aR)"/>
+    <text x="908" y="290" font-size="11" fill="#b91c1c">raw XML</text>
+
+    <!-- P3 -> D3 -->
+    <line x1="940" y1="200" x2="940" y2="270" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="948" y="240" font-size="11" fill="#6d28d9">raw output</text>
+
+    <!-- D3 -> P4 -->
+    <line x1="1080" y1="298" x2="1080" y2="200" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1062" y="252" font-size="11" fill="#6d28d9">raw output</text>
+
+    <!-- P4 -> D4 -->
+    <line x1="1080" y1="200" x2="1080" y2="380" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1088" y="290" font-size="11" fill="#6d28d9">findings (SQL)</text>
+
+    <!-- P4 -> D5 -->
+    <line x1="1140" y1="200" x2="1180" y2="380" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1188" y="290" font-size="11" fill="#6d28d9">nodes + edges (Cypher)</text>
+
+    <!-- D4 -> P5 -->
+    <line x1="1180" y1="436" x2="1320" y2="200" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1290" y="320" font-size="11" fill="#6d28d9">findings</text>
+
+    <!-- P5 <-> Ollama -->
+    <line x1="1370" y1="200" x2="1370" y2="370" stroke="#EF4444" stroke-width="1.5" marker-end="url(#aR)"/>
+    <text x="1380" y="290" font-size="11" fill="#b91c1c">prompt (JSON)</text>
+    <line x1="1430" y1="370" x2="1430" y2="200" stroke="#EF4444" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#aR)"/>
+    <text x="1438" y="290" font-size="11" fill="#b91c1c">remediation + citations</text>
+
+    <!-- P5 -> D6 -->
+    <line x1="1470" y1="200" x2="1470" y2="270" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1478" y="240" font-size="11" fill="#6d28d9">scripts + citations</text>
+
+    <!-- D6 -> P6 -->
+    <line x1="1560" y1="298" x2="1560" y2="200" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1568" y="252" font-size="11" fill="#6d28d9">scripts</text>
+
+    <!-- D4 -> P6 (long route, top) -->
+    <path d="M 1180,380 L 1180,560 L 1660,560 L 1660,200" fill="none" stroke="#8B5CF6" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#aV)"/>
+    <text x="1400" y="552" font-size="10.5" fill="#6d28d9">findings (for report)</text>
+
+    <!-- D5 -> P6 (long route, bottom) -->
+    <path d="M 1240,436 L 1240,580 L 1640,580 L 1640,200" fill="none" stroke="#8B5CF6" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#aV)"/>
+    <text x="1440" y="574" font-size="10.5" fill="#6d28d9">graph + blast_radius</text>
+
+    <!-- P6 -> D7 -->
+    <line x1="1560" y1="200" x2="1560" y2="80" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aV)"/>
+    <text x="1500" y="100" font-size="11" fill="#6d28d9">PDF + Cosign sig</text>
+
+    <!-- D7 -> User (deliver) -->
+    <path d="M 1460,52 L 130,52 L 130,120" fill="none" stroke="#374151" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="700" y="44" font-size="11" fill="#374151">PDF report (download)</text>
+
+    <!-- Audit arrows: each process -> P7.0 (centered at x=840, y=680) -->
+    <!-- P7.0 box: left=740, top=640, right=940, bottom=720 -->
+    <!-- P1 -> P7 -->
+    <path d="M 410,200 L 410,640" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <!-- P2 -> P7 -->
+    <path d="M 650,200 L 650,640" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <!-- P3 -> P7 -->
+    <path d="M 890,200 L 890,640" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <!-- P4 -> P7 -->
+    <path d="M 1130,200 L 1130,640" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <!-- P5 -> P7 -->
+    <path d="M 1370,200 L 1370,640" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <!-- P6 -> P7 -->
+    <path d="M 1610,200 L 1610,620 L 940,620 L 940,640" fill="none" stroke="#6B7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+    <text x="420" y="635" font-size="10.5" fill="#6b7280">audit events</text>
+
+    <!-- P7 -> D8 -->
+    <line x1="840" y1="720" x2="840" y2="790" stroke="#6B7280" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="848" y="760" font-size="11" fill="#6b7280">append-only</text>
+
+    <!-- D8 -> Auditor -->
+    <line x1="740" y1="818" x2="600" y2="818" stroke="#6B7280" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="670" y="810" text-anchor="middle" font-size="11" fill="#6b7280">read-only</text>
+
+  </svg>
+
+  <!-- External: User -->
+  <div class="ext" style="left:60px; top:120px;">
+    <div class="en">User (analyst)</div>
+    <div class="es">Authentifié RBAC</div>
+  </div>
+
+  <!-- Processes row at y=120 -->
+  <div class="proc" style="left:360px; top:120px;">
+    <div class="pid">1.0</div>
+    <div class="pn">Validate Input</div>
+    <div class="pd">PoA + URL check</div>
+  </div>
+  <div class="proc" style="left:600px; top:120px;">
+    <div class="pid">2.0</div>
+    <div class="pn">Enqueue Scan</div>
+    <div class="pd">XADD + state=pending</div>
+  </div>
+  <div class="proc" style="left:840px; top:120px;">
+    <div class="pid">3.0</div>
+    <div class="pn">Execute Scan Tools</div>
+    <div class="pd">nmap/masscan subprocess</div>
+  </div>
+  <div class="proc" style="left:1080px; top:120px;">
+    <div class="pid">4.0</div>
+    <div class="pn">Parse &amp; Normalize</div>
+    <div class="pd">CVSS, CVE, citations</div>
+  </div>
+  <div class="proc" style="left:1320px; top:120px;">
+    <div class="pid">5.0</div>
+    <div class="pn">AI Remediation</div>
+    <div class="pd">Remediation-as-Code</div>
+  </div>
+  <div class="proc" style="left:1560px; top:120px;">
+    <div class="pid">6.0</div>
+    <div class="pn">Generate Report</div>
+    <div class="pd">PDF + Cosign sign</div>
+  </div>
+
+  <!-- Tool (nmap) -->
+  <div class="tool" style="left:760px; top:370px;">
+    <div class="tn">nmap / masscan</div>
+    <div class="td">subprocess (sandboxed)</div>
+  </div>
+
+  <!-- Ollama -->
+  <div class="tool" style="left:1320px; top:370px;">
+    <div class="tn">Ollama LLM</div>
+    <div class="td">qwen2.5-coder:7b (local)</div>
+  </div>
+
+  <!-- Data stores row at y=270 -->
+  <div class="store" style="left:360px; top:270px;">
+    <div class="sid">D1</div>
+    <div class="sname">Projects / Targets</div>
+    <div class="sdesc">PostgreSQL (SQL)</div>
+  </div>
+  <div class="store" style="left:600px; top:270px;">
+    <div class="sid">D2</div>
+    <div class="sname">Redis Streams</div>
+    <div class="sdesc">scan:requests (XADD)</div>
+  </div>
+  <div class="store" style="left:840px; top:270px;">
+    <div class="sid">D3</div>
+    <div class="sname">Raw Output</div>
+    <div class="sdesc">XML / JSON (transient)</div>
+  </div>
+  <div class="store" style="left:1080px; top:380px;">
+    <div class="sid">D4</div>
+    <div class="sname">Findings</div>
+    <div class="sdesc">PostgreSQL (SQL)</div>
+  </div>
+  <div class="store" style="left:1180px; top:380px;">
+    <div class="sid">D5</div>
+    <div class="sname">Knowledge Graph</div>
+    <div class="sdesc">Apache AGE (Cypher)</div>
+  </div>
+  <div class="store" style="left:1370px; top:270px;">
+    <div class="sid">D6</div>
+    <div class="sname">Remediation Scripts</div>
+    <div class="sdesc">SQL + JSON citations</div>
+  </div>
+  <div class="store" style="left:1460px; top:24px;">
+    <div class="sid">D7</div>
+    <div class="sname">PDF Report</div>
+    <div class="sdesc">Cosign-signed artifact</div>
+  </div>
+
+  <!-- Audit process + store -->
+  <div class="proc" style="left:740px; top:640px; border-color:#6B7280; background:#F3F4F6;">
+    <div class="pid" style="color:#6b7280">7.0</div>
+    <div class="pn" style="color:#374151">Audit Logger</div>
+    <div class="pd">Immutable event sink</div>
+  </div>
+  <div class="store" style="left:740px; top:790px; border-color:#6B7280; background:#F3F4F6;">
+    <div class="sid" style="color:#374151">D8</div>
+    <div class="sname" style="color:#374151">Audit Log</div>
+    <div class="sdesc">append-only (WORM)</div>
+  </div>
+  <div class="ext" style="left:460px; top:790px;">
+    <div class="en">Auditor</div>
+    <div class="es">Lecture seule (RBAC)</div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span style="font-weight:700; color:#374151;">Légende :</span>
+    <div class="li"><span class="sw" style="background:#F0FDF4;border-color:#10B981;border-radius:10px"></span>Processus (numéroté)</div>
+    <div class="li"><span class="sw-open"></span>Magasin de données (Dn)</div>
+    <div class="li"><span class="sw" style="background:#F3F4F6;border-color:#6B7280"></span>Entité externe</div>
+    <div class="li"><span class="sw" style="background:#FEE2E2;border-color:#EF4444"></span>Outil / sous-processus</div>
+    <span style="color:#6b7280;">— flèches pleines : flux principal ; pointillées : lectures/retours ; gris : audit</span>
+  </div>
+</div>
+</body>
+</html>
