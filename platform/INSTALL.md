@@ -26,7 +26,7 @@ Step-by-step install guide. Pick the section that matches your OS.
 
 **No PHP, Composer, Node, or Python required on the host** — everything runs inside containers. You only need Docker.
 
-> **Why so much RAM?** The Ollama container has a 4 GB ceiling (qwen2.5-coder:7b inferences). If you skip the model pull with `SKIP_MODEL_PULL=1 bash scripts/setup.sh`, you can get away with 4 GB total.
+> **Why so much RAM?** The Ollama container has a 4 GB ceiling (qwen2.5-coder:7b inferences). If you skip the model pull with `SKIP_MODEL_PULL=1 bash scripts/setup.sh`, you can get away with 4 GB total. On RAM-constrained hosts, `OLLAMA_MODEL=qwen2.5-coder:1.5b bash scripts/setup.sh` pulls a ~1 GB model instead.
 
 ---
 
@@ -55,8 +55,8 @@ What happens during setup.sh:
 7. 📦 Runs `php artisan migrate --force` (creates 14 tables)
 8. 🌱 Runs `RoleSeeder` (creates admin/analyst/client/auditor roles) + `UserSeeder` (creates 4 users with password = 'password')
 9. ⚡ Rebuilds config/route/view/event caches
-10. 🤖 Pulls `qwen2.5-coder:7b` model into the ollama container (4.7 GB, 5-15 min — skipped if `SKIP_MODEL_PULL=1`)
-11. 🌐 Starts all 12 services
+10. 🤖 Pulls the `qwen2.5-coder:7b` model into the ollama container (4.7 GB, 5-15 min — skipped if `SKIP_MODEL_PULL=1`; set `OLLAMA_MODEL=qwen2.5-coder:1.5b` for the ~1 GB variant)
+11. 🌐 Starts all services
 12. 🩺 Runs healthcheck loop, prints final URLs + credentials
 
 ---
@@ -94,7 +94,7 @@ bash scripts/setup.sh
 
 ### Step 3c. Access from Windows
 
-Open in your Windows browser: `http://localhost` (or `http://localhost:80` if port 80 is taken).
+Open in your Windows browser: `http://localhost:3000` (the default `NGINX_HTTP_PORT`; change it in `.env.docker` if the port is taken).
 
 ---
 
@@ -103,13 +103,14 @@ Open in your Windows browser: `http://localhost` (or `http://localhost:80` if po
 After `bash scripts/setup.sh` finishes, run these checks:
 
 ```bash
-# 1. All 12 containers should be "running" or "healthy"
+# 1. All containers should be "running" or "healthy"
 docker compose ps
 
-# Expected output (12 services):
+# Expected output (13 services):
 # NAME                     STATUS                   PORTS
-# cybersec-nginx           Up (healthy)             80, 443
+# cybersec-nginx           Up (healthy)             3000, 443
 # cybersec-backend         Up (healthy)             9000
+# cybersec-backend-http    Up                       8000 (internal)
 # cybersec-recon           Up (healthy)             5000
 # cybersec-security        Up (healthy)             5001
 # cybersec-osint           Up (healthy)             5002
@@ -122,20 +123,20 @@ docker compose ps
 # cybersec-socket-proxy    Up                       2375
 
 # 2. Laravel health endpoint
-curl http://localhost/api/health
-# Expected: {"status":"ok","services":{"reconnaissance":"ok",...}}
+curl http://localhost:3000/api/health
+# Expected: {"status":"ok","time":"..."}
 
 # 3. Aggregated health (api-gateway probes all downstreams)
-curl http://localhost/api/health/all
-# Expected: JSON with every service marked "ok"
+docker compose exec api-gateway python -c "import urllib.request;print(urllib.request.urlopen('http://localhost:8080/health/all',timeout=20).read().decode())"
+# Expected: JSON with every service marked "up"
 
 # 4. Login as admin
-curl -s -o /dev/null -w '%{http_code}\n' -X POST http://localhost/login \
+curl -s -o /dev/null -w '%{http_code}\n' -X POST http://localhost:3000/login \
     -d 'email=admin@cybersec.local&password=password'
 # Expected: 302  (302 = redirect to /dashboard = login succeeded)
 
 # 5. Open the UI
-# In your browser: http://localhost
+# In your browser: http://localhost:3000
 # Login: admin@cybersec.local / password
 ```
 
@@ -241,7 +242,7 @@ docker compose exec ollama ollama pull qwen2.5-coder:7b
 
 ### "Port 80 is already in use"
 
-Something else is using port 80 on your host. Change it:
+Something else is using port 3000 on your host. Change it:
 ```bash
 # In .env.docker, change:
 NGINX_HTTP_PORT=8080

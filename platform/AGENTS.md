@@ -8,7 +8,7 @@ This document tells you what the codebase is, how it's organized, what's safe to
 
 ## TL;DR for any task
 
-1. **This is a Laravel 11 + 5 Python microservices + Docker project.**
+1. **This is a Laravel 13 + 5 Python microservices + Docker project.**
 2. **One command to bootstrap:** `bash scripts/setup.sh` (15-20 min, mostly the Ollama model download).
 3. **All secrets are auto-generated** — never hardcode passwords, API keys, or paths.
 4. **The 4 default users** all use password `password` (see [Default credentials](#default-credentials)).
@@ -18,7 +18,7 @@ This document tells you what the codebase is, how it's organized, what's safe to
 
 ## 1. What this project is
 
-A graduation project (PFE 2025-2026) by Aymen AZIZI for the National Engineering Diploma in Computer and Network Security Systems at TEK-UP (Tunis). It is a web platform that orchestrates 5 security tools (nmap, nuclei, gobuster, subfinder, wpscan), builds a knowledge graph of the attack surface, and generates AI-assisted remediation reports. The whole thing runs in 12 Docker containers behind a hardened Nginx reverse proxy.
+A graduation project (PFE 2025-2026) by Aymen AZIZI for the National Engineering Diploma in Computer and Network Security Systems at TEK-UP (Tunis). It is a web platform that orchestrates the security tools nmap, nuclei, gobuster and subfinder (plus a wpscan wrapper that degrades gracefully when the binary is absent), builds a knowledge graph of the attack surface, and generates AI-assisted remediation reports. The whole thing runs in 12 Docker containers (+1 backend-http override service) behind a hardened Nginx reverse proxy.
 
 The compliance target is the project's "Cahier des Charges" (CDC) document, which is ~90% satisfied as of the last commit. Known gaps: DAST in CI, Policy-as-Code, NFR performance targets, RGPD retention enforcement, expirable share links.
 
@@ -27,22 +27,23 @@ The compliance target is the project's "Cahier des Charges" (CDC) document, whic
 ## 2. Architecture (read this before touching anything)
 
 ```
-Nginx (:80/:443, host-exposed)
-   ├── Laravel backend (:9000, PHP-FPM 8.3, exposes host :8000 for dev)
-   │     ├── Sanctum (token auth)
+Nginx (:3000/:443, host-exposed)
+   ├── Laravel backend (:9000, PHP-FPM 8.4, exposes host :8000 for dev)
+   │     ├── Session auth (web UI)
    │     ├── Spatie permission (RBAC: admin/analyst/client/auditor)
    │     └── Talks to api-gateway for scans, OSINT, AI chat
+   ├── backend-http (:8000, artisan serve via docker-compose.override.yml) — HTTP face of Laravel for the gateway
    ├── api-gateway (:8080, Flask)
    │     └── Routes /api/recon/* → :5000, /api/security/* → :5001,
    │                  /api/osint/*   → :5002, /api/ai/*       → :5003
-   ├── reconnaissance (:5000, Flask) — nmap, nuclei, gobuster, subfinder, wpscan
+   ├── reconnaissance (:5000, Flask) — nmap, nuclei, gobuster, subfinder (+ wpscan wrapper)
    ├── security (:5001, Flask) — attack detection + Docker sandbox (via socket-proxy)
    ├── osint (:5002, Flask) — whois, dns, ssl, subdomains, tech-stack
-   ├── ai (:5003, Flask) — Ollama client (qwen2.5-coder:7b)
+   ├── ai (:5003, Flask) — Ollama client (qwen2.5-coder)
    ├── worker (no port, Python) — Redis Streams consumer
-   ├── postgres (:5432, Postgres 16 + Apache AGE)
+   ├── postgres (:5432, Postgres 16 — graph in assets/asset_relations tables)
    ├── redis (:6379, Redis 7 + AOF + password)
-   ├── ollama (:11434, qwen2.5-coder:7b)
+   ├── ollama (:11434, qwen2.5-coder — 7b default / 1.5b on light hosts)
    └── socket-proxy (:2375, tecnativa/docker-socket-proxy — restricted Docker API)
 ```
 
@@ -54,13 +55,13 @@ Nginx (:80/:443, host-exposed)
 
 ```
 platform/
-├── app/                       # Laravel app code (PHP 8.3)
-│   ├── Http/Controllers/      # 12 root controllers + Auth/ + Api/ + Admin/
+├── app/                       # Laravel app code (PHP 8.4)
+│   ├── Http/Controllers/      # 25 controllers across root + Auth/ + Api/ + Admin/
 │   ├── Models/                # 15 Eloquent models
 │   ├── Jobs/                  # ExecuteScan, GenerateReport, GenerateRemediation
 │   ├── Services/              # MicroserviceClient, GraphBuilder, AuditLogger
 │   └── Traits/
-├── bootstrap/                 # Laravel 11 boot config
+├── bootstrap/                 # Laravel 13 boot config
 ├── config/                    # Laravel config files (services.php is the big one)
 ├── database/
 │   ├── migrations/            # 14 migrations — version-controlled schema
@@ -81,7 +82,7 @@ platform/
 │   └── js/                   # app.js, chat.js, graph.js (vis-network)
 ├── routes/
 │   ├── web.php               # UI routes — login, dashboard, projects, scans, reports
-│   ├── api.php               # Sanctum-authenticated REST + CI/CD webhook
+│   ├── api.php               # REST API + CI/CD webhook (scan callbacks)
 │   └── console.php           # artisan commands
 ├── scripts/                  # setup.sh, stop.sh, seed-demo.sh, scan-tools.sh
 ├── tests/                    # PHPUnit tests (currently minimal)
@@ -90,7 +91,7 @@ platform/
 ├── .env.docker.example       # Template (committed) — copy to .env.docker
 ├── .env.docker                # Runtime secrets (gitignored, generated by setup.sh)
 ├── docker-compose.yml        # 12 services, networks, volumes
-├── composer.json             # Laravel 11 + Sanctum + Spatie permission
+├── composer.json             # Laravel 13 + Spatie permission
 ├── package.json              # Vite + Tailwind 4 + Playwright
 └── README.md / INSTALL.md / AGENTS.md (this file)
 ```
@@ -305,8 +306,8 @@ docker compose exec backend php artisan config:cache
 docker compose exec backend php artisan route:cache
 
 # 7. Health endpoints
-curl http://localhost/api/health
-curl http://localhost/api/health/all
+curl http://localhost:3000/api/health
+docker compose exec api-gateway python -c "import urllib.request;print(urllib.request.urlopen('http://localhost:8080/health/all',timeout=20).read().decode())"
 
 # 8. Login still works
 curl -s -o /dev/null -w '%{http_code}\n' -X POST http://localhost/login \

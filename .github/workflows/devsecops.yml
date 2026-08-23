@@ -26,13 +26,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_pgsql, pgsql
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_pgsql, pgsql, pdo_sqlite, sqlite3
           coverage: none
 
       - name: Install PHP Dependencies
         working-directory: ./platform
-        run: composer install --prefer-dist --no-progress --no-suggest || composer install --ignore-platform-reqs
+        run: composer install --prefer-dist --no-progress
 
       - name: Run PHPStan Static Analysis
         working-directory: ./platform
@@ -90,8 +90,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
-          extensions: mbstring, xml, pdo, pdo_sqlite, sqlite3
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_sqlite, sqlite3
 
       - name: Install Dependencies
         working-directory: ./platform
