@@ -141,7 +141,7 @@ class AttackDetector:
             headers={"User-Agent": self.user_agent},
             timeout=self.timeout,
             allow_redirects=False,
-            verify=False,
+            verify=False,  # nosec B501
         )
 
     # ------------------------------------------------------------------

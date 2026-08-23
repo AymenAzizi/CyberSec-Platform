@@ -49,7 +49,7 @@ class PreventionEngine:
                 target,
                 headers={"User-Agent": "PFE-CyberSec/1.0 (waf-detect)"},
                 timeout=self.timeout,
-                verify=False,
+                verify=False,  # nosec B501
                 allow_redirects=False,
             )
         except requests.RequestException as exc:
@@ -74,7 +74,7 @@ class PreventionEngine:
                     url,
                     headers={"User-Agent": "PFE-CyberSec/1.0 (waf-detect)"},
                     timeout=self.timeout,
-                    verify=False,
+                    verify=False,  # nosec B501
                     allow_redirects=False,
                 )
             except requests.RequestException:

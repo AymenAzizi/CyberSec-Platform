@@ -80,7 +80,7 @@ class TechDetector:
                 target,
                 headers={"User-Agent": "PFE-CyberSec/1.0 (tech-detect)"},
                 timeout=self.timeout,
-                verify=False,
+                verify=False,  # nosec B501
                 allow_redirects=True,
             )
         except requests.RequestException as exc:

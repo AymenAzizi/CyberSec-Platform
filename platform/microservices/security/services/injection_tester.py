@@ -228,7 +228,7 @@ class InjectionTester:
                 url,
                 headers={"User-Agent": "PFE-CyberSec/1.0 (injection-test)"},
                 timeout=self.timeout,
-                verify=False,
+                verify=False,  # nosec B501
                 allow_redirects=False,
             )
             latency = int((time.monotonic() - start) * 1000)

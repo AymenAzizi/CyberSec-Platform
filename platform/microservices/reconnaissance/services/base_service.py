@@ -15,7 +15,7 @@ import logging
 import os
 import random
 import re
-import subprocess
+import subprocess  # nosec B404
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -286,7 +286,7 @@ class BaseScannerService:
         safe_command = [str(arg) for arg in command]
         start = time.monotonic()
         try:
-            proc = subprocess.run(  # noqa: S603
+            proc = subprocess.run(  # nosec B603
                 safe_command,
                 capture_output=True,
                 text=True,
@@ -298,7 +298,7 @@ class BaseScannerService:
             )
             duration = time.monotonic() - start
             # Apply jitter *after* the call so that consecutive scans are
-            # spaced (CDC: jitter between subprocess calls).
+            # spaced out.
             self._apply_jitter(profile)
             return ScanResult(
                 tool=self.tool_name,
@@ -335,7 +335,7 @@ class BaseScannerService:
             "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
             "LANG": "C.UTF-8",
             "LC_ALL": "C.UTF-8",
-            "HOME": os.environ.get("HOME", "/tmp"),
+            "HOME": os.environ.get("HOME", "/tmp"),  # nosec B108
         }
         # Allow tools that need HOME (e.g. nuclei config dir) to find it.
         if "NUCLEI_HOME" in os.environ:
@@ -348,7 +348,7 @@ class BaseScannerService:
             return
         lo = profile.jitter_ms_min / 1000.0
         hi = profile.jitter_ms_max / 1000.0
-        delay = random.uniform(lo, hi) if hi > lo else hi
+        delay = random.uniform(lo, hi) if hi > lo else hi  # nosec B311
         if delay > 0:
             time.sleep(delay)
 

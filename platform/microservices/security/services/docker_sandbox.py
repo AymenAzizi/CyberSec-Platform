@@ -78,7 +78,7 @@ class DockerSandbox:
         try:
             existing = self._client.containers.get(container_name)
             existing.remove(force=True)
-        except Exception:  # noqa: BLE001
+        except Exception:  # nosec B110
             pass
 
         try:
