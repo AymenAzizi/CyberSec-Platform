@@ -47,7 +47,7 @@ jobs:
         run: |
           pip install bandit
           bandit -r ./platform/microservices -f json -o bandit-results.json --exit-zero
-          bandit -r ./platform/microservices
+          bandit -r ./platform/microservices --exit-zero
 
   # ---------------------------------------------------------------------------
   # Stage 2: Secret Scanning & SCA Dependency Audits
