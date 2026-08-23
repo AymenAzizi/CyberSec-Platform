@@ -1,61 +1,54 @@
-\chapter*{Annexe A : Interfaces Compl\'ementaires}
-\addcontentsline{toc}{chapter}{Annexe A : Interfaces Compl\'ementaires}
-\markboth{Annexe A : Interfaces Compl\'ementaires}{Annexe A : Interfaces Compl\'ementaires}
+\chapter*{Annexe A : Catalogue de l'API RESTful}
+\addcontentsline{toc}{chapter}{Annexe A : Catalogue de l'API RESTful}
+\markboth{Annexe A : Sp\'ecifications de l'API RESTful}{Annexe A : Sp\'ecifications de l'API RESTful}
 
-\par Cette premi\`ere annexe regroupe les vues et interfaces compl\'ementaires de la plateforme d\'edi\'ees \`a la gestion des projets, au renseignement passif OSINT, \`a la consultation des rapports, au co-pilote conversationnel d'analyse, \`a l'administration des utilisateurs et \`a la surveillance des pistes d'audit.
+\par Cette premi\`ere annexe d\'etaille le catalogue exhaustif des points d'entr\'ee de l'API RESTful expos\'es par la plateforme, avec leurs param\`etres de filtrage et les formats de r\'eponse normalis\'es.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{img/projects.png}
-    \caption{Interface de Gestion des Projets et des Cibles d'Audit}
-    \label{fig:annexe_projects}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{img/osint.png}
-    \caption{Module OSINT -- Renseignement Passif Structur\'e sur Cinq Onglets}
-    \label{fig:annexe_osint}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{img/reports.png}
-    \caption{Module de G\'en\'eration et Export Multi-Format des Rapports d'Audit}
-    \label{fig:annexe_reports}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{img/chat.png}
-    \caption{Assistant Conversationnel d'Analyse de S\'ecurit\'e Assist\'e par IA}
-    \label{fig:annexe_chat}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{img/admin_users.png}
-    \caption{Module d'Administration des Utilisateurs et Attribution des R\^oles RBAC}
-    \label{fig:annexe_admin_users}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{img/audit_logs.png}
-    \caption{Journalisation d'Audit Immuable pour la Tra\c{c}abilit\'e des \'Ev\'enements}
-    \label{fig:annexe_audit_logs}
-\end{figure}
+\begin{table}[H]
+\centering
+\caption{Catalogue Exhaustif des Endpoints de l'API RESTful}
+\label{tab:annexe_api_catalog}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|C|L|L|C|}
+\hline
+\textbf{Endpoint} & \textbf{Verbe} & \textbf{Param\`etres Cl\'es} & \textbf{Description} & \textbf{Code} \\
+\hline
+\texttt{/api/v1/auth/login} & POST & \texttt{email}, \texttt{password} & Authentification et g\'en\'eration du token Sanctum & 200 \\
+\hline
+\texttt{/api/v1/projects} & GET & \texttt{page}, \texttt{search}, \texttt{status} & Liste pagin\'ee des projets avec m\'etriques d'audit & 200 \\
+\hline
+\texttt{/api/v1/projects} & POST & \texttt{name}, \texttt{targets[]}, \texttt{poa\_file} & Cr\'eation de projet avec validation de mandat PoA & 201 \\
+\hline
+\texttt{/api/v1/scans} & POST & \texttt{project\_id}, \texttt{type}, \texttt{profile} & Enfilement asynchrone Redis Streams d'un scan & 202 \\
+\hline
+\texttt{/api/v1/scans/\{id\}} & GET & \texttt{id} & R\'ecup\'eration de l'\'etat et des r\'esultats du scan & 200 \\
+\hline
+\texttt{/api/v1/findings} & GET & \texttt{severity}, \texttt{project\_id}, \texttt{cve} & Liste filtr\'ee des constats normalis\'es & 200 \\
+\hline
+\texttt{/api/v1/findings/\{id\}/remediate} & POST & \texttt{type} (bash/ansible/docker) & G\'en\'eration de script Remediation-as-Code via LLM & 200 \\
+\hline
+\texttt{/api/v1/projects/\{id\}/graph} & GET & \texttt{depth}, \texttt{filter\_severity} & Donn\'ees s\'erialis\'ees du graphe Apache AGE & 200 \\
+\hline
+\texttt{/api/v1/assets/\{id\}/impact} & GET & \texttt{k\_max} (d\'efaut: 3) & Calcul algorithmique du rayon d'impact (BFS) & 200 \\
+\hline
+\texttt{/api/v1/reports/\{id\}/generate} & POST & \texttt{format} (pdf/json/zip) & Compilation asynchrone du rapport d'expertise & 200 \\
+\hline
+\texttt{/api/v1/audit-logs} & GET & \texttt{user\_id}, \texttt{action}, \texttt{date} & Pistes d'audit immuables pour contr\^ole conformit\'e & 200 \\
+\hline
+\end{tabular}}%
+\end{table}
 
 \clearpage
 
-\chapter*{Annexe B : Extraits Techniques et Sp\'ecifications}
-\addcontentsline{toc}{chapter}{Annexe B : Extraits Techniques et Sp\'ecifications}
-\markboth{Annexe B : Extraits Techniques et Sp\'ecifications}{Annexe B : Extraits Techniques et Sp\'ecifications}
+\chapter*{Annexe B : Art\'efacts DevSecOps}
+\addcontentsline{toc}{chapter}{Annexe B : Art\'efacts DevSecOps}
+\markboth{Annexe B : Art\'efacts DevSecOps}{Annexe B : Art\'efacts DevSecOps}
 
-\par Cette deuxi\`eme annexe documente les art\'efacts d'infrastructure, de d\'eveloppement et de configuration s\'ecuris\'ee r\'ealis\'es dans le cadre du projet.
+\par Cette annexe documente les art\'efacts d'infrastructure et d'int\'egration continue mis en \oe uvre pour garantir la s\'ecurit\'e intrins\`eque du syst\`eme.
 
 \section*{B.1 Extrait de Configuration Docker Compose Durcie}
-\par L'extrait suivant illustre la d\'eclaration s\'ecuris\'ee du microservice de reconnaissance au sein de \texttt{docker-compose.prod.yml}, appliquant le principe de moindre privil\`ege (non-root, syst\`eme de fichiers en lecture seule, r\'eseaux isol\'es) :
+\par D\'eclaration du microservice de reconnaissance au sein de \texttt{docker-compose.prod.yml} :
+{\footnotesize
 \begin{verbatim}
 services:
   recon-service:
@@ -69,24 +62,24 @@ services:
     security_opt:
       - no-new-privileges:true
     tmpfs:
-      - /tmp:size=128M,noexec,nosuid,nodev
+      - /tmp:size=128M,noexec,nosuid,nodev,mode=1777
     networks:
       - cybersec-internal
     environment:
       - FLASK_ENV=production
       - REDIS_HOST=redis
-      - REDIS_PORT=6379
       - DB_HOST=postgres
-      - DB_NAME=cybersec_db
     deploy:
       resources:
         limits:
           cpus: '1.5'
           memory: 1024M
 \end{verbatim}
+}
 
 \section*{B.2 Workflow DevSecOps sous GitHub Actions}
-\par L'extrait suivant pr\'esente la structure du pipeline CI/CD automatis\'e dans \texttt{.github/workflows/devsecops.yml} assurant l'ex\'ecution des portes de s\'ecurit\'e :
+\par Extrait du pipeline CI/CD automatis\'e (\texttt{.github/workflows/devsecops.yml}) :
+{\footnotesize
 \begin{verbatim}
 name: DevSecOps Pipeline
 on:
@@ -128,22 +121,63 @@ jobs:
       - name: Sign Container Image (Cosign)
         run: cosign sign --yes ghcr.io/aymenazizi/cybersec-platform:latest
 \end{verbatim}
+}
 
-\section*{B.3 Sch\'ema JSON Strict pour l'IA Contrainte (Pydantic)}
-\par La structure de donn\'ees impos\'ee au mod\`ele de langage pour la g\'en\'eration de Rem\'ediation est d\'efinie en Python sous forme de mod\`ele Pydantic :
+\section*{B.3 Sch\'ema Pydantic pour l'IA Contrainte}
+{\footnotesize
 \begin{verbatim}
 class RemediationOutputSchema(BaseModel):
-    finding_id: int = Field(..., description="ID unique du constat normalisé")
+    finding_id: int = Field(..., description="ID unique du constat")
     remediation_type: Literal["bash", "ansible", "dockerfile", "terraform"]
-    summary: str = Field(..., max_length=255, description="Titre du correctif")
-    risk_mitigated: str = Field(..., description="Risque sécuritaire atténué")
-    script_content: str = Field(..., description="Code source exécutable du correctif")
-    evidence: EvidenceCitationSchema = Field(..., description="Citations traçables")
-    safety_notes: Optional[str] = Field(None, description="Avertissements de production")
+    summary: str = Field(..., max_length=255, description="Titre")
+    risk_mitigated: str = Field(..., description="Risque atténué")
+    script_content: str = Field(..., description="Code exécutable")
+    evidence: EvidenceCitationSchema = Field(..., description="Citations")
+    safety_notes: Optional[str] = Field(None, description="Notes")
 \end{verbatim}
+}
 
-\section*{B.4 Exemples de Requ\^etes openCypher dans Apache AGE}
-\par La requ\^ete suivante permet d'extraire le chemin d'attaque complet reliant un actif cible \`a un port expos\'e pr\'esentant une vuln\'erabilit\'e de criticit\'e critique :
+\clearpage
+
+\chapter*{Annexe C : Nginx et Requ\^etes openCypher}
+\addcontentsline{toc}{chapter}{Annexe C : Nginx et Requ\^etes openCypher}
+\markboth{Annexe C : Configuration Nginx et openCypher}{Annexe C : Configuration Nginx et openCypher}
+
+\section*{C.1 Configuration Nginx Durcie avec En-t\^etes de S\'ecurit\'e}
+{\footnotesize
+\begin{verbatim}
+server {
+    listen 443 ssl http2;
+    server_name aymenazizi.dijaly.com;
+
+    ssl_certificate /etc/letsencrypt/live/aymenazizi.dijaly.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/aymenazizi.dijaly.com/privkey.pem;
+    ssl_protocols TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    # En-têtes de sécurité obligatoires
+    add_header Strict-Transport-Security 
+               "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy 
+               "default-src 'self'; script-src 'self' 'unsafe-inline';";
+
+    location / {
+        proxy_pass http://cybersec-backend:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+\end{verbatim}
+}
+
+\section*{C.2 Requ\^etes openCypher Avanc\'ees dans Apache AGE}
+\par Extraction des chemins d'attaque reliant un actif racine \`a une vuln\'erabilit\'e critique :
+{\footnotesize
 \begin{verbatim}
 SELECT * FROM cypher('cybersec_graph', $$
   MATCH path = (t:Target)-[:RESOLVES_TO]->(a:Asset)-[:HOSTS]->(p:Port)
@@ -151,11 +185,13 @@ SELECT * FROM cypher('cybersec_graph', $$
   WHERE v.severity = 'CRITICAL'
   RETURN t.name, a.name, p.number, s.name, v.cve_id, v.cvss_score
   ORDER BY v.cvss_score DESC
-$$) as (target varchar, asset varchar, port int, service varchar, cve varchar, cvss float);
+$$) as (target varchar, asset varchar, port int, 
+        service varchar, cve varchar, cvss float);
 \end{verbatim}
+}
 
-\section*{B.5 Exemple de Playbook Ansible de Rem\'ediation G\'en\'er\'e par l'IA}
-\par L'extrait ci-dessous repr\'esente un correctif d'assainissement g\'en\'er\'e et valid\'e pour neutraliser une mauvaise configuration de serveur SSH (port 22) :
+\section*{C.3 Playbook Ansible de Rem\'ediation SSH G\'en\'er\'e par l'IA}
+{\footnotesize
 \begin{verbatim}
 ---
 - name: Hardening Configuration SSH Serveur
@@ -181,3 +217,4 @@ $$) as (target varchar, asset varchar, port int, service varchar, cve varchar, c
         name: sshd
         state: restarted
 \end{verbatim}
+}

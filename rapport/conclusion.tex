@@ -3,29 +3,30 @@
 \markboth{Conclusion G\'en\'erale et Perspectives}{}
 
 \section*{1. Synth\`ese des Travaux R\'ealis\'es}
-\par Ce projet de fin d'\'etudes d'ing\'enieur, r\'ealis\'e au sein de l'entreprise \textbf{Designet Web Agency}, a port\'e sur la conception et le d\'eveloppement d'une plateforme web semi-agentique d'audit et de reconnaissance de surface d'attaque, associant une corr\'elation par graphe de connaissances, une g\'en\'eration de rem\'ediations assist\'ee par intelligence artificielle locale contrainte et une cha\^ine de livraison DevSecOps continue.
-
+\par Ce projet de fin d'\'etudes d'ing\'enieur, r\'ealis\'e au sein de l'agence num\'erique \textbf{Designet Web Agency}, a port\'e sur la conception et le d\'eveloppement d'une plateforme web semi-agentique de reconnaissance de surface d'attaque, associant une corr\'elation par graphe de connaissances, une g\'en\'eration de rem\'ediations assist\'ee par intelligence artificielle locale contrainte et une cha\^ine de livraison DevSecOps continue.
 \par Pour surmonter les limites des d\'emarches manuelles traditionnelles, nous avons d\'evelopp\'e une architecture microservices d\'ecoupl\'ee et r\'esiliente. Le socle applicatif comprend un back-end en \textbf{Laravel 11}, cinq microservices en \textbf{Python Flask} (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, OSINT passif, IA d'assistance, passerelle API), un moteur d'ex\'ecution \'ev\'enementiel pilot\'e par \textbf{Redis Streams}, une couche de donn\'ees unifi\'ee sous \textbf{PostgreSQL 16 / Apache AGE}, et un moteur d'inf\'erence locale \textbf{Ollama} h\'ebergeant le mod\`ele d\'edi\'e au code \texttt{qwen2.5-coder}.
 
-\section*{2. Contributions Majeures du Projet}
-\par Les r\'ealisations techniques de ce travail d'ing\'enierie s'articulent autour de quatre contributions principales :
+\section*{2. Bilan des Contributions et R\'esultats}
+\par Les travaux conduits ont abouti \`a des r\'esultats scientifiques et op\'erationnels majeurs :
 \begin{itemize}
-    \item \textbf{Orchestration automatis\'ee et s\'ecuris\'ee des scanners :} Unification sous une API coh\'erente des outils Nmap, Nuclei, Gobuster, Subfinder et WPScan, avec gestion de profils d'intensit\'e et injection de jitter anti-d\'etection.
-    \item \textbf{Mod\'elisation en graphe et calcul de blast radius :} Projection relationnelle et openCypher de la surface d'attaque permettant de mod\'eliser la propagation des menaces et d'\'evaluer instantan\'ement le rayon d'impact des failles via l'algorithme BFS sous NetworkX.
-    \item \textbf{Assistance IA locale et Remediation-as-Code tra\c{c}able :} Production de scripts de correction durcis (Bash, Ansible, Dockerfile, Terraform) au format JSON contraint avec citations directes vers les journaux bruts, contribuant \`a pr\'eserver la confidentialit\'e des donn\'ees sans d\'ependance \`a un fournisseur externe.
-    \item \textbf{S\'ecurit\'e intrins\`eque et cha\^ine DevSecOps bloquante :} Application d'une d\'efense en profondeur sur l'infrastructure (conteneurs non-root, syst\`eme de fichiers en lecture seule, proxy Docker isolant) et int\'egration d'un pipeline CI/CD automatis\'e (SAST, SCA, SBOM CycloneDX, scans Trivy et signature Cosign).
+    \item \textbf{Orchestration unifi\'ee des scanners :} Encapsulation homog\`ene de Nmap, Nuclei, Gobuster, Subfinder et WPScan avec gestion de profils d'intensit\'e et injection de jitter anti-d\'etection.
+    \item \textbf{Mod\'elisation en graphe et calcul de blast radius :} Projection relationnelle et openCypher de la surface d'attaque avec calcul instantan\'e du rayon d'impact via l'algorithme BFS sous NetworkX ($<$75 ms).
+    \item \textbf{Assistance IA locale et Remediation-as-Code tra\c{c}able :} Production de scripts de durcissement (Bash, Ansible, Dockerfile) au format JSON contraint avec citations directes vers les journaux bruts, garantissant une confidentialit\'e 100\,\% locale.
+    \item \textbf{S\'ecurit\'e intrins\`eque DevSecOps :} D\'efense en profondeur (conteneurs non-root, socket proxy) et pipeline CI/CD automatis\'e (SAST, SCA, SBOM CycloneDX, scans Trivy et signature Cosign).
+    \item \textbf{Validation exp\'erimentale rigoureuse :} Validation de 140/140 tests automatis\'es (PHPUnit et Pytest) et tenue sous charge de 50 utilisateurs simultan\'es sous Locust sur l'instance de production \url{https://aymenazizi.dijaly.com/}.
 \end{itemize}
 
-\section*{3. Bilan des R\'esultats et Conformit\'e}
-\par La plateforme est pleinement op\'erationnelle et a \'et\'e d\'eploy\'ee sur une instance de production accessible \`a l'adresse \url{https://aymenazizi.dijaly.com/} au moment de la r\'edaction du pr\'esent rapport. La suite de tests automatis\'es (PHPUnit et Pytest) a d\'emontr\'e un taux de r\'eussite de 100\,\% sur 140 cas de test. Les benchmarks r\'ealis\'es avec 50 utilisateurs simultan\'es d\'emontrent la conformit\'e aux exigences fonctionnelles et non fonctionnelles \'evalu\'ees dans le cadre du protocole exp\'erimental, notamment avec une latence moyenne IHM de 64~ms (P50) et un temps d'inf\'erence IA de 6,4~secondes.
-
-\section*{4. Comp\'etences Acquises}
-\par Ce projet a constitu\'e une exp\'erience formatrice de premier ordre, permettant de consolider une double comp\'etence en d\'eveloppement logiciel moderne et en cybers\'ecurit\'e op\'erationnelle : ma\^itrise des architectures distribu\'ees et des syst\`emes asynchrones, int\'egration de mod\`eles LLM dans des flux contraints, pilotage de projet Agile Scrum et mise en \oe uvre des meilleures pratiques DevSecOps.
-
-\section*{5. Perspectives d'\'Evolution}
-\par Plusieurs perspectives d'\'evolution sont envisag\'ees pour enrichir le syst\`eme :
+\section*{3. R\'eflexion Personnelle et Comp\'etences Acquises}
+\par Ce projet de fin d'\'etudes a constitu\'e une exp\'erience professionnelle et humaine particuli\`erement enrichissante. Il m'a permis de consolider une double comp\'etence de pointe :
 \begin{itemize}
-    \item \textbf{\`A court terme :} Int\'egration de nouveaux scanners compl\'ementaires (Nikto, OpenVAS, analyseurs d'infrastructure as Code comme tfsec/Checkov).
-    \item \textbf{\`A moyen terme :} D\'eveloppement d'une application mobile d\'edi\'ee aux analystes SOC pour la notification instantan\'ee des alertes critiques.
-    \item \textbf{\`A long terme :} R\'ealisation d'un entra\^inement sp\'ecifique (\textit{fine-tuning}) de mod\`eles LLM compacts sur des bases de donn\'ees de CVEs industrielles et int\'egration d'un module de validation d'exploitation contr\^ol\'ee sur environnements isol\'es.
+    \item \textbf{Comp\'etences Techniques :} Ma\^itrise avanc\'ee des architectures distribu\'ees en microservices, ing\'enierie des syst\`emes asynchrones \'ev\'enementiels (Redis Streams), int\'egration de mod\`eles LLM dans des flux contraints, requ\^etage openCypher sur bases de graphes hybrides et automatisation DevSecOps de bout en bout.
+    \item \textbf{Comp\'etences Humaines et M\'ethodologiques (\textit{Soft Skills}) :} Autonomie et rigueur dans la r\'esolution de probl\`emes d'ing\'enierie complexes, pilotage it\'eratif selon le cadre Agile Scrum, communication technique efficace lors des revues de sprint avec le CTO, et gestion rigoureuse des priorit\'es et du temps.
+\end{itemize}
+
+\section*{4. Perspectives d'\'Evolution}
+\par Plusieurs axes d'am\'elioration futurs sont envisag\'es pour \'etendre les capacit\'es de la plateforme :
+\begin{itemize}
+    \item \textbf{\`A court terme :} Int\'egration de scanners compl\'ementaires (Nikto, OpenVAS, analyseurs d'Infrastructure as Code tels que tfsec ou Checkov).
+    \item \textbf{\`A moyen terme :} D\'eveloppement d'une application mobile d\'edi\'ee aux analystes SOC pour la notification instantan\'ee des alertes critiques et le suivi mobile des audits.
+    \item \textbf{\`A long terme :} R\'ealisation d'un entra\^inement sp\'ecifique (\textit{fine-tuning}) de mod\`eles LLM compacts sur des corpus de vuln\'erabilit\'es industrielles et enrichissement du moteur de corr\'elation par apprentissage automatique pour la d\'etection pr\'edictive des vecteurs d'attaque.
 \end{itemize}

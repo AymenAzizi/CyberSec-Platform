@@ -71,9 +71,159 @@
     \label{fig:usecase_admin}
 \end{figure}
 
-\subsection{Description Textuelle des Principaux Cas d'Utilisation}
-\par \textbf{CU01 -- Lancement d'un Scan d'Audit :} L'analyste s\'electionne un projet et une cible, choisit le profil d'intensit\'e (Silent, Balanced, Aggressive), valide la pr\'esence de la PoA, et soumet la requ\^ete. Le back-end ins\`ere la commande dans Redis Streams et retourne un identifiant de session.
-\par \textbf{CU02 -- G\'en\'eration de Remediation-as-Code :} L'analyste consulte un constat de vuln\'erabilit\'e et sollicite l'IA. Le microservice transmet le contexte technique \`a Ollama, r\'ecup\`ere le script structur\'e (Bash, Ansible, Dockerfile, Terraform) et l'affiche avec ses citations directes vers les logs bruts.
+\subsection{Description Textuelle D\'etaill\'ee des Cas d'Utilisation Cl\'es}
+\par Afin de formaliser avec pr\'ecision la dynamique des interactions homme-syst\`eme, nous d\'etaillons ci-apr\`es les cinq cas d'utilisation majeurs de la plateforme sous forme de fiches descriptives standardis\'ees :
+
+\subsubsection*{CU01 : Lancement et Orchestration d'un Scan d'Audit}
+\begin{table}[H]
+\centering
+\caption{Description Textuelle du Cas d'Utilisation CU01 -- Lancement d'un Scan}
+\label{tab:cu01}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|}
+\hline
+\textbf{Cas d'Utilisation} & \textbf{CU01 : Lancement et Orchestration d'un Scan de Reconnaissance} \\
+\hline
+\textbf{Acteur Principal} & Analyste de S\'ecurit\'e (\textit{Security Analyst}) / Administrateur \\
+\hline
+\textbf{Pr\'e-conditions} & Authentification r\'eussie, projet existant avec mandat PoA valide et cible d\'eclar\'ee. \\
+\hline
+\textbf{Post-conditions} & T\^ache de scan ins\'er\'ee dans Redis Streams, statut \texttt{Queued}, suivi en temps r\'eel activ\'e. \\
+\hline
+\textbf{Sc\'enario Nominal} & 
+1. L'analyste acc\`ede au formulaire de lancement de scan (\texttt{/scans/create}). \newline
+2. Il s\'electionne le projet, la cible d'audit et l'outil de balayage souhait\'e. \newline
+3. Il choisit le profil d'intensit\'e (Silent, Balanced, Aggressive) avec d\'elais de jitter. \newline
+4. Le syst\`eme v\'erifie automatiquement la validit\'e de la preuve d'autorisation (PoA). \newline
+5. L'analyste soumet la demande de scan. \newline
+6. Le back-end Laravel publie la commande dans Redis Streams (\texttt{XADD scan:requests}) et renvoie l'ID du scan. \newline
+7. L'interface redirige l'analyste vers la page de progression du scan. \\
+\hline
+\textbf{Sc\'enarios Alternatifs} & 
+4.a. \textit{Mandat PoA manquant ou expir\'e} : Le syst\`eme bloque imm\'ediatement la soumission avec une alerte 403 et journalise la tentative dans les pistes d'audit. \newline
+6.a. \textit{Service Redis injoignable} : Le syst\`eme bascule sur une mise en file locale d'urgence et notifie l'administrateur. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\subsubsection*{CU02 : G\'en\'eration de Remediation-as-Code Assist\'ee par IA}
+\begin{table}[H]
+\centering
+\caption{Description Textuelle du Cas d'Utilisation CU02 -- G\'en\'eration de Remediation}
+\label{tab:cu02}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|}
+\hline
+\textbf{Cas d'Utilisation} & \textbf{CU02 : G\'en\'eration de Remediation-as-Code par IA Locale Contrainte} \\
+\hline
+\textbf{Acteur Principal} & Analyste de S\'ecurit\'e (\textit{Security Analyst}) \\
+\hline
+\textbf{Pr\'e-conditions} & Scan termin\'e avec succ\`es, constats de vuln\'erabilit\'es normalis\'es pr\'esents en base. \\
+\hline
+\textbf{Post-conditions} & Scripts de durcissement multi-cibles g\'en\'er\'es, valid\'es, sign\'es et attach\'es au constat. \\
+\hline
+\textbf{Sc\'enario Nominal} & 
+1. L'analyste consulte la fiche d'une vuln\'erabilit\'e d\'etect\'ee. \newline
+2. Il clique sur le bouton \og G\'en\'erer Rem\'ediation \fg. \newline
+3. Le contr\^oleur extrait le contexte technique (service, version, CVE, lignes de logs bruts). \newline
+4. Le microservice IA formate le prompt contraint et interroge le mod\`ele local Ollama (\texttt{qwen2.5-coder}). \newline
+5. Le mod\`ele produit le correctif au format JSON strict avec citations de preuves. \newline
+6. Le validateur Pydantic contr\^ole la structure et la v\'eracit\'e des citations. \newline
+7. Le script est persist\'e dans la table \texttt{remediation\_scripts} et affich\'e \`a l'\'ecran avec coloration syntaxique. \\
+\hline
+\textbf{Sc\'enarios Alternatifs} & 
+6.a. \textit{R\'eponse JSON invalide ou hallucination de citation d\'etect\'ee} : Le syst\`eme rejette la sortie brute et g\'en\`ere un script de durcissement d\'eterministe durci de repli (fallback). \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\subsubsection*{CU03 : Consultation et Exploration du Graphe de Connaissances}
+\begin{table}[H]
+\centering
+\caption{Description Textuelle du Cas d'Utilisation CU03 -- Graphe de Connaissances}
+\label{tab:cu03}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|}
+\hline
+\textbf{Cas d'Utilisation} & \textbf{CU03 : Consultation du Graphe et \'Evaluation du Rayon d'Impact} \\
+\hline
+\textbf{Acteur Principal} & Analyste de S\'ecurit\'e, Client / Auditeur \\
+\hline
+\textbf{Pr\'e-conditions} & Projet s\'electionn\'e disposant d'actifs et de services cartographi\'es. \\
+\hline
+\textbf{Post-conditions} & Topologie relationnelle affich\'ee sous Cytoscape.js avec calcul du blast radius. \\
+\hline
+\textbf{Sc\'enario Nominal} & 
+1. L'utilisateur acc\`ede \`a l'onglet \og Graphe de Connaissances \fg\ du projet. \newline
+2. Le back-end ex\'ecute une requ\^ete openCypher dans Apache AGE pour r\'ecup\'erer les n\oe uds et ar\^etes. \newline
+3. L'interface Cytoscape.js restitue la topologie interactive avec filtres par criticit\'e. \newline
+4. L'analyste clique sur un sommet de vuln\'erabilit\'e pour d\'eclencher le calcul du rayon d'impact. \newline
+5. L'algorithme BFS sous NetworkX calcule les d\'ependances jusqu'\`a une profondeur de 3 sauts. \newline
+6. Les actifs et services potentiellement impact\'es sont mis en surbrillance rouge \`a l'\'ecran. \\
+\hline
+\textbf{Sc\'enarios Alternatifs} & 
+2.a. \textit{Projet sans scan ant\'erieur} : Le graphe affiche l'actif racine seul avec une invite \`a lancer un premier balayage. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\subsubsection*{CU04 : Gestion des Projets et Validation du Mandat PoA}
+\begin{table}[H]
+\centering
+\caption{Description Textuelle du Cas d'Utilisation CU04 -- Gestion des Projets et PoA}
+\label{tab:cu04}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|}
+\hline
+\textbf{Cas d'Utilisation} & \textbf{CU04 : Cr\'eation de Projet et Validation du Mandat d'Autorisation} \\
+\hline
+\textbf{Acteur Principal} & Administrateur Syst\`eme / Analyste de S\'ecurit\'e \\
+\hline
+\textbf{Pr\'e-conditions} & Compte utilisateur authentifi\'e avec privil\`ege de gestion de projet. \\
+\hline
+\textbf{Post-conditions} & Projet cr\'e\'e, cibles valid\'ees, document PoA chiffr\'e et stock\'e sur disque isol\'e. \\
+\hline
+\textbf{Sc\'enario Nominal} & 
+1. L'utilisateur acc\`ede \`a la vue de cr\'eation de projet (\texttt{/projects/create}). \newline
+2. Il saisit le nom du projet, la description, et d\'eclare la liste des domaines/IPs cibles. \newline
+3. Il t\'el\'everse le document PDF de mandat d'autorisation d\^ument sign\'e par le client. \newline
+4. Le back-end v\'erifie le type MIME du fichier, sa signature num\'erique et calcule son empreinte SHA-256. \newline
+5. Le projet est enregistr\'e et activ\'e, autorisant d\'esormais les scans sur le p\'erim\`etre valid\'e. \\
+\hline
+\textbf{Sc\'enarios Alternatifs} & 
+4.a. \textit{Fichier non conforme ou corrompu} : Le formulaire rejette le document et bloque la cr\'eation du projet. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\subsubsection*{CU05 : G\'en\'eration et Export Multi-Formats des Rapports d'Expertise}
+\begin{table}[H]
+\centering
+\caption{Description Textuelle du Cas d'Utilisation CU05 -- G\'en\'eration de Rapports}
+\label{tab:cu05}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|}
+\hline
+\textbf{Cas d'Utilisation} & \textbf{CU05 : Production et T\'el\'echargement de Rapport d'Audit Certifi\'e} \\
+\hline
+\textbf{Acteur Principal} & Analyste de S\'ecurit\'e / Client / Auditeur \\
+\hline
+\textbf{Pr\'e-conditions} & Scans achev\'es, constats \'evalu\'es et rem\'ediations associ\'ees. \\
+\hline
+\textbf{Post-conditions} & Rapport PDF/JSON g\'en\'er\'e, horodat\'e, sign\'e et mis \`a disposition au t\'el\'echargement. \\
+\hline
+\textbf{Sc\'enario Nominal} & 
+1. L'utilisateur s\'electionne un scan ou une vue projet et clique sur \og G\'en\'erer Rapport \fg. \newline
+2. Il s\'electionne le format d'export souhait\'e (PDF ex\'ecutif, JSON technique, archive ZIP). \newline
+3. Le service de reporting agr\`ege les constats, les matrices de risques et les scripts de durcissement. \newline
+4. Le document est compil\'e et horodat\'e avec un jeton cryptographique de v\'erification d'int\'egrit\'e. \newline
+5. L'utilisateur t\'el\'echarge le document ou g\'en\`ere un lien d'acc\`es temporaire s\'ecuris\'e. \\
+\hline
+\textbf{Sc\'enarios Alternatifs} & 
+5.a. \textit{Acc\`es par lien externe expir\'e} : Le serveur refuse la requ\^ete (HTTP 410 Gone) et invite \`a r\'e\'emettre un lien. \\
+\hline
+\end{tabular}}%
+\end{table}
 
 \section{Architecture Globale du Syst\`eme}
 \subsection{Vue d'Ensemble du Syst\`eme}
@@ -174,14 +324,85 @@
 \subsection{Mod\`ele du Graphe de Connaissances et Projection Apache AGE}
 \par Les relations de s\'ecurit\'e sont mod\'elis\'ees sous forme de n\oe uds (\textit{Target}, \textit{Asset}, \textit{Port}, \textit{Service}, \textit{Vulnerability}) et d'ar\^etes typ\'ees (\textit{RESOLVES\_TO}, \textit{HOSTS}, \textit{RUNS}, \textit{HAS\_VULN}, \textit{IMPACTS}). Cette mod\'elisation permet de calculer le rayon d'impact (\textit{blast radius}) par parcours de graphe en largeur (BFS) impl\'ement\'e sous NetworkX.
 
-\subsection{Diagramme de S\'equence du D\'eroulement d'un Scan}
-\par La figure~\ref{fig:sequence_scan} mod\'elise la s\'equence d'ex\'ecution compl\`ete d'un audit de reconnaissance, de la soumission initiale jusqu'\`a la persistance des constats et \`a l'analyse IA.
+\subsection{Diagrammes de S\'equence du Syst\`eme}
+\par Afin de couvrir l'ensemble des sc\'enarios critiques de la plateforme, nous mod\'elisons trois flux d'interaction s\'equentiels majeurs :
+
+\subsubsection{Orchestration Asynchrone d'un Scan}
+\par La figure~\ref{fig:sequence_scan} mod\'elise la s\'equence d'ex\'ecution compl\`ete d'un audit de reconnaissance, de la soumission initiale jusqu'\`a la persistance des constats.
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.92\textwidth]{img/sequence_scan.png}
     \caption{Diagramme de S\'equence -- Orchestration Asynchrone d'un Scan}
     \label{fig:sequence_scan}
+\end{figure}
+
+\subsubsection{G\'en\'eration de Remediation-as-Code Assist\'ee par IA}
+\par La figure~\ref{fig:seq_remediation} illustre le flux d'interaction entre l'analyste, le back-end Laravel, le microservice d'IA et le mod\`ele local Ollama lors de la cr\'eation d'un correctif de s\'ecurit\'e.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=10mm and 20mm,
+    actor/.style={draw, rounded corners=2pt, fill=blue!10, draw=blue!60, thick, minimum width=24mm, minimum height=8mm, align=center, font=\scriptsize\bfseries},
+    lifeline/.style={draw=gray!50, dashed, thick},
+    msg/.style={-{Stealth[length=2mm]}, thick, font=\tiny},
+    reply/.style={-{Stealth[length=2mm]}, thick, dashed, font=\tiny}
+]
+\node[actor] (user) {Analyste};
+\node[actor, right=14mm of user] (backend) {Back-end\\Laravel 11};
+\node[actor, right=14mm of backend] (ai) {Microservice\\IA (Flask)};
+\node[actor, right=14mm of ai] (ollama) {Ollama\\Qwen2.5};
+
+\draw[lifeline] (user) -- ++(0,-5.2);
+\draw[lifeline] (backend) -- ++(0,-5.2);
+\draw[lifeline] (ai) -- ++(0,-5.2);
+\draw[lifeline] (ollama) -- ++(0,-5.2);
+
+\draw[msg, draw=blue!70] (0,-1.0) -- node[above]{1. POST /remediation/\{id\}} (2.8,-1.0);
+\draw[msg, draw=blue!70] (2.8,-1.5) -- node[above]{2. Contexte + Logs bruts} (5.6,-1.5);
+\draw[msg, draw=purple!70] (5.6,-2.0) -- node[above]{3. Prompt contraint JSON} (8.4,-2.0);
+\draw[reply, draw=purple!70] (8.4,-2.7) -- node[above]{4. Script JSON g\'en\'er\'e} (5.6,-2.7);
+\draw[msg, draw=green!60!black] (5.6,-3.3) -- node[above]{5. Valid. Pydantic \& Citations} (5.6,-3.3);
+\draw[reply, draw=blue!70] (5.6,-3.9) -- node[above]{6. Script valid\'e + type} (2.8,-3.9);
+\draw[msg, draw=orange!70] (2.8,-4.4) -- node[above]{7. Persistance en DB} (2.8,-4.4);
+\draw[reply, draw=blue!70] (2.8,-4.9) -- node[above]{8. Rendu IHM coloration} (0,-4.9);
+\end{tikzpicture}
+\caption{Diagramme de S\'equence -- G\'en\'eration de Remediation-as-Code Assist\'ee par IA}
+\label{fig:seq_remediation}
+\end{figure}
+
+\subsubsection{Consultation du Graphe et Propagation du Rayon d'Impact}
+\par La figure~\ref{fig:seq_graph} d\'etaille les \'echanges lors du requ\^etage openCypher du graphe de connaissances et du calcul algorithmique du rayon d'impact via l'algorithme BFS sous NetworkX.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=10mm and 20mm,
+    actor/.style={draw, rounded corners=2pt, fill=blue!10, draw=blue!60, thick, minimum width=24mm, minimum height=8mm, align=center, font=\scriptsize\bfseries},
+    lifeline/.style={draw=gray!50, dashed, thick},
+    msg/.style={-{Stealth[length=2mm]}, thick, font=\tiny},
+    reply/.style={-{Stealth[length=2mm]}, thick, dashed, font=\tiny}
+]
+\node[actor] (user) {Analyste};
+\node[actor, right=14mm of user] (backend) {Back-end\\Laravel 11};
+\node[actor, right=14mm of backend] (age) {PostgreSQL 16\\Apache AGE};
+\node[actor, right=14mm of age] (nx) {NetworkX\\(Moteur BFS)};
+
+\draw[lifeline] (user) -- ++(0,-4.8);
+\draw[lifeline] (backend) -- ++(0,-4.8);
+\draw[lifeline] (age) -- ++(0,-4.8);
+\draw[lifeline] (nx) -- ++(0,-4.8);
+
+\draw[msg, draw=blue!70] (0,-1.0) -- node[above]{1. GET /projects/\{id\}/graph} (2.8,-1.0);
+\draw[msg, draw=blue!70] (2.8,-1.5) -- node[above]{2. cypher('cybersec\_graph', MATCH ...)} (5.6,-1.5);
+\draw[reply, draw=blue!70] (5.6,-2.1) -- node[above]{3. N\oe uds, ar\^etes JSONB} (2.8,-2.1);
+\draw[msg, draw=green!60!black] (2.8,-2.7) -- node[above]{4. Calcul blast\_radius(v, k=3)} (8.4,-2.7);
+\draw[reply, draw=green!60!black] (8.4,-3.3) -- node[above]{5. Sommets impact\'es ($<$75 ms)} (2.8,-3.3);
+\draw[reply, draw=blue!70] (2.8,-4.0) -- node[above]{6. Donn\'ees Cytoscape.js + alertes} (0,-4.0);
+\end{tikzpicture}
+\caption{Diagramme de S\'equence -- Exploration du Graphe et Calcul de Blast Radius}
+\label{fig:seq_graph}
 \end{figure}
 
 \subsection{Machine \`a \'Etats d'un Scan}
@@ -205,15 +426,31 @@
 \end{figure}
 
 \section{Architecture de S\'ecurit\'e Multicouche}
-\par Afin de prot\'eger la plateforme elle-m\^eme contre toute compromission, nous appliquons une d\'efense en profondeur (\textit{Defense-in-Depth}) sur six niveaux :
-\begin{enumerate}
-    \item \textbf{S\'ecurit\'e R\'eseau et Segmentation :} R\'epartition en deux r\'eseaux bridges Docker isol\'es : \texttt{cybersec-external} (exposant uniquement Nginx sur les ports 80/443) et \texttt{cybersec-internal} (inaccessible depuis l'ext\'erieur, r\'eserv\'e aux communications inter-microservices et bases de donn\'ees).
-    \item \textbf{S\'ecurit\'e des Conteneurs :} Ex\'ecution de tous les microservices sous utilisateur non-root (\texttt{UID 1001:1001}), syst\`eme de fichiers racine mont\'e en lecture seule (\texttt{read\_only: true}), et suppression de toutes les capabilit\'es Linux superflues (\texttt{cap\_drop: [ALL]}).
-    \item \textbf{S\'ecurit\'e Applicative :} Authentification par jetons s\'ecuris\'es Laravel Sanctum, protection native contre les failles CSRF, XSS et injections SQL, limitation de d\'ebit (\textit{rate limiting}) et validation stricte des param\`etres HTTP.
-    \item \textbf{S\'ecurit\'e des Donn\'ees :} Chiffrement des mots de passe en \texttt{bcrypt}, chiffrement des cl\'es d'API sensibles, journalisation d'audit immuable et politique de purge automatique RGPD.
-    \item \textbf{Mod\`ele de Contr\^ole d'Acc\`es RBAC :} Attribution granulaire des permissions selon quatre r\^oles stricts (Admin, Analyste, Client, Auditeur).
-    \item \textbf{Isolation du Bac \`a Sable (Sandbox) :} Les conteneurs de test vuln\'erables (DVWA, SQLi-Labs) sont pilot\'es \`a travers \texttt{docker-socket-proxy} qui filtre et d\'esactive formellement les commandes Docker dangereuses (suppression d'images, acc\`es aux volumes de production).
-\end{enumerate}
+\par Afin de prot\'eger la plateforme elle-m\^eme contre toute compromission, nous appliquons une d\'efense en profondeur (\textit{Defense-in-Depth}) sur six niveaux d\'etaill\'es dans le tableau~\ref{tab:defense_in_depth}.
+
+\begin{table}[H]
+\centering
+\caption{Mesures de S\'ecurit\'e en Profondeur par Couche Architecturale}
+\label{tab:defense_in_depth}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{Couche de S\'ecurit\'e} & \textbf{M\'ecanismes Impl\'ement\'es} & \textbf{Objectif de Protection} \\
+\hline
+\textbf{1. R\'eseau \& DMZ} & Nginx TLS 1.3, r\'eseaux bridges isol\'es (\texttt{internal} vs \texttt{external}) & Isolation des flux inter-services et terminaison s\'ecuris\'ee. \\
+\hline
+\textbf{2. Conteneurs Docker} & Utilisateur non-root (UID 1001), \texttt{read\_only: true}, \texttt{cap\_drop: ALL} & Pr\'evention de l'\'evasion de conteneurs et de l'\'el\'evation de privil\`eges. \\
+\hline
+\textbf{3. Applicative Web} & Tokens CSRF, assainissement XSS, requ\^etes pr\'epar\'ees Eloquent & Neutralisation compl\`ete des risques OWASP Top 10 web. \\
+\hline
+\textbf{4. Donn\'ees \& Secrets} & Chiffrement \texttt{bcrypt}, cl\'es d'API chiffr\'ees, pistes d'audit immuables & Int\'egrit\'e, confidentialit\'e et tra\c{c}abilit\'e sans faille. \\
+\hline
+\textbf{5. Contr\^ole d'Acc\`es} & Mod\`ele RBAC strict (4 r\^oles), validation syst\'ematique de PoA & Respect du principe de moindre privil\`ege et conformit\'e l\'egale. \\
+\hline
+\textbf{6. Bac \`a Sable (Sandbox)} & Docker Socket Proxy filtrant les appels d'API du daemon & Confinement strict des tests sur environnements vuln\'erables. \\
+\hline
+\end{tabular}}%
+\end{table}
 
 \section{Mod\'elisation Formelle des Menaces (Threat Modeling STRIDE)}
 \subsection{M\'ethodologie et Fronti\`eres de Confiance}
@@ -222,6 +459,7 @@
 
 \begin{figure}[!htbp]
 \centering
+\resizebox{0.97\textwidth}{!}{%
 \begin{tikzpicture}[
     node distance=6mm and 10mm,
     zone/.style={draw, dashed, rounded corners=4pt, inner sep=6pt, font=\scriptsize\bfseries},
@@ -249,7 +487,7 @@
 \draw[tb] (2.2, 2.2) -- (2.2, -2.2) node[pos=0.05, right, font=\tiny\color{red!70}]{TB1: Fronti\`ere Externe};
 \draw[tb] (5.8, 2.2) -- (5.8, -2.2) node[pos=0.05, right, font=\tiny\color{red!70}]{TB2: Fronti\`ere Applicative};
 \draw[tb] (10.6, 2.2) -- (10.6, -2.2) node[pos=0.05, right, font=\tiny\color{red!70}]{TB3: Fronti\`ere Sandbox};
-\end{tikzpicture}
+\end{tikzpicture}}
 \caption{Cartographie de la Surface d'Attaque et Fronti\`eres de Confiance (Trust Boundaries)}
 \label{fig:trust_boundaries}
 \end{figure}

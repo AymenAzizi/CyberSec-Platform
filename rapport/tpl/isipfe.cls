@@ -112,6 +112,11 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{microtype}
+% Relax paragraph justification so long French/technical words never
+% spill into the margin (fixes most Overfull \hbox warnings).
+\tolerance=2000
+\setlength{\emergencystretch}{2.5em}
+\hyphenation{Connais-sances Im-pl\'e-men-ta-tion Re-m\'e-dia-tion}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 % @author: Stoufa
@@ -134,13 +139,10 @@
   \DTLnewrow{list}% Create a new entry
   \DTLnewdbentry{list}{sortlabel}{#1}
   \DTLnewdbentry{list}{description}{
-      \begin{minipage}[l]{0.1\columnwidth}
-            ~\textbf{#1}
-        \end{minipage}
-        \begin{minipage}[l]{0.05\columnwidth}
-            \textbf{=}
-        \end{minipage}
-        \begin{minipage}[l]{0.85\columnwidth}
+      \begin{minipage}[l]{0.18\columnwidth}
+            \raggedleft\textbf{#1}~
+        \end{minipage}%
+        \begin{minipage}[l]{0.76\columnwidth}
             #2
         \end{minipage}
   }% Add entry description
@@ -149,7 +151,7 @@
   \DTLifdbexists{list}{\DTLcleardb{list}}{\DTLnewdb{list}}% Create new/discard old list
 }{%
   \DTLsort{sortlabel}{list}% Sort list
-  \begin{itemize}%
+  \begin{itemize}[leftmargin=1.5em,itemsep=2pt]%
     \DTLforeach*{list}{\theDesc=description}{%
       \item \theDesc}% Print each item
   \end{itemize}%
@@ -199,9 +201,9 @@
         \vskip 30\p@
     }
 }
-\def\@makeschapterhead#1{\hbox{%
-    \huge\hbox{\textbf{#1}}%
-}\par\vskip 1cm}
+\def\@makeschapterhead#1{%
+    {\centering\LARGE\bfseries #1\par}%
+    \vskip 1cm}
 
 %============== Table & Figure Captions Style ==============%
 

@@ -2,43 +2,65 @@
 \addcontentsline{toc}{chapter}{Introduction G\'en\'erale}
 \markboth{Introduction G\'en\'erale}{Introduction G\'en\'erale}
 
-\section*{1. Contexte G\'en\'eral et Motivations}
-\par Dans un \'ecosyst\`eme num\'erique en constante mutation, caract\'eris\'e par l'adoption massive des infrastructures infonuagiques (\textit{Cloud Computing}), la conteneurisation et la d\'ecomposition en microservices, les syst\`emes d'information des entreprises connaissent une extension sans pr\'ec\'edent de leur surface d'exposition. Chaque nouveau service d\'eploy\'e, chaque sous-domaine cr\'e\'e et chaque port r\'eseau ouvert constituent autant de points d'entr\'ee potentiels pour des cyberattaquants de plus en plus outill\'es et automatis\'es. 
+\section*{1. Contexte et Motivations}
+\par Dans un \'ecosyst\`eme num\'erique marqu\'e par l'adoption massive des infrastructures Cloud, la conteneurisation et les architectures en microservices, les syst\`emes d'information connaissent une extension sans pr\'ec\'edent de leur surface d'exposition. Chaque nouveau service d\'eploy\'e, sous-domaine cr\'e\'e et port r\'eseau ouvert constituent autant de points d'entr\'ee potentiels pour des cyberattaquants de plus en plus outill\'es.
+\par Face \`a cette r\'ealit\'e, les audits de s\'ecurit\'e p\'eriodiques traditionnels (annuels ou semestriels) r\'ev\`elent d'importantes limites op\'erationnelles : entre deux campagnes manuelles, l'apparition d'une nouvelle vuln\'erabilit\'e critique peut exposer durablement l'organisation. La gestion continue de la surface d'attaque externe (\textit{External Attack Surface Management} -- EASM) s'impose d\'esormais comme un imp\'eratif strat\'egique pour garantir une visibilit\'e permanente sur l'ensemble des actifs expos\'es.
 
-\par Face \`a cette dynamique, les approches conventionnelles d'audit de s\'ecurit\'e, fond\'ees sur des tests d'intrusion ponctuels et p\'eriodiques (annuels ou semestriels), r\'ev\`elent d'importantes limites op\'erationnelles. Entre deux campagnes d'audit manuelles, une modification de configuration ou l'apparition d'une nouvelle vuln\'erabilit\'e de type \textit{Zero-Day} ou \textit{1-Day} peut exposer durablement l'infrastructure \`a des risques critiques de compromission. Ainsi, la gestion continue de la surface d'attaque externe (\textit{External Attack Surface Management} -- EASM) s'impose d\'esormais comme un paradigme d\'ecisif pour garantir une visibilit\'e permanente et proactive sur les actifs expos\'es.
-
-\section*{2. Probl\'ematique Industrielle et Scientifique}
-\par L'\'evaluation rigoureuse de la surface d'attaque d'une organisation implique g\'en\'eralement l'orchestration conjointe d'un arsenal d'outils sp\'ecialis\'es : cartographie r\'eseau (Nmap), d\'etection de vuln\'erabilit\'es applicatives (Nuclei), \'enum\'eration de contenus web (Gobuster), d\'ecouverte passive de sous-domaines (Subfinder) et audit de syst\`emes de gestion de contenu (WPScan). N\'eanmoins, dans la pratique industrielle au sein des centres de surveillance de la s\'ecurit\'e (\textit{Security Operations Centers} -- SOC), l'exploitation de ces outils se heurte \`a quatre verrous majeurs :
+\section*{2. Probl\'ematique et Approche Propos\'ee}
+\par L'\'evaluation de la surface d'attaque implique l'orchestration conjointe d'un ensemble d'outils sp\'ecialis\'es (Nmap, Nuclei, Gobuster, Subfinder, WPScan). N\'eanmoins, dans la pratique industrielle au sein des centres de surveillance (SOC), cette d\'emarche se heurte \`a quatre verrous majeurs :
 \begin{itemize}
-    \item \textbf{Fragmentation et absence d'orchestration centralis\'ee :} L'utilisation disparate de scripts et d'ex\'ecutables en ligne de commande engendre des frictions op\'erationnelles, des redondances et un risque \'elev\'e d'erreurs humaines.
-    \item \textbf{Explosion des donn\'ees brutes et d\'eficit de corr\'elation s\'emantique :} Les r\'esultats produits (formats XML, JSON h\'et\'erog\`enes ou flux textuels bruts) sont d\'epourvus de mise en relation contextuelle. L'analyste doit recouper manuellement les ports ouverts, les technologies d\'etect\'ees et les vuln\'erabilit\'es associ\'ees, ce qui retarde la compr\'ehension de la cha\^ine d'attaque (\textit{Kill Chain}).
-    \item \textbf{Temps de latence de la rem\'ediation (\textit{Mean Time to Remediate} -- MTTR) :} La synth\`ese des constats et la r\'edaction manuelle de scripts de correction pour chaque \'equipement impact\'e sont chronophages, laissant une fen\^etre d'exposition critique aux attaquants.
-    \item \textbf{Contraintes l\'egales et \'ethiques strictes :} L'ex\'ecution d'outils d'audit offensif sans encadrement contractuel et technique rigoureux expose l'auditeur \`a des responsabilit\'es p\'enales s\'ev\`eres et au risque de perturber la disponibilit\'e des services cibles.
+    \item \textbf{Fragmentation et ex\'ecution manuelle en silos :} Absence d'orchestration centralis\'ee et h\'et\'erog\'en\'eit\'e des formats de sortie (XML, JSON, texte brut).
+    \item \textbf{D\'eficit de corr\'elation s\'emantique :} Difficult\'e \`a mod\'eliser les relations de d\'ependance entre actifs, ports, services et failles pour \'evaluer le risque r\'eel.
+    \item \textbf{Temps de latence de la rem\'ediation (\textit{MTTR}) :} R\'edaction manuelle et chronophage de proc\'edures de durcissement adapt\'ees.
+    \item \textbf{Exigences l\'egales et \'ethiques :} Risque d'engager des actions de balayage offensif sans mandat formel d'autorisation (\textit{Proof of Authorization} -- PoA).
 \end{itemize}
 
-\section*{3. Approche Propos\'ee : Le Paradigme Semi-Agentique}
-\par Pour r\'epondre \`a cette probl\'ematique, ce travail de th\`ese professionnelle d'ing\'enieur propose la conception et la r\'ealisation d'une plateforme web novatrice reposant sur une architecture \textbf{semi-agentique}. Contrairement \`a un agent enti\`erement autonome qui prendrait des d\'ecisions d'exploitation non supervis\'ees, le mod\`ele semi-agentique impl\'emente le principe de l'humain dans la boucle (\textit{Human-in-the-Loop}). 
-\par La plateforme automatise les t\^aches lourdes et r\'ep\'etitives (balayage r\'eseau, \'enum\'eration, normalisation, corr\'elation en graphe et pr\'e-g\'en\'eration de scripts de correction assist\'ee par un mod\`ele de langage local contraint), tout en subordonnant chaque action sensible (lancement de scans intensifs, validation d'exploitation en bac \`a sable et d\'eploiement de correctifs en production) \`a l'approbation formelle d'un analyste humain accr\'edit\'e disposant d'un mandat l\'egal de test (PoA).
+\par Pour lever ces verrous, ce projet propose une \textbf{plateforme web semi-agentique} combinant l'automatisation lourde des audits (orchestration multi-scanners asynchrone via Redis Streams), la corr\'elation relationnelle par graphe de connaissances (PostgreSQL 16 / Apache AGE / NetworkX) et l'assistance \`a la d\'ecision par une IA locale contrainte (Ollama / \texttt{qwen2.5-coder}). L'approche semi-agentique conserve l'humain dans la boucle (\textit{Human-in-the-Loop}), garantissant que chaque d\'ecision sensible (scans intensifs, validation en bac \`a sable et d\'eploiement de correctifs) demeure sous le contr\^ole d'un analyste accr\'edit\'e.
 
-\section*{4. Objectifs du Projet}
-\par Les objectifs assign\'es \`a ce projet de fin d'\'etudes se d\'eclinent selon les axes scientifiques, techniques et m\'ethodologiques suivants :
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=6mm and 10mm,
+    legacy/.style={draw, rounded corners=3pt, fill=red!8, draw=red!50, thick, minimum width=48mm, minimum height=9mm, align=center, font=\scriptsize},
+    proposed/.style={draw, rounded corners=3pt, fill=green!8, draw=green!60!black, thick, minimum width=48mm, minimum height=9mm, align=center, font=\scriptsize},
+    arrow/.style={-{Stealth[length=2.2mm]}, thick},
+    title_box/.style={font=\footnotesize\bfseries, align=center}
+]
+% Colonne Approche Traditionnelle
+\node[title_box, text=red!70!black] (t1) {\underline{Audit Traditionnel Manuel (Silos)}};
+\node[legacy, below=3mm of t1] (l1) {Outils CLI h\'et\'erog\`enes\\(Nmap, Nuclei, Gobuster)};
+\node[legacy, below=4mm of l1] (l2) {Sorties brutes disparates\\(XML / JSON / Textes)};
+\node[legacy, below=4mm of l2] (l3) {Corr\'elation et filtrage manuels\\(Risque d'erreurs, MTTR \'elev\'e)};
+\node[legacy, below=4mm of l3] (l4) {Rapports bureautiques statiques\\(Absence de tra\c{c}abilit\'e dynamique)};
+
+\draw[arrow, draw=red!60] (l1) -- (l2);
+\draw[arrow, draw=red!60] (l2) -- (l3);
+\draw[arrow, draw=red!60] (l3) -- (l4);
+
+% Colonne Plateforme Proposée
+\node[title_box, text=green!60!black, right=22mm of t1] (t2) {\underline{Notre Plateforme Semi-Agentique (ASM)}};
+\node[proposed, below=3mm of t2] (p1) {Orchestration Unifi\'ee \& PoA\\(Redis Streams + Microservices)};
+\node[proposed, below=4mm of p1] (p2) {Normalisation Universelle\\(\texttt{ResultParser} $\rightarrow$ Format Finding)};
+\node[proposed, below=4mm of p2] (p3) {Graphe \& Rayon d'Impact\\(PostgreSQL/AGE + BFS NetworkX)};
+\node[proposed, below=4mm of p3] (p4) {Remediation-as-Code \& DevSecOps\\(IA Locale Contrainte + CI/CD)};
+
+\draw[arrow, draw=green!60!black] (p1) -- (p2);
+\draw[arrow, draw=green!60!black] (p2) -- (p3);
+\draw[arrow, draw=green!60!black] (p3) -- (p4);
+
+% Flèche de comparaison
+\draw[dashed, <->, thick, draw=blue!60] (l2.east) -- (p2.west) node[midway, above, font=\tiny\bfseries]{Automatisation} node[midway, below, font=\tiny\bfseries]{et Corr\'elation};
+\end{tikzpicture}
+\caption{Comparaison Conceptuelle : D\'emarche d'Audit Traditionnelle vs Plateforme Semi-Agentique Propos\'ee}
+\label{fig:intro_conceptuelle}
+\end{figure}
+
+\section*{3. Cadre du Projet et Organisation du Rapport}
+\par Ce projet a \'et\'e r\'ealis\'e au sein de l'agence num\'erique \textbf{Designet Web Agency} (Menzel Temime, Tunisie), sous la direction conjointe de \textbf{M. Ali DORBOZ} (Directeur Technique) et de \textbf{Mme Sonia BEN AISSA} (Encadrante Universitaire, \'Ecole TEK-UP). La conduite des travaux a suivi le cadre m\'ethodologique Agile Scrum.
+\par Le pr\'esent rapport d'ing\'enierie est structur\'e en quatre chapitres compl\'ementaires :
 \begin{itemize}
-    \item \textbf{Axe 1 -- Orchestration Asynchrone \& R\'esilience :} Concevoir un moteur distribu\'e capable d'ex\'ecuter des flux de scans concurrents via Redis Streams, avec politiques de reprise sur panne et injection de gigue temporelle (\textit{jitter}) anti-blocage.
-    \item \textbf{Axe 2 -- Mod\'elisation en Graphe de Connaissances :} Unifier la topologie de la surface d'attaque au sein d'une base relationnelle et orient\'ee graphe (PostgreSQL 16 avec l'extension Apache AGE), et d\'evelopper un algorithme de calcul de rayon d'impact (\textit{blast radius}) par parcours BFS.
-    \item \textbf{Axe 3 -- Assistance IA Locale et Remediation-as-Code :} Int\'egrer un mod\`ele de langage sp\'ecialis\'e dans le code (\texttt{qwen2.5-coder} via Ollama local) pour g\'en\'erer des correctifs durcis multi-cibles (Bash, Ansible, Docker, Terraform) avec tra\c{c}abilit\'e obligatoire vers les journaux bruts d'audit.
-    \item \textbf{Axe 4 -- S\'ecurit\'e Intrins\`eque et Int\'egration DevSecOps :} Appliquer le principe de d\'efense en profondeur sur l'infrastructure (conteneurs Docker durcis non-root, proxy socket) et automatiser la cha\^ine de s\'ecurit\'e logicielle sous GitHub Actions (SAST, SCA, SBOM CycloneDX, analyse d'images Trivy et signature cryptographique Cosign).
-    \item \textbf{Axe 5 -- Validation Exp\'erimentale Rigoureuse :} D\'eployer la plateforme sur un environnement de production r\'eel durci et conduire des campagnes de tests unitaires, d'int\'egration, de conformit\'e l\'egale et de charge sous Locust.
-\end{itemize}
-
-\section*{5. Cadre Institutionnel et M\'ethodologique}
-\par Ce projet a \'et\'e men\'e au sein de l'agence num\'erique \textbf{Designet Web Agency} (Manzel Tmim, Tunisie), sous l'encadrement conjoint de \textbf{M. Ali DORBOZ} (Directeur Technique de l'entreprise) et de \textbf{Mme Sonia BEN AISSA} (Encadrante Universitaire \`a l'\'Ecole TEK-UP). Les d\'eveloppements ont \'et\'e conduits conform\'ement au cadre Agile Scrum, rythm\'e par des it\'erations de deux semaines garantissant une adaptation continue aux exigences m\'etier.
-
-\section*{6. Organisation du Pr\'esent Rapport}
-\par Le pr\'esent m\'emoire d'ing\'enieur est structur\'e en quatre chapitres fondamentaux, compl\'et\'es par une conclusion g\'en\'erale et des annexes techniques :
-\begin{itemize}
-    \item \textbf{Chapitre 1 -- Cadre G\'en\'eral du Projet :} Situe l'organisme d'accueil, expose le contexte m\'etier, analyse l'\'etat des solutions existantes du march\'e, d\'efinit la probl\'ematique et pr\'esente la m\'ethodologie de conduite de projet Agile Scrum adopt\'ee.
-    \item \textbf{Chapitre 2 -- \'Etat de l'Art et \'Etude Comparative :} D\'eveloppe le socle th\'eorique (surface d'attaque, vuln\'erabilit\'es web, paradigme DevSecOps, IA contrainte et syst\`emes \'ev\'enementiels) et formalise des \'etudes comparatives justifiant rigoureusement le choix des technologies retenues.
-    \item \textbf{Chapitre 3 -- Analyse des Besoins et Conception du Syst\`eme :} Formalise les sp\'ecifications fonctionnelles et non fonctionnelles, la mod\'elisation UML compl\`ete, l'architecture globale en microservices (7 composants logiques et 12 conteneurs Docker), la conception des donn\'ees, la mod\'elisation des menaces selon la m\'ethode STRIDE et l'architecture DevSecOps.
-    \item \textbf{Chapitre 4 -- R\'ealisation et Validation Exp\'erimentale :} D\'etaille l'architecture interne des composants impl\'ement\'es (Laravel 11, microservices Python, pipeline de normalisation, graphe Apache AGE, moteur IA contraint), expose la matrice de tra\c{c}abilit\'e, et analyse les r\'esultats des 140 tests automatis\'es et des benchmarks de charge Locust men\'es en environnement de production.
-    \item \textbf{Conclusion G\'en\'erale et Perspectives :} R\'esume les r\'ealisations cl\'es, synth\'etise les comp\'etences techniques acquises et trace les axes d'am\'elioration futurs pour le passage \`a l'\'echelle industrielle.
+    \item \textbf{Chapitre 1 -- Cadre G\'en\'eral du Projet :} Pr\'esente l'organisme d'accueil, formalise le contexte m\'etier, analyse l'\'etat des solutions existantes du march\'e, d\'efinit la probl\'ematique et d\'etaille la m\'ethodologie Scrum adopt\'ee.
+    \item \textbf{Chapitre 2 -- \'Etat de l'Art et \'Etude Comparative :} Expose les fondements th\'eoriques (OWASP, ASM, DevSecOps, IA locale contrainte, microservices) et justifie le choix des technologies retenues.
+    \item \textbf{Chapitre 3 -- Analyse des Besoins et Conception du Syst\`eme :} D\'efinit les exigences fonctionnelles et non fonctionnelles, la mod\'elisation UML (cas d'utilisation, s\'equences), l'architecture en microservices (7 composants applicatifs, 12 conteneurs Docker), la mod\'elisation des menaces STRIDE et la s\'ecurit\'e de la cha\^ine DevSecOps.
+    \item \textbf{Chapitre 4 -- R\'ealisation et Validation Exp\'erimentale :} D\'etaille l'impl\'ementation des modules (Laravel 11, Flask, Apache AGE, Ollama), illustre les interfaces r\'ealis\'ees, analyse les difficult\'es surmont\'ees, et valide la solution \`a travers 140 tests automatis\'es et des benchmarks sous charge Locust.
 \end{itemize}

@@ -4,24 +4,72 @@
 \par Ce quatri\`eme chapitre d\'etaille la r\'ealisation technique de notre plateforme et pr\'esente les r\'esultats rigoureux de sa validation exp\'erimentale. Nous commen\c{c}ons par d\'ecrire l'environnement de d\'eveloppement, puis nous d\'etaillons l'architecture interne du back-end Laravel 11, le framework d'encapsulation des scanners Python, le pipeline de normalisation des r\'esultats et la sp\'ecification de l'API RESTful. Nous pr\'esentons ensuite les interfaces utilisateurs cl\'es, avant d'approfondir l'impl\'ementation algorithmique du graphe de connaissances (Apache AGE / NetworkX) et du moteur d'IA locale contrainte (Ollama / \texttt{qwen2.5-coder}). Nous exposons les modalit\'es de d\'eploiement durci en production et l'ex\'ecution de la cha\^ine DevSecOps. Enfin, nous dressons la matrice de tra\c{c}abilit\'e des exigences, analysons les r\'esultats des 140 tests unitaires et d'int\'egration, d\'etaillons les benchmarks de charge men\'es avec Locust, et conduisons une discussion approfondie sur les performances et les limites du syst\`eme.
 
 \section{Environnement de D\'eveloppement et Outillage}
-\par Le d\'eveloppement et la validation de la plateforme ont \'et\'e conduits dans un environnement standardis\'e et reproductible :
-\begin{itemize}
-    \item \textbf{Postes de D\'eveloppement :} Syst\`emes d'exploitation Linux Ubuntu 24.04 LTS et Windows 11 avec Docker Desktop 4.30, VS Code, Git et extensions d'analyse statique.
-    \item \textbf{Socles Logiciels :} PHP 8.3 (Laravel 11), Python 3.12 (Flask 3.1, NetworkX 3.2, Pydantic v2), JavaScript ES6+ (Vite, Tailwind CSS, Cytoscape.js 3.28, ECharts 5.5).
-    \item \textbf{Gestionnaires de Paquets \& D\'ependances :} Composer 2.7 (PHP), Pip 24.0 (Python), Npm 10.8 (Node.js).
-    \item \textbf{Scanners de S\'ecurit\'e Int\'egr\'es :} Nmap 7.94, Nuclei v3.2, Gobuster v3.6, Subfinder v2.6, WPScan v3.8.
-\end{itemize}
+\par Le d\'eveloppement, l'int\'egration et la validation de la plateforme ont \'et\'e conduits dans un environnement standardis\'e et reproductible. Les tableaux~\ref{tab:hardware_env} et~\ref{tab:software_env} d\'etaillent respectivement la configuration mat\'erielle et logicielle exploit\'ee.
+
+\begin{table}[H]
+\centering
+\caption{Sp\'ecification de la Configuration Mat\'erielle Utilis\'ee}
+\label{tab:hardware_env}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{Composant Mat\'eriel} & \textbf{Poste de D\'eveloppement Local} & \textbf{Serveur VPS de Production} \\
+\hline
+Processeur (CPU) & AMD Ryzen 7 5800H @ 3.20~GHz (8 C\oe urs / 16 Threads) & Intel Xeon @ 2.60~GHz (4 vCPUs) \\
+\hline
+M\'emoire Vive (RAM) & 16 Go DDR4 3200 MHz & 8 Go DDR4 ECC \\
+\hline
+Stockage & 512 Go SSD NVMe M.2 & 100 Go SSD NVMe haute performance \\
+\hline
+Syst\`eme d'Exploitation & Windows 11 Professionnel / WSL2 Ubuntu 24.04 & Ubuntu 24.04 LTS (Noyau Linux 6.8 x86\_64) \\
+\hline
+Connectivit\'e R\'eseau & Fibre optique 100 Mbit/s sym\'etrique & Connexion d\'edi\'ee 1 Gbit/s non plafonn\'ee \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Environnement Logiciel, Outils et Versions des Frameworks}
+\label{tab:software_env}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{Cat\'egorie} & \textbf{Outil / Technologie} & \textbf{Version \& R\^ole} \\
+\hline
+Environnement d'Ex\'ecution & Docker Engine / Compose & v27.0.3 / v2.28 (Conteneurisation et isolation) \\
+\hline
+Serveur Web \& Reverse Proxy & Nginx & v1.27.0 (Terminaison TLS 1.3, reverse proxy) \\
+\hline
+Back-end Web & PHP / Laravel & PHP 8.3 / Laravel 11.x (Portail m\'etier, ORM, Auth) \\
+\hline
+Microservices & Python / Flask & Python 3.12 / Flask 3.1.0 (Scanners, IA, OSINT) \\
+\hline
+Base de Donn\'ees & PostgreSQL + Apache AGE & PostgreSQL 16.3 + Apache AGE 1.5.0 (Relationnel/Graphe) \\
+\hline
+Message Broker \& Cache & Redis & Redis 7.2 (Streams, files de t\^aches, sessions) \\
+\hline
+Moteur d'IA Locale & Ollama / \texttt{qwen2.5-coder} & Ollama v0.3.4 / Mod\`ele 7B Q4\_K\_M (Inference RaC) \\
+\hline
+Front-end & Tailwind CSS / Vite / Cytoscape.js & Tailwind v3.4 / Vite v5.2 / Cytoscape.js v3.28 \\
+\hline
+Outils de S\'ecurit\'e Int\'egr\'es & Nmap, Nuclei, Gobuster, Subfinder & Nmap 7.94, Nuclei v3.2.9, Gobuster v3.6, Subfinder v2.6.6 \\
+\hline
+Cha\^ine DevSecOps & Psalm, Bandit, Trivy, Syft, Cosign & Psalm 5.24, Bandit 1.7.9, Trivy v0.52, Cosign v2.4 \\
+\hline
+\end{tabular}}%
+\end{table}
 
 \section{Impl\'ementation du Back-end Applicatif (Laravel 11)}
 \subsection{Architecture Interne en Couches du Back-end}
 \par Le back-end Laravel 11 adopte une architecture modulaire en couches garantissant une stricte s\'eparation des responsabilit\'es :
 \begin{enumerate}
-    \item \textbf{Couche de Routage (\texttt{routes/web.php} et \texttt{routes/api.php}) :} D\'eclaration des points d'entr\'ee HTTP avec application des groupes de middlewares de s\'ecurit\'e.
-    \item \textbf{Couche des Requ\^etes de Formulaire (\textit{Form Requests}) :} Validation rigoureuse des param\`etres d'entr\'ee (types, formats d'URL, pr\'esence des fichiers PoA) avant toute transmission aux contr\^oleurs m\'etier.
-    \item \textbf{Couche des Contr\^oleurs (\textit{Controllers}) :} R\'eception des requ\^etes valid\'ees, coordination avec les services et renvoi des r\'eponses JSON ou des vues Blade.
-    \item \textbf{Couche de Services (\textit{Services}) :} Encapsulation de la logique m\'etier pure (\texttt{ScanOrchestrationService}, \texttt{ReportGenerationService}, \texttt{GraphDataService}).
-    \item \textbf{Couche des T\^aches Asynchrones (\textit{Jobs}) :} D\'el\'egation des traitements lourds (\texttt{ExecuteScanJob}, \texttt{ExportReportJob}) vers les files de messages Redis.
-    \item \textbf{Couche d'Acc\`es aux Donn\'ees (\textit{Eloquent Models}) :} Repr\'esentation objet des 14 tables relationnelles avec gestion des contraintes et colonnes JSONB index\'ees.
+    \item \textbf{Couche de Routage (\texttt{routes/web.php} et \texttt{routes/api.php}) :} D\'eclaration des points d'entr\'ee HTTP avec application des middlewares de s\'ecurit\'e.
+    \item \textbf{Couche des Requ\^etes de Formulaire (\textit{Form Requests}) :} Validation rigoureuse des param\`etres d'entr\'ee (formats d'URL, pr\'esence PoA) avant transmission aux contr\^oleurs.
+    \item \textbf{Couche des Contr\^oleurs (\textit{Controllers}) :} R\'eception des requ\^etes valid\'ees, coordination m\'etier et renvoi des r\'eponses JSON ou vues Blade.
+    \item \textbf{Couche de Services (\textit{Services}) :} Logique m\'etier pure (\textit{ScanOrchestration}, \textit{ReportGeneration}, \textit{GraphDataService}).
+    \item \textbf{Couche des T\^aches Asynchrones (\textit{Jobs}) :} Traitements d'arri\`ere-plan (\textit{ExecuteScanJob}, \textit{ExportReportJob}) d\'el\'egu\'es \`a Redis.
+    \item \textbf{Couche d'Acc\`es aux Donn\'ees (\textit{Eloquent Models}) :} Repr\'esentation objet des 14 tables relationnelles avec contraintes et colonnes JSONB.
 \end{enumerate}
 
 \subsection{Authentification, RBAC et Middlewares de S\'ecurit\'e}
@@ -137,54 +185,229 @@
 \end{tabular}}%
 \end{table}
 
-\section{Interface Utilisateur de la Plateforme}
-\par L'interface utilisateur a \'et\'e con\c{c}ue avec le moteur de templates Blade, Tailwind CSS et Vite, offrant un rendu r\'eactif adapt\'e aux environnements de surveillance SOC.
+\subsection{Exemple de Requ\^ete et R\'eponse JSON Normalis\'ee}
+\par L'extrait suivant illustre le format JSON de r\'eponse produit lors de la consultation d'un constat de vuln\'erabilit\'e normalis\'e via l'endpoint \texttt{GET /api/v1/findings/442} :
+\begin{verbatim}
+{
+  "status": "success",
+  "data": {
+    "id": 442,
+    "scan_id": 87,
+    "target": "ensit.tn",
+    "port": 22,
+    "service": "OpenSSH 8.9p1 Ubuntu",
+    "title": "SSH Weak Password Authentication Enabled",
+    "severity": "medium",
+    "cvss_score": 5.3,
+    "cve_id": "CVE-2023-48795",
+    "cwe_id": "CWE-287",
+    "evidence_file": "nmap_scan_87.xml",
+    "remediation_status": "generated",
+    "created_at": "2026-08-22T10:42:33Z"
+  }
+}
+\end{verbatim}
 
-\begin{figure}[!htbp]
+\section{Interfaces Utilisateurs de la Plateforme}
+\par L'interface graphique a \'et\'e d\'evelopp\'ee sous le moteur de templates Laravel Blade, enrichie de Tailwind CSS et orchestr\'ee via Vite. Elle offre un th\`eme sombre (\textit{Dark Theme}) optimis\'e pour les salles de contr\^ole SOC.
+
+\subsection{Authentification et Enregistrement S\'ecuris\'e}
+\par L'acc\`es \`a la plateforme est prot\'eg\'e par une authentification forte int\'egrant la protection anti-CSRF, la limitation de d\'ebit et la journalisation des tentatives d'acc\`es (figures~\ref{fig:login_page} et~\ref{fig:register_page}).
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{img/dashboard.png}
+    \includegraphics[width=0.75\textwidth]{img/login_page.png}
+    \caption{Interface d'Authentification Sécurisée de la Plateforme}
+    \label{fig:login_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{img/register_page.png}
+    \caption{Interface de Création de Compte et Enregistrement Utilisateur}
+    \label{fig:register_page}
+\end{figure}
+
+\subsection{Tableau de Bord Principal (Dashboard ASM)}
+\par Le tableau de bord principal (figure~\ref{fig:dashboard}) synth\'etise l'\'etat global de la surface d'attaque : indicateurs cl\'es (KPIs), r\'epartition des vuln\'erabilit\'es par criticit\'e (Critical, High, Medium, Low, Info), statut des scans actifs et alertes r\'ecentes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.49\textwidth]{img/dashboard_p1.png}\hfill
+    \includegraphics[width=0.49\textwidth]{img/dashboard_p2.png}
     \caption{Tableau de Bord Principal -- Indicateurs Cl\'es (KPIs) et Cartographie des Risques}
     \label{fig:dashboard}
 \end{figure}
 
-\begin{figure}[!htbp]
+\subsection{Gestion des Projets et Cibles d'Audit}
+\par La gestion des p\'erim\`etres s'effectue via les interfaces d\'edi\'ees aux projets (figures~\ref{fig:projects}, \ref{fig:new_project} et~\ref{fig:project_detail}), permettant de d\'eclarer les cibles et de rattacher la preuve d'autorisation (PoA).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/projects.png}
+    \caption{Liste des Projets d'Audit et Synth\`ese du Statut des Cibles}
+    \label{fig:projects}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/new_project.png}
+    \caption{Formulaire de Cr\'eation de Projet et T\'el\'eversement de la Preuve d'Autorisation (PoA)}
+    \label{fig:new_project}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/project_detail.png}
+    \caption{Fiche D\'etaill\'ee d'un Projet -- Cibles Associ\'ees et Historique des Scans}
+    \label{fig:project_detail}
+\end{figure}
+
+\subsection{Lancement et Suivi des Scans de Reconnaissance}
+\par Les figures~\ref{fig:launch_scan} et~\ref{fig:scans_list} illustrent la configuration des profils de balayage (Silent, Balanced, Aggressive) et le suivi en temps r\'eel de l'avancement des scans via Redis Streams.
+
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.80\textwidth]{img/launch_scan.png}
     \caption{Interface de Configuration et Lancement d'un Scan d'Audit}
     \label{fig:launch_scan}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{img/scan_results.png}
+    \includegraphics[width=0.80\textwidth]{img/scans_list.png}
+    \caption{Liste et \'Etat d'Avancement des Scans d'Audit Orchestr\'es}
+    \label{fig:scans_list}
+\end{figure}
+
+\subsection{Restitution des R\'esultats et Preuves Brutes}
+\par La vue d\'etaill\'ee d'un scan (figure~\ref{fig:scan_results}) affiche l'ensemble des constats identifi\'es avec filtrage dynamique par niveau de gravit\'e et acc\`es aux extraits bruts des logs.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.49\textwidth]{img/scan_results_p1.png}\hfill
+    \includegraphics[width=0.49\textwidth]{img/scan_results_p2.png}
     \caption{Restitution des R\'esultats de Scan et Visualisation des Preuves Techniques}
     \label{fig:scan_results}
 \end{figure}
 
-\begin{figure}[!htbp]
+\subsection{Fiche de Constat et Remediation-as-Code Assist\'ee par IA}
+\par La figure~\ref{fig:remediation} pr\'esente la fiche compl\`ete d'une faille, incluant le score CVSS, le descriptif technique et les scripts de rem\'ediation automatis\'es (Bash, Ansible, Dockerfile) g\'en\'er\'es par l'IA locale contrainte.
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{img/remediation.png}
-    \caption{Fiche D\'etaill\'ee d'un Constat et Recommandations de Rem\'ediation Assist\'ees par IA}
+    \includegraphics[width=0.82\textwidth]{img/remediation.png}
+    \caption{Fiche D\'etaill\'ee d'un Constat et Scripts de Remediation-as-Code G\'en\'er\'es par l'IA}
     \label{fig:remediation}
 \end{figure}
 
-\begin{figure}[!htbp]
+\subsection{Visualisation Interactive du Graphe de Connaissances}
+\par L'interface Cytoscape.js (figure~\ref{fig:knowledge_graph}) projette la topologie relationnelle des actifs (\textit{Target $\rightarrow$ Asset $\rightarrow$ Port $\rightarrow$ Service $\rightarrow$ Vulnerability}) et met en \'evidence le rayon d'impact calcul\'e par parcours BFS.
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{img/knowledge_graph.png}
+    \includegraphics[width=0.82\textwidth]{img/knowledge_graph.png}
     \caption{Visualisation Interactive du Graphe de Connaissances et du Rayon d'Impact}
     \label{fig:knowledge_graph}
 \end{figure}
 
-\begin{figure}[!htbp]
+\subsection{Module de Renseignement Passif (OSINT)}
+\par Le module OSINT (figure~\ref{fig:osint}) regroupe les donn\'ees d'\'enum\'eration passive : r\'esolutions DNS compl\`etes, enregistrements WHOIS, certificats SSL/TLS via \texttt{crt.sh} et technologies web d\'etect\'ees.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{img/osint.png}
+    \caption{Module de Renseignement Passif OSINT -- Analyse DNS, WHOIS et Certificats TLS}
+    \label{fig:osint}
+\end{figure}
+
+\subsection{Gestionnaire du Bac \`a Sable (Sandbox Isol\'ee)}
+\par La figure~\ref{fig:sandbox} illustre le pilotage s\'ecuris\'e des environnements vuln\'erables conteneuris\'es (DVWA, SQLi-Labs) via \texttt{docker-socket-proxy} pour la validation contr\^ol\'ee des techniques de d\'etection.
+
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.80\textwidth]{img/sandbox.png}
     \caption{Gestionnaire du Bac \`a Sable (Sandbox) pour la Validation d'Exploits}
     \label{fig:sandbox}
 \end{figure}
 
-\par \textit{Note : Les captures d'\'ecran des modules compl\'ementaires (administration des comptes, journaux d'audit immuables, module OSINT d\'etaill\'e et assistant conversationnel) sont pr\'esent\'ees dans l'Annexe~A.}
+\subsection{Alertes de S\'ecurit\'e et Surveillance Continue}
+\par Les figures~\ref{fig:alerts} et~\ref{fig:monitoring} pr\'esentent le centre de gestion des alertes critiques et le module de t\'el\'em\'etrie pour la surveillance en temps r\'eel de la surface d'attaque.
 
-\section{Conception et Impl\'ementation Avanc\'ee du Graphe de Connaissances}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{img/alerts_p1.png}\hfill
+    \includegraphics[width=0.46\textwidth]{img/alerts_p2.png}
+    \caption{Centre de Gestion et d'Acquittement des Alertes de S\'ecurit\'e}
+    \label{fig:alerts}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/monitoring.png}
+    \caption{Module de Surveillance Continue et T\'el\'em\'etrie des Actifs Expos\'es}
+    \label{fig:monitoring}
+\end{figure}
+
+\subsection{Co-pilote Conversationnel de S\'ecurit\'e (AI Assistant)}
+\par L'assistant interactif (figure~\ref{fig:chat}) permet \`a l'analyste d'interroger la base de connaissances du projet en langage naturel et d'obtenir des conseils de durcissement adapt\'es.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/chat.png}
+    \caption{Assistant Conversationnel d'Analyse de S\'ecurit\'e Assist\'e par IA Locale}
+    \label{fig:chat}
+\end{figure}
+
+\subsection{Administration des Utilisateurs et R\^oles RBAC}
+\par La figure~\ref{fig:admin_users} pr\'esente le module de gestion des comptes et d'attribution granulaire des r\^oles RBAC (Admin, Analyste, Client, Auditeur).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/admin_users.png}
+    \caption{Module d'Administration des Utilisateurs et Gestion des R\^oles RBAC}
+    \label{fig:admin_users}
+\end{figure}
+
+\subsection{Journalisation d'Audit Immuable (Audit Logs)}
+\par Le module de tra\c{c}abilit\'e (figure~\ref{fig:audit_logs}) assure l'immuabilit\'e et la non-r\'epudiation des actions administratives et des soumissions de scans.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/audit_logs.png}
+    \caption{Module de Journalisation d'Audit Immuable pour la Tra\c{c}abilit\'e des \'Ev\'enements}
+    \label{fig:audit_logs}
+\end{figure}
+
+\subsection{Surveillance de la Sant\'e des Microservices (System Health)}
+\par La figure~\ref{fig:system_health} illustre la console de supervision op\'erationnelle de l'\'etat des douze conteneurs Docker composant l'architecture de la plateforme.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/system_health.png}
+    \caption{Supervision de la Sant\'e des Microservices et \'Etat des Conteneurs Docker}
+    \label{fig:system_health}
+\end{figure}
+
+\subsection{G\'en\'eration et Consultation des Rapports d'Expertise}
+\par Les figures~\ref{fig:reports} et~\ref{fig:report_view} illustrent la g\'en\'eration multi-formats des rapports d'audit (PDF ex\'ecutif sign\'e, JSON) et leur consultation interactive.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{img/reports.png}
+    \caption{Module de G\'en\'eration et Export Multi-Formats des Rapports d'Audit}
+    \label{fig:reports}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.49\textwidth]{img/report_view_p1.png}\hfill
+    \includegraphics[width=0.49\textwidth]{img/report_view_p2.png}
+    \caption{Visualisation et Consultation d'un Rapport d'Expertise de S\'ecurit\'e}
+    \label{fig:report_view}
+\end{figure}
+
+\section{Conception et Impl\'ementation Avanc\'ee du Graphe de Connais\-sances}
 \subsection{Mod\`ele de Donn\'ees en Graphe (N\oe uds et Ar\^etes)}
 \par La mod\'elisation en graphe permet de capturer la topologie relationnelle de la cible d'audit. Les entit\'es sont d\'efinies selon six types de n\oe uds :
 \begin{itemize}
@@ -198,7 +421,7 @@
 \par Ces n\oe uds sont interconnect\'es par cinq relations orient\'ees typ\'ees : \texttt{RESOLVES\_TO}, \texttt{HOSTS}, \texttt{RUNS}, \texttt{HAS\_VULN} et \texttt{IMPACTS}.
 
 \subsection{Pipeline de Construction et Requ\^etage openCypher}
-\par Lors de la r\'eception des constats normalis\'es, le service \texttt{GraphBuilder} g\'en\`ere et ex\'ecute des requ\^etes openCypher au sein de l'extension **Apache AGE** dans PostgreSQL 16. Par exemple, l'insertion d'un port et de son service associ\'e s'ex\'ecute via la requ\^ete param\'etr\'ee :
+\par Lors de la r\'eception des constats normalis\'es, le service \texttt{GraphBuilder} g\'en\`ere et ex\'ecute des requ\^etes openCypher au sein de l'extension \textbf{Apache AGE} dans PostgreSQL 16. Par exemple, l'insertion d'un port et de son service associ\'e s'ex\'ecute via la requ\^ete param\'etr\'ee :
 \begin{verbatim}
 SELECT * FROM cypher('cybersec_graph', $$
   MATCH (a:Asset {name: $asset_name})
@@ -210,7 +433,7 @@ $$) as (v agtype);
 \end{verbatim}
 
 \subsection{Algorithme de Calcul du Rayon d'Impact (Blast Radius)}
-\par Pour quantifier la menace r\'eelle, le syst\`eme calcule le rayon d'impact (\textit{blast radius}) \`a l'aide d'un algorithme de parcours en largeur (\textit{Breadth-First Search} -- BFS) impl\'ement\'e sous **NetworkX**, limit\'e \`a une profondeur maximale de $k=3$ sauts. L'encadr\'e ci-dessous (Algorithme~4.1) d\'ecrit formellement ce processus.
+\par Pour quantifier la menace r\'eelle, le syst\`eme calcule le rayon d'impact (\textit{blast radius}) \`a l'aide d'un algorithme de parcours en largeur (\textit{Breadth-First Search} -- BFS) impl\'ement\'e sous \textbf{NetworkX}, limit\'e \`a une profondeur maximale de $k=3$ sauts. L'encadr\'e ci-dessous (Algorithme~4.1) d\'ecrit formellement ce processus.
 
 \begin{tcolorbox}[colback=blue!3,colframe=blue!40,title=\textbf{Algorithme 4.1 : Calcul du Rayon d'Impact d'une Vuln\'erabilit\'e (BFS NetworkX)},fonttitle=\small\bfseries]
 \small
@@ -242,7 +465,7 @@ $$) as (v agtype);
 
 \par \textbf{Analyse de Complexit\'e :} L'algorithme BFS s'ex\'ecute en temps $O(|V| + |E|)$, o\`u $|V|$ repr\'esente le nombre de sommets et $|E|$ le nombre d'ar\^etes du sous-graphe de la cible. En limitant le parcours \`a $k=3$, la recherche s'effectue en moins de 75 ms sur un graphe comptant plusieurs milliers de n\oe uds, permettant un calcul instantan\'e \`a chaque consultation de faille par l'analyste.
 
-\section{Moteur d'Intelligence Artificielle Contrainte et Remediation-as-Code}
+\section{Moteur d'Intelligence Artificielle Contrainte et Re\-me\-diation-as-Code}
 \subsection{Pipeline de Traitement IA}
 \par La g\'en\'eration de correctifs automatis\'es suit un pipeline d\'eterministe con\c{c}u pour bannir tout comportement non contr\^ol\'e du mod\`ele de langage :
 \begin{enumerate}
@@ -273,17 +496,40 @@ $$) as (v agtype);
 \par Si le mod\`ele g\'en\`ere une sortie non conforme ou omet les citations de preuves, la r\'eponse est imm\'ediatement rejet\'ee et un fallback s\'ecuris\'e bas\'e sur des mod\`eles de durcissement pr\'ed\'efinis est appliqu\'e.
 
 \section{D\'eploiement en Production et Durcissement VPS}
-\par La plateforme a \'et\'e d\'eploy\'ee avec succ\`es sur une instance de production accessible \`a l'adresse \url{https://aymenazizi.dijaly.com/} au moment de la r\'edaction du pr\'esent rapport. L'infrastructure repose sur un serveur VPS d\'edi\'e sous Ubuntu 24.04 LTS (4 vCPU Intel Xeon, 8 Go RAM, 100 Go SSD NVMe).
+\par La plateforme a \'et\'e d\'eploy\'ee avec succ\`es sur une instance de production accessible \`a l'adresse \url{https://aymenazizi.dijaly.com/} au moment de la r\'edaction du pr\'esent rapport. L'infrastructure repose sur un serveur VPS d\'edi\'e sous Ubuntu 24.04 LTS (4 vCPUs, 8 Go RAM, 100 Go SSD).
 \par La topologie de d\'eploiement applique des mesures de durcissement rigoureuses :
 \begin{itemize}
-    \item \textbf{Serveur Mandataire Inverse Nginx 1.27 :} Terminaison TLS 1.3 avec certificat Let's Encrypt, renouvellement automatique par \texttt{certbot}, et redirection forc\'ee de HTTP (port 80) vers HTTPS (port 443).
-    \item \textbf{En-t\^etes de S\'ecurit\'e HTTP Durcis :} Injection obligatoire de \texttt{Strict-Transport-Security} (HSTS avec \texttt{max-age=31536000}), \texttt{X-Frame-Options: DENY}, \texttt{X-Content-Type-Options: nosniff} et \texttt{Content-Security-Policy}.
-    \item \textbf{Segmentation R\'eseau Docker :} Isolation herm\'etique entre le r\'eseau externe (\texttt{cybersec-external}) et le r\'eseau interne priv\'e (\texttt{cybersec-internal}).
-    \item \textbf{Filtrage Pare-Feu UFW :} Seuls les ports 22 (SSH filtr\'e par cl\'e), 80 (HTTP) et 443 (HTTPS) sont ouverts sur l'interface publique du VPS.
+    \item \textbf{Serveur Mandataire Inverse Nginx 1.27 :} Terminaison TLS 1.3 avec certificat Let's Encrypt renouvel\'e par \texttt{certbot}, et redirection forc\'ee de HTTP vers HTTPS.
+    \item \textbf{En-t\^etes de S\'ecurit\'e HTTP Durcis :} Injection de HSTS (\texttt{max-age=31536000}), \texttt{X-Frame-Options}, \texttt{X-Content-Type-Options} et \texttt{Content-Security-Policy}.
+    \item \textbf{Segmentation R\'eseau Docker :} Isolation herm\'etique entre le r\'eseau externe public et le r\'eseau interne priv\'e.
+    \item \textbf{Filtrage Pare-Feu UFW :} Seuls les ports 22 (SSH filtr\'e), 80 (HTTP) et 443 (HTTPS) sont ouverts sur l'interface publique du VPS.
 \end{itemize}
 
 \section{Ex\'ecution du Pipeline DevSecOps}
 \par \`A chaque commit pouss\'e sur la branche principale, le workflow GitHub Actions ex\'ecute l'int\'egralit\'e des contr\^oles automatis\'es : analyse SAST (0 anomalie critique d\'etect\'ee par Psalm et Bandit), analyse SCA (0 vuln\'erabilit\'e critique non corrig\'ee), g\'en\'eration du SBOM CycloneDX par Syft, scan de l'image de production par Trivy et signature cryptographique par Cosign via GitHub Container Registry (GHCR).
+
+\section{Difficult\'es Rencontr\'ees et Solutions Apport\'ees}
+\par La r\'ealisation d'une plateforme unifi\'ee associant des outils offensifs h\'et\'erog\`enes, un moteur de graphe et un LLM contraint a soulev\'e plusieurs d\'efis d'ing\'enierie complexes :
+
+\subsection{Difficult\'e 1 : Int\'egration et Compatibilit\'e d'Apache AGE avec PostgreSQL 16}
+\par \textbf{Probl\`eme :} L'extension Apache AGE pour PostgreSQL \'etait initialement con\c{c}ue pour des versions ant\'erieures. L'int\'egration avec PostgreSQL 16 a provoqu\'e des incompatibilit\'es lors de la compilation des extensions et des erreurs de conversion de types \texttt{agtype} avec le driver PDO. \newline
+\textbf{Solution :} Compilation sur mesure d'une image Docker PostgreSQL 16 durcie int\'egrant Apache AGE 1.5. C\^ot\'e Laravel, conception d'un service d'encapsulation (\texttt{GraphDataService}) transformant les r\'esultats \texttt{agtype} bruts en structures JSON natives.
+
+\subsection{Difficult\'e 2 : Optimisation de la Latence du LLM Local et \'Elimination des Hallucinations}
+\par \textbf{Probl\`eme :} L'ex\'ecution d'un mod\`ele de 7 milliards de param\`etres sur CPU induisait une latence initiale sup\'erieure \`a 20 secondes par requ\^ete et pr\'esentait des risques d'hallucination. \newline
+\textbf{Solution :} Adoption du mod\`ele quantifi\'e \texttt{qwen2.5-coder} r\'eduisant l'empreinte m\'emoire \`a 4,7 Go et la latence \`a 6,4 s (P50). Mise en place d'un validateur Pydantic (\textit{schema\_validator}) for\c{c}ant les citations obligatoires vers les logs bruts d'audit, adoss\'e \`a un m\'ecanisme d\'eterministe de repli (\textit{fallback hardening templates}).
+
+\subsection{Difficult\'e 3 : Isolation Herm\'etique du Bac \`a Sable (Docker Socket Proxy)}
+\par \textbf{Probl\`eme :} L'ex\'ecution d'environnements vuln\'erables de test n\'ecessitait de cr\'eer des conteneurs via l'API Docker, exposant le socket Unix (\texttt{docker.sock}) \`a des risques d'\'evasion. \newline
+\textbf{Solution :} Interposition d'un conteneur d\'edi\'e \textbf{Docker-Socket-Proxy} n'autorisant que la cr\'eation et le d\'emarrage des conteneurs sandbox, tout en interdisant l'acc\`es aux volumes de production et aux privil\`eges \'elev\'es.
+
+\subsection{Difficult\'e 4 : Normalisation H\'et\'erog\`ene des Sorties Scanners}
+\par \textbf{Probl\`eme :} Chaque scanner g\'en\`ere des formats disparates (XML, JSON-Lines, texte brut), compliquant la d\'eduplication et l'ingestion dans le graphe. \newline
+\textbf{Solution :} Conception du patron Adaptateur via la classe abstraite \texttt{BaseScannerService} et d\'eveloppement du composant \texttt{ResultParser} r\'ealisant le hachage d'empreinte SHA-256 et le mapping universel vers le r\'ef\'erentiel CVSS v3.1.
+
+\subsection{Difficult\'e 5 : Gestion de la Concurrence et R\'esilience des Workers Redis Streams}
+\par \textbf{Probl\`eme :} L'ex\'ecution simultan\'ee de scans intensifs par plusieurs utilisateurs risquait de saturer les ressources ou de perdre des messages en cas d'arr\^et impr\'evu du worker. \newline
+\textbf{Solution :} Structuration d'un groupe de consommateurs Redis Streams (\texttt{XREADGROUP}) avec verrouillage distribu\'e, acquittement explicite (\texttt{XACK}) et processus de reprise sur panne r\'ecup\'erant les messages en attente (PEL).
 
 \section{Matrice de Tra\c{c}abilit\'e des Exigences (RTM)}
 \par Le tableau~\ref{tab:rtm} formalise la matrice de tra\c{c}abilit\'e reliant chaque exigence fonctionnelle et de s\'ecurit\'e du cahier des charges aux composants d'impl\'ementation et aux cas de tests valid\'es.
@@ -329,7 +575,7 @@ Gates de S\'ecurit\'e CI/CD & Pipeline GitHub Actions & \texttt{devsecops.yml} &
 \par Pour mesurer scientifiquement la robustesse, la fiabilit\'e et la performance de la plateforme, nous avons \'etabli un protocole exp\'erimental reproductible :
 \begin{itemize}
     \item \textbf{Environnement Mat\'eriel \& Syst\`eme :} Instance VPS Cloud \'equip\'ee de 4 vCPU Intel Xeon @ 2.60~GHz, 8~Go de RAM DDR4, stockage SSD NVMe 100~Go, bande passante r\'eseau 1~Gbit/s, sous Ubuntu 24.04 LTS avec Docker Engine 27.0.
-    \item \textbf{Outils d'\'Evaluation :} Suites automatis\'ees PHPUnit 11 (back-end Laravel) et Pytest (microservices Python). Pour les tests sous charge, nous avons employ\'e le framework **Locust 2.24**.
+    \item \textbf{Outils d'\'Evaluation :} Suites automatis\'ees PHPUnit 11 (back-end Laravel) et Pytest (microservices Python). Pour les tests sous charge, nous avons employ\'e le framework \textbf{Locust 2.24}.
     \item \textbf{Jeux d'Essais et Cibles :} (1) Bac \`a sable interne isol\'e (DVWA, SQLi-Labs) pour valider la d\'etection des vuln\'erabilit\'es applicatives ; (2) cibles r\'eelles d\^ument autoris\'ees avec mandat PoA formel.
 \end{itemize}
 
@@ -403,7 +649,7 @@ Pipeline DevSecOps (Gates SAST, SCA, SBOM, Cosign) & GitHub Actions & 8 & 8 & 10
 
 \section{\'Evaluation des Performances sous Charge (Locust)}
 \subsection{Conditions du Benchmark et M\'etriques Recueillies}
-\par Pour mesurer le comportement sous contrainte, nous avons simul\'e la charge de 50 utilisateurs concurrents via **Locust 2.24** sur une dur\'ee de 60 secondes, injectant un total de 2\,500 requ\^etes r\'eparties sur les sc\'enarios standards d'utilisation.
+\par Pour mesurer le comportement sous contrainte, nous avons simul\'e la charge de 50 utilisateurs concurrents via \textbf{Locust 2.24} sur une dur\'ee de 60 secondes, injectant un total de 2\,500 requ\^etes r\'eparties sur les sc\'enarios standards d'utilisation.
 
 \begin{table}[H]
 \centering

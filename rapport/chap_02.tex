@@ -75,6 +75,7 @@
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     node distance=5mm and 8mm,
     phase/.style={draw, rounded corners=3pt, fill=cyan!10, draw=cyan!60, thick, minimum width=22mm, minimum height=10mm, align=center, font=\footnotesize},
@@ -92,7 +93,7 @@
 \draw[arrow] (p4) -- (p5);
 \draw[arrow] (p5) -- (p6);
 \draw[arrow, draw=cyan!50] (p6.south) .. controls +(0,-9mm) and +(0,-9mm) .. (p1.south) node[midway, below, font=\tiny]{Cycle it\'eratif continu};
-\end{tikzpicture}
+\end{tikzpicture}}
 \caption{Cycle de Vie du Processus d'Attack Surface Management (ASM)}
 \label{fig:asm_flow}
 \end{figure}
@@ -106,19 +107,55 @@
 \end{itemize}
 
 \subsection{Outils d'Audit Int\'egr\'es dans la Plateforme}
-\par Notre plateforme int\`egre cinq outils de r\'ef\'erence compl\'ementaires :
+\par Notre plateforme int\`egre cinq outils de reconnaissance et d'audit de s\'ecurit\'e de r\'ef\'erence, encapsul\'es au sein de conteneurs isol\'es :
+
 \begin{itemize}
-    \item \textbf{Nmap (Network Mapper)~\cite{nmap} :} Outil d'exploration r\'eseau mondialement reconnu. Il utilise l'\'emission de paquets TCP SYN bruts (\textit{SYN stealth scan}) pour d\'eterminer l'\'etat des ports, identifie les banni\`eres applicatives et d\'etecte les syst\`emes d'exploitation via l'analyse de signatures TCP/IP. Son moteur NSE (\textit{Nmap Scripting Engine}) permet d'ex\'ecuter des scripts Lua pour \'evaluer des vuln\'erabilit\'es connues.
-    \item \textbf{Nuclei~\cite{nuclei} :} Moteur d'\'evaluation de vuln\'erabilit\'es pilot\'e par des mod\`eles d\'eclaratifs YAML communautaires. Con\c{c}u en langage Go, il excelle dans la d\'etection rapide de failles web complexes (CVEs r\'ecentes, faiblesses d'authentification, fuites de donn\'ees d'infrastructure) en envoyant des requ\^etes cibl\'ees avec un taux de faux positifs inf\'erieur aux scanners g\'en\'eriques.
-    \item \textbf{Gobuster~\cite{gobuster} :} Outil d'\'enum\'eration brute rapide d\'evelopp\'e en Go exploitant des routines concurrentes. Il permet d'identifier les chemins, r\'epertoires cach\'es, fichiers sensibles d'environnement (\texttt{.env}, \texttt{.git}, sauvegardes \texttt{.bak}) et sous-domaines par confrontation \`a des dictionnaires volumineux (\textit{SecLists}).
-    \item \textbf{Subfinder~\cite{subfinder} :} Outil d'\'enum\'eration passive de sous-domaines. Il agr\`ege les donn\'ees issues de dizaines de sources passives ouvertes sans jamais contacter directement la cible, assurant la d\'ecouverte exhaustive des p\'erim\`etres oubli\'es.
-    \item \textbf{WPScan~\cite{wpscan} :} Scanner sp\'ecialis\'e dans l'audit des syst\`emes WordPress. Il analyse le code source HTML, les en-t\^etes HTTP et les r\'epertoires standards pour recenser les th\`emes et extensions obsol\`etes r\'epertori\'es dans la base de donn\'ees WPScan Vulnerability Database.
+    \item \textbf{\color{blue!80!black}[\,Nmap\,] -- Network Mapper~\cite{nmap} :} Outil d'exploration r\'eseau mondialement reconnu. Il utilise l'\'emission de paquets TCP SYN bruts (\textit{SYN stealth scan}) pour d\'eterminer l'\'etat des ports, identifie les banni\`eres applicatives et d\'etecte les syst\`emes d'exploitation via l'analyse de signatures TCP/IP. Son moteur NSE (\textit{Nmap Scripting Engine}) permet d'ex\'ecuter des scripts Lua pour \'evaluer des vuln\'erabilit\'es connues.
+    \item \textbf{\color{purple!80!black}[\,Nuclei\,] -- Vulnerability Scanner~\cite{nuclei} :} Moteur d'\'evaluation de vuln\'erabilit\'es pilot\'e par des mod\`eles d\'eclaratifs YAML communautaires. Con\c{c}u en langage Go, il excelle dans la d\'etection rapide de failles web complexes (CVEs r\'ecentes, faiblesses d'authentification, fuites de donn\'ees d'infrastructure) en envoyant des requ\^etes cibl\'ees avec un taux de faux positifs inf\'erieur aux scanners g\'en\'eriques.
+    \item \textbf{\color{cyan!80!black}[\,Gobuster\,] -- Content \& DNS Enumeration~\cite{gobuster} :} Outil d'\'enum\'eration brute rapide d\'evelopp\'e en Go exploitant des routines concurrentes. Il permet d'identifier les chemins, r\'epertoires cach\'es, fichiers sensibles d'environnement (\texttt{.env}, \texttt{.git}, sauvegardes \texttt{.bak}) et sous-domaines par confrontation \`a des dictionnaires volumineux (\textit{SecLists}).
+    \item \textbf{\color{green!60!black}[\,Subfinder\,] -- Passive OSINT Subdomains~\cite{subfinder} :} Outil d'\'enum\'eration passive de sous-domaines. Il agr\`ege les donn\'ees issues de dizaines de sources passives ouvertes sans jamais contacter directement la cible, assurant la d\'ecouverte exhaustive des p\'erim\`etres oubli\'es.
+    \item \textbf{\color{orange!80!black}[\,WPScan\,] -- WordPress Vulnerability Scanner~\cite{wpscan} :} Scanner sp\'ecialis\'e dans l'audit des syst\`emes WordPress. Il analyse le code source HTML, les en-t\^etes HTTP et les r\'epertoires standards pour recenser les th\`emes et extensions obsol\`etes r\'epertori\'es dans la base de donn\'ees WPScan Vulnerability Database.
 \end{itemize}
 
 \section{DevSecOps et S\'ecurit\'e de la Cha\^ine Logicielle}
 \subsection{Origine et Philosophie Shift-Left}
 \par Le mod\`ele traditionnel de d\'eveloppement logiciel r\'eservait les contr\^oles de s\'ecurit\'e \`a la fin du cycle de livraison, juste avant le passage en production. Cette approche tardive engendrait des goulots d'\'etranglement op\'erationnels majeurs : la correction d'une faille architecturale ou d'une d\'ependance vuln\'erable d\'ecouverte tardivement entra\^inant des co\^uts prohibitifs et des retards de d\'eploiement importants.
 \par Le paradigme \textbf{DevSecOps}~\cite{devsecops} propose de fusionner le d\'eveloppement (\textit{Dev}), la s\'ecurit\'e (\textit{Sec}) et les op\'erations (\textit{Ops}) en int\'egrant des contr\^oles automatis\'es \`a chaque \'etape du cycle de vie logiciel. Cette philosophie, qualifi\'ee de \textbf{\textit{Shift-Left Security}}, consiste \`a d\'eplacer les v\'erifications de s\'ecurit\'e le plus t\^ot possible dans la cha\^ine de fabrication logicielle, permettant aux d\'eveloppeurs d'identifier et de corriger les vuln\'erabilit\'es d\`es la phase d'\'ecriture du code source.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=5mm and 6mm,
+    stage/.style={draw, rounded corners=3pt, fill=blue!8, draw=blue!50, thick, minimum width=24mm, minimum height=10mm, align=center, font=\tiny\bfseries},
+    secgate/.style={draw, rounded corners=3pt, fill=red!10, draw=red!60, thick, minimum width=24mm, minimum height=8mm, align=center, font=\tiny},
+    arrow/.style={-{Stealth[length=2mm]}, thick, draw=blue!70}
+]
+\node[stage] (plan) {1. Planifier\\\& Coder};
+\node[stage, right=of plan] (build) {2. Construire\\\& Tester};
+\node[stage, right=of build] (scan) {3. Scanner\\\& Valider};
+\node[stage, right=of scan] (sign) {4. Signer\\\& Publier};
+\node[stage, right=of sign] (deploy) {5. D\'eployer\\en Prod};
+
+\node[secgate, below=4mm of plan] (g1) {IDE Linting\\Pre-commit};
+\node[secgate, below=4mm of build] (g2) {SAST (Psalm/Bandit)\\SCA D\'ependances};
+\node[secgate, below=4mm of scan] (g3) {SBOM (Syft)\\Trivy Container};
+\node[secgate, below=4mm of sign] (g4) {Cosign Signature\\Attestation OCI};
+\node[secgate, below=4mm of deploy] (g5) {UFW + Nginx TLS\\Audit Logs};
+
+\draw[arrow] (plan) -- (build);
+\draw[arrow] (build) -- (scan);
+\draw[arrow] (scan) -- (sign);
+\draw[arrow] (sign) -- (deploy);
+
+\draw[dashed, ->, draw=red!70] (g1) -- (plan);
+\draw[dashed, ->, draw=red!70] (g2) -- (build);
+\draw[dashed, ->, draw=red!70] (g3) -- (scan);
+\draw[dashed, ->, draw=red!70] (g4) -- (sign);
+\draw[dashed, ->, draw=red!70] (g5) -- (deploy);
+\end{tikzpicture}
+\caption{Cycle de Livraison DevSecOps : Int\'egration Continue des Portes de S\'ecurit\'e (Shift-Left)}
+\label{fig:devsecops_cycle}
+\end{figure}
 
 \subsection{S\'ecurit\'e de la Cha\^ine d'Approvisionnement Logicielle (Software Supply Chain)}
 \par Dans les applications modernes, plus de 80\,\% du code d\'eploy\'e provient de d\'ependances open-source et de conteneurs tiers. Les attaquants ciblent d\'esormais fr\'equemment la cha\^ine d'approvisionnement logicielle (\textit{Supply Chain Attacks}) en injectant du code malveillant dans des biblioth\`eques populaires. Pour r\'epondre \`a ce risque, le cadre DevSecOps d\'eploie cinq m\'ecanismes de d\'efense compl\'ementaires :
@@ -138,9 +175,59 @@
 \par Le recours \`a des API d'IA h\'eberg\'ees dans le Cloud public (telles qu'OpenAI ou Anthropic) soul\`eve des probl\`emes majeurs de confidentialit\'e industrielle : les vuln\'erabilit\'es critiques d'infrastructures sensibles et les adresses IP d'actifs audit\'es seraient transmises \`a des serveurs tiers.
 \par Pour r\'esoudre ce d\'efi, nous avons fait le choix strat\'egique d'un moteur d'inf\'erence local (\textbf{Ollama}) h\'ebergeant le mod\`ele \textbf{\texttt{qwen2.5-coder}}. Cette approche contribue \`a pr\'eserver la confidentialit\'e des donn\'ees en \'evitant leur transmission \`a un fournisseur externe de LLM. De plus, le microservice contribue \`a r\'eduire le risque d'hallucination inh\'erent aux mod\`eles g\'en\'eratifs en imposant un gabarit de prompt syst\`eme (\textit{system prompt}) contraignant la sortie \`a un format JSON strict et exigeant des r\'ef\'erences explicites aux num\'eros de lignes des journaux bruts d'audit.
 
+\begin{figure}[H]
+\centering
+\resizebox{0.97\textwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=5mm and 7mm,
+    ibox/.style={draw, rounded corners=3pt, fill=purple!8, draw=purple!50, thick, minimum width=28mm, minimum height=9mm, align=center, font=\tiny},
+    arrow/.style={-{Stealth[length=2mm]}, thick, draw=purple!70}
+]
+\node[ibox] (in) {1. Constat Brut\\+ Contexte Faille};
+\node[ibox, right=of in] (prompt) {2. Prompt Contraint\\(R\`egles \& Guardrails)};
+\node[ibox, right=of prompt] (llm) {3. LLM Local\\(Ollama / Qwen2.5)};
+\node[ibox, right=of llm] (val) {4. Validation Pydantic\\+ V\'erif. Citations};
+\node[ibox, right=of val] (out) {5. Remediation-as-Code\\(Bash / Ansible / Docker)};
+
+\draw[arrow] (in) -- (prompt);
+\draw[arrow] (prompt) -- (llm);
+\draw[arrow] (llm) -- (val);
+\draw[arrow] (val) -- (out);
+\draw[dashed, ->, draw=red!60] (val.south) .. controls +(0,-6mm) and +(0,-6mm) .. (prompt.south) node[midway, below, font=\tiny]{Rejet \& Fallback si JSON invalide};
+\end{tikzpicture}}
+\caption{Pipeline de l'IA Locale Contrainte pour la Production de Remediation-as-Code}
+\label{fig:ai_pipeline}
+\end{figure}
+
 \section{Architectures Microservices et Syst\`emes \'Ev\'enementiels}
 \par L'architecture microservices d\'ecompose une application complexe en un ensemble de services autonomes, ind\'ependamment d\'eployables et hautement sp\'ecialis\'es, communiquant via des protocoles r\'eseau l\'egers.
-\par Pour une plateforme d'audit o\`u les t\^aches de balayage (scans Nmap, Gobuster) peuvent durer de plusieurs secondes \`a plusieurs dizaines de minutes, une architecture purement synchrone HTTP conduirait in\'evitablement \`a des blocages de requ\^etes (\textit{timeouts}). L'adoption d'un mod\`ele asynchrone pilot\'e par \'ev\'enements via **Redis Streams** permet de d\'ecoupler le portail web de l'ex\'ecution des scanners : les requ\^etes d'audit sont ins\'er\'ees dans un flux persistant, puis consomm\'ees par des processus d\'edi\'es (\textit{workers}) capables de g\'erer les r\'eessais automatiques avec repli exponentiel.
+\par Pour une plateforme d'audit o\`u les t\^aches de balayage (scans Nmap, Gobuster) peuvent durer de plusieurs secondes \`a plusieurs dizaines de minutes, une architecture purement synchrone HTTP conduirait in\'evitablement \`a des blocages de requ\^etes (\textit{timeouts}). L'adoption d'un mod\`ele asynchrone pilot\'e par \'ev\'enements via \textbf{Redis Streams} permet de d\'ecoupler le portail web de l'ex\'ecution des scanners : les requ\^etes d'audit sont ins\'er\'ees dans un flux persistant, puis consomm\'ees par des processus d\'edi\'es (\textit{workers}) capables de g\'erer les r\'eessais automatiques avec repli exponentiel.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=6mm and 8mm,
+    cbox/.style={draw, rounded corners=3pt, fill=blue!10, draw=blue!60, thick, minimum width=32mm, minimum height=9mm, align=center, font=\scriptsize\bfseries},
+    mbox/.style={draw, rounded corners=3pt, fill=green!10, draw=green!60!black, thick, minimum width=28mm, minimum height=8mm, align=center, font=\tiny},
+    rbox/.style={draw, rounded corners=3pt, fill=orange!10, draw=orange!60, thick, minimum width=30mm, minimum height=8mm, align=center, font=\tiny\bfseries},
+    arrow/.style={-{Stealth[length=2mm]}, thick}
+]
+\node[cbox] (client) {Utilisateur / SOC};
+\node[cbox, right=14mm of client] (backend) {Back-end Laravel 11\\(Portail + API)};
+\node[rbox, below=10mm of backend] (redis) {Redis Streams 7\\(Message Broker)};
+\node[mbox, below=10mm of redis] (worker) {Worker Asynchrone\\(Consommation XREADGROUP)};
+\node[mbox, left=10mm of worker] (recon) {Microservice Recon\\(Nmap, Nuclei, Gobuster)};
+\node[mbox, right=10mm of worker] (ai) {Microservice IA\\(Ollama LLM)};
+
+\draw[arrow, draw=blue!70] (client) -- (backend) node[midway, above, font=\tiny]{HTTPS};
+\draw[arrow, draw=orange!70] (backend) -- (redis) node[midway, right, font=\tiny]{XADD scan:requests};
+\draw[arrow, draw=orange!70] (redis) -- (worker) node[midway, right, font=\tiny]{\'Ev\'enement de Scan};
+\draw[arrow, draw=green!60!black] (worker) -- (recon) node[midway, above, font=\tiny]{REST POST};
+\draw[arrow, draw=green!60!black] (worker) -- (ai) node[midway, above, font=\tiny]{REST POST};
+\end{tikzpicture}
+\caption{Patron d'Architecture Microservices et D\'ecouplage Asynchrone via Redis Streams}
+\label{fig:microservices_pattern}
+\end{figure}
 
 \section{\'Etude Comparative et Justification des Choix Technologiques}
 \par Afin de garantir la robustesse et la p\'erennit\'e du syst\`eme, nous avons men\'e des \'etudes comparatives syst\'ematiques sur chaque brique technologique.
@@ -268,6 +355,39 @@ Usage multifonction & Broker + Cache + Sessions & Broker uniquement & Streaming 
 \end{tabular}}%
 \end{table}
 \par \textbf{Justification du Choix de Redis 7 Streams :} Redis 7 offre \`a la fois un r\^ole de Message Broker avec persistance et acquittement (\texttt{XACK}), de cache de requ\^etes IHM et de gestionnaire de sessions, r\'eduisant ainsi le nombre de composants d'infrastructure requis.
+
+\subsection{Synth\`ese Globale des Choix Technologiques}
+\par Le tableau~\ref{tab:tech_summary} r\'ecapitule l'ensemble des choix technologiques adopt\'es pour la r\'ealisation de la plateforme avec leur justification strat\'egique.
+
+\begin{table}[H]
+\centering
+\caption{Tableau R\'ecapitulatif de la Pile Technologique Retenue}
+\label{tab:tech_summary}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{Composant / Couche} & \textbf{Technologie Retenue} & \textbf{Justification Strat\'egique} \\
+\hline
+Portail Web Backend & Laravel 11 (PHP 8.3) & ORM Eloquent expressif, RBAC Spatie, queues Redis natives. \\
+\hline
+Microservices d'Audit & Flask 3.1 (Python 3.12) & L\'eg\`erement conteneuris\'e, contr\^ole absolu sur les sous-processus CLI. \\
+\hline
+Base de Donn\'ees & PostgreSQL 16 + Apache AGE & Instance unifi\'ee supportant \`a la fois SQL relationnel et graphe openCypher. \\
+\hline
+Message Broker \& Cache & Redis 7 (Streams) & Files persistantes asynchrones, reprise sur panne et cache performant. \\
+\hline
+Calcul de Rayon d'Impact & NetworkX 3.2 & Algorithmes de parcours en largeur (BFS) ultra-rapides en m\'emoire ($<$75 ms). \\
+\hline
+IA Locale \& Remediation & Ollama / \texttt{qwen2.5-coder} & Confidentialit\'e totale 100\,\% locale, mod\`ele sp\'ecialiste code, sch\'emas JSON stricts. \\
+\hline
+Front-end \& Rendu IHM & Blade + Tailwind CSS + Cytoscape.js & Rendu serveur r\'eactif, visualisation dynamique et interactive du graphe. \\
+\hline
+Conteneurisation \& Proxy & Docker + Docker Socket Proxy & Isolation herm\'etique des conteneurs non-root et filtrage de l'API Docker. \\
+\hline
+Pipeline DevSecOps & GitHub Actions, Psalm, Bandit, Trivy, Cosign & Automatisation des portes bloquantes (SAST, SCA, SBOM CycloneDX, signature). \\
+\hline
+\end{tabular}}%
+\end{table}
 
 \section*{Conclusion}
 \par Ce chapitre a \'etabli l'\'etat de l'art scientifique et conceptuel de la cybers\'ecurit\'e, de l'ASM, des scanners d'audit, du DevSecOps, de l'IA locale et des microservices. Les \'etudes comparatives syst\'ematiques ont justifi\'e l'ensemble des choix technologiques retenus. Le chapitre suivant d\'etaillera l'analyse approfondie des besoins, la mod\'elisation formelle des menaces STRIDE et la conception architecturale de la plateforme.

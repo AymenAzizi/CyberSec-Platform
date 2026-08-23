@@ -1,0 +1,9 @@
+# Local fix: the api-gateway needs an HTTP endpoint on Laravel, but the backend
+# container only runs PHP-FPM (FastCGI on 9000). artisan serve (started manually
+# in the backend container) listens on 8000 instead.
+services:
+  api-gateway:
+    environment:
+      # The gateway strips the /api prefix before forwarding, while Laravel's
+      # routes live under /api/* — append it to the upstream URL.
+      - LARAVEL_URL=http://backend:8000/api

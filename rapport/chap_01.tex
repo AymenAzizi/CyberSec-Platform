@@ -5,14 +5,51 @@
 
 \section{Pr\'esentation de l'Organisme d'Accueil}
 \subsection{Identit\'e et Domaines d'Activit\'e}
-\par \textbf{Designet Web Agency} est une entreprise d'ing\'enierie logicielle et de services num\'eriques bas\'ee \`a Menzel Temime (Tunisie). Fond\'ee par des experts en technologies web et infrastructures r\'eseaux, l'agence s'est forg\'ee une solide r\'eputation dans le d\'eveloppement de plateformes critiques sur mesure, l'infog\'erance Cloud, et le conseil en cybers\'ecurit\'e op\'erationnelle. Elle accompagne un portefeuille diversifi\'e de clients (entreprises priv\'ees, \'etablissements financiers, collectivit\'es) dans la transformation et la s\'ecurisation de leurs actifs num\'eriques.
+\par \textbf{Designet Web Agency} est une agence d'ing\'enierie logicielle, d'infrastructures Cloud et de cybers\'ecurit\'e bas\'ee \`a Menzel Temime (Gouvernorat de Nabeul, Tunisie). Fond\'ee par une \'equipe d'ing\'enieurs passionn\'es, la soci\'et\'e s'est impos\'ee comme un partenaire technologique privil\'egi\'e aupr\`es d'entreprises locales et internationales (PME, grands comptes, institutions financi\`eres et collectivit\'es). Elle emploie une vingtaine de collaborateurs r\'epartis entre d\'eveloppeurs full-stack, ing\'enieurs syst\`emes et r\'eseaux, consultants en cybers\'ecurit\'e et experts DevOps.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{img/logoSociete.png}
+    \caption{Logo Officiel de l'Organisme d'Accueil -- Designet Web Agency}
+    \label{fig:logo_designet}
+\end{figure}
+
 \par Les activit\'es principales de la soci\'et\'e s'articulent autour de quatre p\^oles d'excellence :
 \begin{itemize}
-    \item \textbf{Ing\'enierie Logicielle \& Web Avanc\'e :} Conception d'architectures applicatives complexes sous des frameworks modernes (Laravel, Node.js, Python), int\'egrant des exigences \'elev\'ees de mont\'ee en charge et d'ergonomie utilisateur.
+    \item \textbf{Ing\'enierie Logicielle \& Web Avanc\'e :} Conception et r\'ealisation d'architectures applicatives complexes sous des frameworks modernes (Laravel, Node.js, Python), int\'egrant des exigences \'elev\'ees de mont\'ee en charge et d'ergonomie utilisateur.
     \item \textbf{Administration Syst\`eme \& Cloud DevOps :} D\'eploiement, orchestration de conteneurs (Docker, Kubernetes) et automatisation de pipelines d'int\'egration et de livraison continues.
     \item \textbf{Audit \& Conseil en Cybers\'ecurit\'e :} R\'ealisation de tests d'intrusion (\textit{pentesting}), revues de code source, \'evaluations de conformit\'e et r\'eponse \`a incidents.
     \item \textbf{Solutions M\'etier et R\&D :} D\'eveloppement d'outils internes visant \`a automatiser les processus op\'erationnels et \`a r\'eduire les d\'elais de livraison des prestations d'audit.
 \end{itemize}
+
+\subsection{Organigramme de l'Entreprise}
+\par La figure~\ref{fig:organigramme_designet} illustre la structure organisationnelle de Designet Web Agency. L'agence est dirig\'ee par une Direction G\'en\'erale chapeautant la Direction Technique (CTO) et la Direction Op\'erationnelle.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=6mm and 8mm,
+    orgbox/.style={draw, rounded corners=3pt, fill=blue!10, draw=blue!60, thick, minimum width=38mm, minimum height=9mm, align=center, font=\scriptsize\bfseries},
+    subbox/.style={draw, rounded corners=3pt, fill=gray!10, draw=gray!60, thick, minimum width=32mm, minimum height=8mm, align=center, font=\tiny},
+    arrow/.style={-{Stealth[length=2mm]}, thick, draw=blue!70}
+]
+\node[orgbox, fill=blue!20] (dg) {Direction G\'en\'erale};
+\node[orgbox, below left=8mm and 4mm of dg] (cto) {Direction Technique\\(CTO -- M. Ali DORBOZ)};
+\node[orgbox, below right=8mm and 4mm of dg] (coo) {Direction Administrative\\et Commerciale};
+
+\node[subbox, below left=8mm and -2mm of cto] (dev) {P\^ole D\'eveloppement\\Web \& Logiciel};
+\node[subbox, below=8mm of cto] (sec) {P\^ole Cybers\'ecurit\'e\\\& Audit Syst\`eme};
+\node[subbox, below right=8mm and -2mm of cto] (ops) {P\^ole Cloud\\DevOps \& Infra};
+
+\draw[arrow] (dg) -| (cto);
+\draw[arrow] (dg) -| (coo);
+\draw[arrow] (cto) -| (dev);
+\draw[arrow] (cto) -- (sec);
+\draw[arrow] (cto) -| (ops);
+\end{tikzpicture}
+\caption{Organigramme Fonctionnel de Designet Web Agency}
+\label{fig:organigramme_designet}
+\end{figure}
 
 \subsection{Cadre Institutionnel du Stage}
 \par Ce Projet de Fin d'\'Etudes (PFE) s'inscrit dans le cadre de l'obtention du Dipl\^ome National d'Ing\'enieur en Sciences Appliqu\'ees et Technologiques, sp\'ecialit\'e S\'ecurit\'e des Syst\`emes Informatiques et R\'eseaux (SSIR), au sein de l'\'Ecole Sup\'erieure Priv\'ee de Technologies et d'Ing\'enierie (\textbf{TEK-UP}).
@@ -31,6 +68,26 @@
     \item L'auditeur lit, filtre et interpr\`ete manuellement ces donn\'ees pour \'eliminer les faux positifs.
     \item Les r\'esultats sont ensuite transcrits manuellement dans un document traitement de texte ou un tableur afin de r\'ediger le rapport d'expertise remis au client.
 \end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=5mm and 6mm,
+    stepbox/.style={draw, rounded corners=3pt, fill=orange!10, draw=orange!60, thick, minimum width=30mm, minimum height=8mm, align=center, font=\tiny},
+    arrow/.style={-{Stealth[length=1.8mm]}, thick, draw=orange!70}
+]
+\node[stepbox] (s1) {1. Lancement manuel\\(CLI individuels)};
+\node[stepbox, right=of s1] (s2) {2. Fichiers bruts\\(XML, JSON, Textes)};
+\node[stepbox, right=of s2] (s3) {3. D\'epouillement\\et tri manuel};
+\node[stepbox, right=of s3] (s4) {4. R\'edaction rapport\\bureautique statique};
+
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (s4);
+\end{tikzpicture}
+\caption{Processus S\'equentiel d'Audit Traditionnel et Frictions Op\'erationnelles Associ\'ees}
+\label{fig:processus_audit_traditionnel}
+\end{figure}
 
 \subsection{Limites de la D\'emarche Traditionnelle}
 \par Ce mode op\'eratoire pr\'esente cinq limites fondamentales :
@@ -84,12 +141,12 @@ Confidentialit\'e des Donn\'ees & Donn\'ees publiques & Locale & Locale & Donn\'
 \section{Solution Propos\'ee}
 \par Pour r\'epondre \`a cette probl\'ematique, nous proposons la r\'ealisation d'une \textbf{plateforme web semi-agentique de reconnaissance de surface d'attaque}. La solution s'appuie sur une architecture microservices d\'ecoupl\'ee associant :
 \begin{itemize}
-    \item Un portail web applicatif d\'evelopp\'e sous **Laravel 11** assurant l'authentification s\'ecuris\'ee, le contr\^ole d'acc\`es RBAC granulaire, la gestion des projets et le rendu ergonomique.
-    \item Cinq microservices sp\'ecialis\'es en **Python Flask** (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, renseignement passif OSINT, moteur IA contraint, passerelle d'API).
-    \item Un moteur d'ex\'ecution asynchrone pilot\'e par **Redis Streams** garantissant la r\'esilience, la tol\'erance aux pannes et le passage \`a l'\'echelle.
-    \item Une base de donn\'ees unifi\'ee sous **PostgreSQL 16** avec l'extension **Apache AGE** permettant la persistance relationnelle et le requ\^etage openCypher du graphe de connaissances.
-    \item Un moteur d'inf\'erence locale (**Ollama**) h\'ebergeant le mod\`ele \texttt{qwen2.5-coder} pour la synth\`ese contextuelle et la production de code de rem\'ediation (\textit{Remediation-as-Code}).
-    \item Une cha\^ine **DevSecOps** automatis\'ee sous GitHub Actions assurant la s\'ecurit\'e intrins\`eque du code source et des conteneurs de production.
+    \item Un portail web applicatif d\'evelopp\'e sous \textbf{Laravel 11} assurant l'authentification s\'ecuris\'ee, le contr\^ole d'acc\`es RBAC granulaire, la gestion des projets et le rendu ergonomique.
+    \item Cinq microservices sp\'ecialis\'es en \textbf{Python Flask} (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, renseignement passif OSINT, moteur IA contraint, passerelle d'API).
+    \item Un moteur d'ex\'ecution asynchrone pilot\'e par \textbf{Redis Streams} garantissant la r\'esilience, la tol\'erance aux pannes et le passage \`a l'\'echelle.
+    \item Une base de donn\'ees unifi\'ee sous \textbf{PostgreSQL 16} avec l'extension \textbf{Apache AGE} permettant la persistance relationnelle et le requ\^etage openCypher du graphe de connaissances.
+    \item Un moteur d'inf\'erence locale (\textbf{Ollama}) h\'ebergeant le mod\`ele \texttt{qwen2.5-coder} pour la synth\`ese contextuelle et la production de code de rem\'ediation (\textit{Remediation-as-Code}).
+    \item Une cha\^ine \textbf{DevSecOps} automatis\'ee sous GitHub Actions assurant la s\'ecurit\'e intrins\`eque du code source et des conteneurs de production.
 \end{itemize}
 
 \section{Objectifs du Projet}
@@ -130,9 +187,33 @@ Confidentialit\'e des Donn\'ees & Donn\'ees publiques & Locale & Locale & Donn\'
 \par La complexit\'e inh\'erente \`a l'int\'egration de multiples outils d'audit h\'et\'erog\`enes, de technologies de bases de donn\'ees hybrides et de mod\`eles d'IA justifie le recours \`a une d\'emarche Agile. Contrairement aux cycles de d\'eveloppement traditionnels en cascade (\textit{Waterfall}) o\`u les sp\'ecifications sont fig\'ees d\`es le d\'epart, la m\'ethodologie Agile autorise une r\'e\'evaluation continue des priorit\'es techniques au fur et \`a mesure des r\'esultats d'exp\'erimentation.
 
 \subsection{Le Cadre M\'ethodologique Scrum}
-\par Nous avons adopt\'e le cadre \textbf{Scrum}, formalis\'e par des r\^oles, des c\'er\'emonies et des art\'efacts clairs :
+\par Nous avons adopt\'e le cadre \textbf{Scrum}, formalis\'e par des r\^oles, des c\'er\'emonies et des art\'efacts clairement d\'efinis pour assurer une cadence de livraison r\'eguli\`ere :
+
+\subsubsection{Description des R\^oles Scrum}
+\par Le tableau~\ref{tab:scrum_roles} d\'etaille la r\'epartition des responsabilit\'es au sein de l'\'equipe projet :
+
+\begin{table}[H]
+\centering
+\caption{R\'epartition et Responsabilit\'es des R\^oles Scrum sur le Projet}
+\label{tab:scrum_roles}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|L|L|}
+\hline
+\textbf{R\^ole Scrum} & \textbf{Titulaire} & \textbf{Responsabilit\'es Op\'erationnelles} \\
+\hline
+\textbf{Product Owner (PO)} & M. Ali DORBOZ (CTO) & D\'efinition de la vision produit, priorisation du Product Backlog, validation des User Stories et recette des livrables de fin de sprint. \\
+\hline
+\textbf{Scrum Master (SM)} & Aymen AZIZI (\'Etudiant) & Animation des rituels Scrum, \'elimination des obstacles techniques, suivi de la v\'elocit\'e et maintien des normes de qualit\'e. \\
+\hline
+\textbf{Development Team} & Aymen AZIZI (\'Etudiant) & Conception technique, d\'eveloppement back-end (Laravel/Flask), int\'egration de l'IA (Ollama), tests et d\'eploiement DevSecOps. \\
+\hline
+\textbf{Encadrement Acad\'emique} & Mme Sonia BEN AISSA (TEK-UP) & Suivi p\'edagogique, validation m\'ethodologique et contr\^ole de conformit\'e acad\'emique. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\subsubsection{Art\'efacts et C\'er\'emonies Scrum}
 \begin{itemize}
-    \item \textbf{R\^oles du Projet :} Le Directeur Technique (CTO) a incarn\'e le r\^ole de \textit{Product Owner}, d\'efinissant les fonctionnalit\'es prioritaires et validant les d\'emonstrations. L'\'etudiant stagiaire a combin\'e les fonctions de \textit{Scrum Master} (veillant au respect du cadre m\'ethodologique) et de \textit{Development Team} (r\'ealisant l'int\'egralit\'e des conceptions, d\'eveloppements et tests).
     \item \textbf{Art\'efacts Scrum :} Gestion du \textit{Product Backlog} dans GitHub Projects, d\'ecomposition en \textit{Sprint Backlogs}, et formalisation de crit\`eres d'acceptation rigoureux (\textit{Definition of Done} -- DoD : code test\'e unitairement, document\'e, valid\'e par les gates DevSecOps et valid\'e en environnement de d\'eveloppement).
     \item \textbf{C\'er\'emonies Scrum :} S\'eances de \textit{Sprint Planning} au d\'ebut de chaque it\'eration, r\'eunions d'alignement hebdomadaires (\textit{Weekly Sync}), et revues / r\'etrospectives de fin de sprint.
 \end{itemize}

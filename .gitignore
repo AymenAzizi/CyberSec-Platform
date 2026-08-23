@@ -58,6 +58,8 @@ rapport/*.ilg
 # Reference external PDFs
 PFE_Khalil_current_main-2.pdf
 internship-report-1599-1.pdf
+rapport/examples_zip/
+rapport/rapport_pfe.pdf
 
 # OS Files
 .DS_Store
