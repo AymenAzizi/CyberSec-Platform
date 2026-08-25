@@ -79,8 +79,7 @@
 \centering
 \caption{Description Textuelle du Cas d'Utilisation CU01 -- Lancement d'un Scan}
 \label{tab:cu01}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|L|L|}
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Cas d'Utilisation} & \textbf{CU01 : Lancement et Orchestration d'un Scan de Reconnaissance} \\
 \hline
@@ -103,7 +102,7 @@
 4.a. \textit{Mandat PoA manquant ou expir\'e} : Le syst\`eme bloque imm\'ediatement la soumission avec une alerte 403 et journalise la tentative dans les pistes d'audit. \newline
 6.a. \textit{Service Redis injoignable} : Le syst\`eme bascule sur une mise en file locale d'urgence et notifie l'administrateur. \\
 \hline
-\end{tabular}}%
+\end{tabular}
 \end{table}
 
 \subsubsection*{CU02 : G\'en\'eration de Remediation-as-Code Assist\'ee par IA}
@@ -111,8 +110,7 @@
 \centering
 \caption{Description Textuelle du Cas d'Utilisation CU02 -- G\'en\'eration de Remediation}
 \label{tab:cu02}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|L|L|}
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Cas d'Utilisation} & \textbf{CU02 : G\'en\'eration de Remediation-as-Code par IA Locale Contrainte} \\
 \hline
@@ -134,7 +132,7 @@
 \textbf{Sc\'enarios Alternatifs} & 
 6.a. \textit{R\'eponse JSON invalide ou hallucination de citation d\'etect\'ee} : Le syst\`eme rejette la sortie brute et g\'en\`ere un script de durcissement d\'eterministe durci de repli (fallback). \\
 \hline
-\end{tabular}}%
+\end{tabular}
 \end{table}
 
 \subsubsection*{CU03 : Consultation et Exploration du Graphe de Connaissances}
@@ -142,8 +140,7 @@
 \centering
 \caption{Description Textuelle du Cas d'Utilisation CU03 -- Graphe de Connaissances}
 \label{tab:cu03}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|L|L|}
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Cas d'Utilisation} & \textbf{CU03 : Consultation du Graphe et \'Evaluation du Rayon d'Impact} \\
 \hline
@@ -164,7 +161,7 @@
 \textbf{Sc\'enarios Alternatifs} & 
 2.a. \textit{Projet sans scan ant\'erieur} : Le graphe affiche l'actif racine seul avec une invite \`a lancer un premier balayage. \\
 \hline
-\end{tabular}}%
+\end{tabular}
 \end{table}
 
 \subsubsection*{CU04 : Gestion des Projets et Validation du Mandat PoA}
@@ -172,8 +169,7 @@
 \centering
 \caption{Description Textuelle du Cas d'Utilisation CU04 -- Gestion des Projets et PoA}
 \label{tab:cu04}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|L|L|}
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Cas d'Utilisation} & \textbf{CU04 : Cr\'eation de Projet et Validation du Mandat d'Autorisation} \\
 \hline
@@ -193,7 +189,7 @@
 \textbf{Sc\'enarios Alternatifs} & 
 4.a. \textit{Fichier non conforme ou corrompu} : Le formulaire rejette le document et bloque la cr\'eation du projet. \\
 \hline
-\end{tabular}}%
+\end{tabular}
 \end{table}
 
 \subsubsection*{CU05 : G\'en\'eration et Export Multi-Formats des Rapports d'Expertise}
@@ -201,8 +197,7 @@
 \centering
 \caption{Description Textuelle du Cas d'Utilisation CU05 -- G\'en\'eration de Rapports}
 \label{tab:cu05}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|L|L|}
+\begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
 \textbf{Cas d'Utilisation} & \textbf{CU05 : Production et T\'el\'echargement de Rapport d'Audit Certifi\'e} \\
 \hline
@@ -222,7 +217,7 @@
 \textbf{Sc\'enarios Alternatifs} & 
 5.a. \textit{Acc\`es par lien externe expir\'e} : Le serveur refuse la requ\^ete (HTTP 410 Gone) et invite \`a r\'e\'emettre un lien. \\
 \hline
-\end{tabular}}%
+\end{tabular}
 \end{table}
 
 \section{Architecture Globale du Syst\`eme}
