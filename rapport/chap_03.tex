@@ -46,7 +46,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.82\textwidth]{img/usecase_global.png}
+    \includegraphics[width=0.80\textwidth]{img/fig_3_1_global_usecases.png}
     \caption{Diagramme Global des Cas d'Utilisation -- Acteurs et Fonctionnalit\'es Cl\'es}
     \label{fig:usecase_global}
 \end{figure}
@@ -56,7 +56,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.82\textwidth]{img/usecase_analyst.png}
+    \includegraphics[width=0.76\textwidth]{img/fig_3_2_analyst_usecases.png}
     \caption{Diagramme des Cas d'Utilisation -- Analyste de S\'ecurit\'e}
     \label{fig:usecase_analyst}
 \end{figure}
@@ -66,7 +66,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.82\textwidth]{img/usecase_admin.png}
+    \includegraphics[width=0.76\textwidth]{img/fig_3_3_admin_usecases.png}
     \caption{Diagramme des Cas d'Utilisation -- Administrateur Syst\`eme}
     \label{fig:usecase_admin}
 \end{figure}
@@ -254,43 +254,19 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.92\textwidth]{img/component_diagram.png}
-    \caption{Architecture Globale en Microservices -- Vue des 12 Conteneurs Docker et R\'eseaux Segment\'es}
+    \includegraphics[width=0.82\textwidth]{img/fig_3_4_architecture.png}
+    \caption{Architecture Globale en Microservices -- Vue des Conteneurs Docker et R\'eseaux Segment\'es}
     \label{fig:component_diagram}
 \end{figure}
 
-\subsection{Communication Inter-Services}
-\par La figure~\ref{fig:ms_comms} pr\'esente la cartographie des flux d'\'echanges internes : requ\^etes REST synchrones, streaming d'\'ev\'enements asynchrones et notifications de mise \`a jour.
+\subsection{Communication Inter-Services et Flux Asynchrone}
+\par La figure~\ref{fig:ms_comms} pr\'esente la cartographie des flux d'\'echanges internes : requ\^etes REST synchrones, streaming d'\'ev\'enements asynchrones et persistance normalis\'ee.
 
 \begin{figure}[!htbp]
-\centering
-\begin{tikzpicture}[
-    node distance=8mm and 14mm,
-    box/.style={draw, rounded corners=2pt, fill=blue!8, draw=blue!50, thick, minimum width=28mm, minimum height=8mm, align=center, font=\footnotesize},
-    sync/.style={-{Stealth[length=2mm]}, thick, draw=green!60!black},
-    async/.style={-{Stealth[length=2mm]}, thick, dashed, draw=orange!80!black},
-    notify/.style={-{Stealth[length=2mm]}, thick, dotted, draw=red!70!black},
-]
-\node[box] (browser) {Navigateur (Blade)};
-\node[box, right=of browser] (laravel) {Back-end\\Laravel 11};
-\node[box, above right=4mm and 16mm of laravel] (recon) {MS Recon\\(Flask :5000)};
-\node[box, right=of laravel] (gateway) {Passerelle API\\(Flask :8080)};
-\node[box, below right=4mm and 16mm of laravel] (ai) {MS IA\\(Flask :5003)};
-\node[box, right=of gateway] (redis) {Redis 7\\Streams};
-\node[box, below=of redis] (worker) {Worker\\(Python)};
-\node[box, below=of laravel] (pg) {PostgreSQL 16\\+ Apache AGE};
-\draw[sync] (browser) -- node[above, font=\tiny]{REST/HTTPS} (laravel);
-\draw[sync] (laravel) -- node[above, font=\tiny]{REST} (gateway);
-\draw[sync] (gateway) -- (recon);
-\draw[sync] (gateway) -- (ai);
-\draw[async] (laravel) -- node[right, font=\tiny]{XADD} (redis);
-\draw[async] (redis) -- node[right, font=\tiny]{XREADGROUP} (worker);
-\draw[async] (worker) -- node[below, font=\tiny]{r\'esultats} (pg);
-\draw[notify] (pg) -- node[left, font=\tiny]{NOTIFY} (laravel);
-\draw[notify] (recon) -- node[below, font=\tiny]{insert} (pg);
-\end{tikzpicture}
-\caption{Flux de Communication du Traitement Asynchrone d'un Scan -- REST Synchrone, Redis Streams et PostgreSQL NOTIFY}
-\label{fig:ms_comms}
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/fig_3_5_async_flow.png}
+    \caption{Flux de Traitement Asynchrone des Scans via Redis Streams et PostgreSQL AGE}
+    \label{fig:ms_comms}
 \end{figure}
 
 \subsection{Communication Synchrone REST vs Asynchrone par \'Ev\'enements}
@@ -306,7 +282,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.92\textwidth]{img/erd.png}
+    \includegraphics[width=0.98\textwidth]{img/fig_3_6_erd.png}
     \caption{Mod\`ele Entit\'e-Association (ERD) -- Les 14 Tables de la Plateforme}
     \label{fig:erd_diagram}
 \end{figure}
@@ -316,7 +292,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.90\textwidth]{img/class_diagram.png}
+    \includegraphics[width=0.95\textwidth]{img/fig_3_7_classes.png}
     \caption{Diagramme de Classes -- Entit\'es M\'etier et Relations du Mod\`ele}
     \label{fig:class_diagram}
 \end{figure}
@@ -332,8 +308,8 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.92\textwidth]{img/sequence_scan.png}
-    \caption{Diagramme de S\'equence -- Orchestration Asynchrone d'un Scan}
+    \includegraphics[width=0.95\textwidth]{img/fig_3_8_sequence.png}
+    \caption{Diagramme de S\'equence -- Lancement, Traitement Asynchrone et Rem\'ediation IA}
     \label{fig:sequence_scan}
 \end{figure}
 
@@ -410,7 +386,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{img/state_machine.png}
+    \includegraphics[width=0.88\textwidth]{img/fig_3_9_state_machine.png}
     \caption{Machine \`a \'Etats -- Cycle de Vie d'une T\^ache de Scan}
     \label{fig:state_machine}
 \end{figure}
@@ -420,7 +396,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.92\textwidth]{img/data_flow.png}
+    \includegraphics[width=0.95\textwidth]{img/fig_3_10_dfd.png}
     \caption{Diagramme de Flux de Donn\'ees (DFD) -- Processus d'Audit, Graphe de Connaissances et Reporting}
     \label{fig:data_flow}
 \end{figure}
@@ -458,38 +434,10 @@
 \par La figure~\ref{fig:trust_boundaries} illustre la cartographie des fronti\`eres de confiance (\textit{Trust Boundaries}) et l'exposition de la surface d'attaque interne de la plateforme.
 
 \begin{figure}[!htbp]
-\centering
-\resizebox{0.97\textwidth}{!}{%
-\begin{tikzpicture}[
-    node distance=6mm and 10mm,
-    zone/.style={draw, dashed, rounded corners=4pt, inner sep=6pt, font=\scriptsize\bfseries},
-    box/.style={draw, rounded corners=2pt, fill=blue!8, draw=blue!50, thick, minimum width=24mm, minimum height=8mm, align=center, font=\footnotesize},
-    ext/.style={draw, rounded corners=2pt, fill=gray!15, draw=gray!60, thick, minimum width=22mm, minimum height=8mm, align=center, font=\footnotesize},
-    tb/.style={draw=red!70, thick, dashed},
-    arrow/.style={-{Stealth[length=2mm]}, thick, draw=gray!80},
-]
-\node[ext] (internet) {Internet Public\\(Attaquants / Clients)};
-\node[box, right=14mm of internet] (nginx) {Nginx 1.27\\(DMZ / TLS 1.3)};
-\node[box, right=14mm of nginx] (laravel) {Back-end\\Laravel 11};
-\node[box, above right=2mm and 10mm of laravel] (recon) {MS Recon\\(Flask)};
-\node[box, right=10mm of laravel] (redis) {Redis 7 / PG 16\\(AGE Graph)};
-\node[box, below right=2mm and 10mm of laravel] (ai) {MS IA / Ollama\\(qwen2.5-coder)};
-\node[box, right=10mm of recon] (sandbox) {Sandbox\\(DVWA / SQLi)};
-
-\draw[arrow] (internet) -- node[above, font=\tiny]{HTTPS (443)} (nginx);
-\draw[arrow] (nginx) -- node[above, font=\tiny]{FastCGI / HTTP} (laravel);
-\draw[arrow] (laravel) -- (recon);
-\draw[arrow] (laravel) -- (redis);
-\draw[arrow] (laravel) -- (ai);
-\draw[arrow] (recon) -- (sandbox);
-
-% Trust Boundary lines
-\draw[tb] (2.2, 2.2) -- (2.2, -2.2) node[pos=0.05, right, font=\tiny\color{red!70}]{TB1: Fronti\`ere Externe};
-\draw[tb] (5.8, 2.2) -- (5.8, -2.2) node[pos=0.05, right, font=\tiny\color{red!70}]{TB2: Fronti\`ere Applicative};
-\draw[tb] (10.6, 2.2) -- (10.6, -2.2) node[pos=0.05, right, font=\tiny\color{red!70}]{TB3: Fronti\`ere Sandbox};
-\end{tikzpicture}}
-\caption{Cartographie de la Surface d'Attaque et Fronti\`eres de Confiance (Trust Boundaries)}
-\label{fig:trust_boundaries}
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/fig_3_11_trust_boundaries.png}
+    \caption{Cartographie de la Surface d'Attaque et Fronti\`eres de Confiance (Trust Boundaries STRIDE)}
+    \label{fig:trust_boundaries}
 \end{figure}
 
 \subsection{Matrice des Menaces STRIDE et Contre-Mesures Appliqu\'ees}
@@ -528,31 +476,10 @@ Moteur de Scanners & Ex\'ecution sur cible non autoris\'ee & Critique & Barri\`e
 \par La s\'ecurit\'e de la cha\^ine logicielle est enti\`erement automatis\'ee au sein du d\'ep\^ot de code via le workflow GitHub Actions d\'eclar\'e dans \texttt{.github/workflows/devsecops.yml}. Chaque commit et requ\^ete de tirage (\textit{pull request}) d\'eclenche l'ex\'ecution de huit \'etapes successives bloquantes.
 
 \begin{figure}[!htbp]
-\centering
-\begin{tikzpicture}[
-    node distance=4mm and 6mm,
-    stage/.style={draw, rounded corners=3pt, fill=violet!10, draw=violet!60, thick, minimum width=24mm, minimum height=10mm, align=center, font=\footnotesize},
-    arrow/.style={-{Stealth[length=2.2mm]}, thick, draw=violet!70},
-]
-\node[stage] (s1) {1.~Commit\\Source};
-\node[stage, right=of s1] (s2) {2.~SAST\\(psalm, bandit)};
-\node[stage, right=of s2] (s3) {3.~SCA\\(trivy fs)};
-\node[stage, right=of s3] (s4) {4.~SBOM\\(syft)};
-\node[stage, below=6mm of s4] (s5) {5.~Build\\Docker};
-\node[stage, left=of s5] (s6) {6.~Image Scan\\(trivy image)};
-\node[stage, left=of s6] (s7) {7.~Signature\\(cosign)};
-\node[stage, left=of s7] (s8) {8.~D\'eploiement\\Production};
-
-\draw[arrow] (s1) -- (s2);
-\draw[arrow] (s2) -- (s3);
-\draw[arrow] (s3) -- (s4);
-\draw[arrow] (s4) -- (s5);
-\draw[arrow] (s5) -- (s6);
-\draw[arrow] (s6) -- (s7);
-\draw[arrow] (s7) -- (s8);
-\end{tikzpicture}
-\caption{Pipeline DevSecOps Automatis\'e -- Cha\^ine de S\'ecurit\'e Int\'egr\'ee sous GitHub Actions}
-\label{fig:devsecops_pipeline}
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/fig_3_12_devsecops.png}
+    \caption{Pipeline DevSecOps Automatis\'e -- Cha\^ine de S\'ecurit\'e Int\'egr\'ee sous GitHub Actions}
+    \label{fig:devsecops_pipeline}
 \end{figure}
 
 \subsection{Description des Portes de S\'ecurit\'e (Security Gates)}

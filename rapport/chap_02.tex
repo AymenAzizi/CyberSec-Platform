@@ -74,28 +74,10 @@
 \end{enumerate}
 
 \begin{figure}[H]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-    node distance=5mm and 8mm,
-    phase/.style={draw, rounded corners=3pt, fill=cyan!10, draw=cyan!60, thick, minimum width=22mm, minimum height=10mm, align=center, font=\footnotesize},
-    arrow/.style={-{Stealth[length=2.2mm]}, thick, draw=cyan!70},
-]
-\node[phase] (p1) {1.~D\'ecouverte\\(OSINT, subfinder)};
-\node[phase, right=of p1] (p2) {2.~Inventaire\\(actifs expos\'es)};
-\node[phase, right=of p2] (p3) {3.~Classification\\(criticit\'e m\'etier)};
-\node[phase, right=of p3] (p4) {4.~Audit\\(nmap, nuclei)};
-\node[phase, right=of p4] (p5) {5.~Priorisation\\(blast radius)};
-\node[phase, right=of p5] (p6) {6.~Rem\'ediation\\(scripts RaC)};
-\draw[arrow] (p1) -- (p2);
-\draw[arrow] (p2) -- (p3);
-\draw[arrow] (p3) -- (p4);
-\draw[arrow] (p4) -- (p5);
-\draw[arrow] (p5) -- (p6);
-\draw[arrow, draw=cyan!50] (p6.south) .. controls +(0,-9mm) and +(0,-9mm) .. (p1.south) node[midway, below, font=\tiny]{Cycle it\'eratif continu};
-\end{tikzpicture}}
-\caption{Cycle de Vie du Processus d'Attack Surface Management (ASM)}
-\label{fig:asm_flow}
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/fig_2_2_asm.png}
+    \caption{Cycle de Vie du Processus d'Attack Surface Management (ASM)}
+    \label{fig:asm_flow}
 \end{figure}
 
 \section{Reconnaissance et Outils d'Audit de S\'ecurit\'e}
