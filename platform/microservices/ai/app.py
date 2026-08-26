@@ -246,7 +246,7 @@ def chat() -> Any:
         normalized.insert(0, {"role": "system", "content": CHAT_SYSTEM_PROMPT})
 
     client = OllamaClient()
-    response = client.chat(normalized, temperature=0.3, max_tokens=1500)
+    response = client.chat(normalized, temperature=0.3, max_tokens=600)
     if response is None or not response.strip():
         last_user_msg = next((m["content"] for m in reversed(normalized) if m["role"] == "user"), "")
         response = _generate_security_response(last_user_msg)

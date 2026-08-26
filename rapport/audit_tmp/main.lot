@@ -1,0 +1,35 @@
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Analyse Comparative des Solutions d'Audit et de Gestion de Surface d'Attaque}}{6}{table.caption.14}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces R\'epartition et Responsabilit\'es des R\^oles Scrum sur le Projet}}{9}{table.caption.15}%
+\contentsline {table}{\numberline {1.3}{\ignorespaces Planification D\'etaill\'ee des Sprints Scrum et Calendrier des R\'ealisations}}{10}{table.caption.16}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Analyse Comparative des Frameworks Web Backend}}{19}{table.caption.23}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Analyse Comparative des Frameworks de Microservices}}{19}{table.caption.24}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Analyse Comparative des Moteurs d'IA Locale}}{20}{table.caption.25}%
+\contentsline {table}{\numberline {2.4}{\ignorespaces Analyse Comparative des Solutions de Base de Donn\'ees et Graphes}}{20}{table.caption.26}%
+\contentsline {table}{\numberline {2.5}{\ignorespaces Analyse Comparative des Syst\`emes de Message Broker}}{21}{table.caption.27}%
+\contentsline {table}{\numberline {2.6}{\ignorespaces Tableau R\'ecapitulatif de la Pile Technologique Retenue}}{21}{table.caption.28}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Description Textuelle du Cas d'Utilisation CU01 -- Lancement d'un Scan}}{28}{table.caption.32}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Description Textuelle du Cas d'Utilisation CU02 -- G\'en\'eration de Remediation}}{29}{table.caption.33}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Description Textuelle du Cas d'Utilisation CU03 -- Graphe de Connaissances}}{30}{table.caption.34}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Description Textuelle du Cas d'Utilisation CU04 -- Gestion des Projets et PoA}}{31}{table.caption.35}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Description Textuelle du Cas d'Utilisation CU05 -- G\'en\'eration de Rapports}}{32}{table.caption.36}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Mesures de S\'ecurit\'e en Profondeur par Couche Architecturale}}{39}{table.caption.46}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Matrice d'Analyse des Menaces STRIDE et Contre-Mesures Architecturales}}{40}{table.caption.48}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Sp\'ecification de la Configuration Mat\'erielle Utilis\'ee}}{42}{table.caption.50}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Environnement Logiciel, Outils et Versions des Frameworks}}{43}{table.caption.51}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Sp\'ecification des Principaux Endpoints de l'API RESTful de la Plateforme}}{46}{table.caption.53}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Matrice de Tra\c {c}abilit\'e des Exigences (Requirements Traceability Matrix)}}{65}{table.caption.75}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces R\'esultats de la Suite de Tests Automatis\'es}}{66}{table.caption.76}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces D\'etail des Sc\'enarios de Tests Repr\'esentatifs Valid\'es}}{66}{table.caption.77}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces M\'etriques de Performance Mesur\'ees sous Charge (50 Utilisateurs Simultan\'es)}}{67}{table.caption.78}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces Conformit\'e aux Exigences Non Fonctionnelles (CDC vs Mesures)}}{68}{table.caption.79}%
+\contentsline {table}{\numberline {4.9}{\ignorespaces Catalogue Exhaustif des Endpoints de l'API RESTful}}{72}{table.caption.82}%

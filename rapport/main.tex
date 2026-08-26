@@ -12,14 +12,13 @@
     
     \frontmatter
         \input{tpl/cover_page}
+        \newpage\thispagestyle{empty}\mbox{}\newpage
         \input{tpl/signatures}
         
         \setcounter{page}{1}
         \input{dedicaces}
         \thispagestyle{frontmatter}
         \input{remerciement}
-        \thispagestyle{frontmatter}
-        \input{./tpl/resume_front}
         \thispagestyle{frontmatter}
         
         \setcounter{secnumdepth}{3}
@@ -69,5 +68,6 @@
         \clearpage
         
     \backmatter
+        \input{tpl/resume}
     
 \end{document}

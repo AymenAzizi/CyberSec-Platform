@@ -3,7 +3,7 @@
 \markboth{Introduction G\'en\'erale}{Introduction G\'en\'erale}
 
 \section*{1. Contexte et Motivations}
-\par Dans un \'ecosyst\`eme num\'erique marqu\'e par l'adoption massive des infrastructures Cloud, la conteneurisation et les architectures en microservices, les syst\`emes d'information connaissent une extension sans pr\'ec\'edent de leur surface d'exposition. Chaque nouveau service d\'eploy\'e, sous-domaine cr\'e\'e et port r\'eseau ouvert constituent autant de points d'entr\'ee potentiels pour des cyberattaquants de plus en plus outill\'es.
+\par Dans un \'ecosyst\`eme num\'erique marqu\'e par l'adoption massive des infrastructures Cloud, la conteneurisation et les architectures en microservices, les syst\`emes d'information connaissent une extension sans pr\'ec\'edent de leur surface d'exposition. Chaque nouveau service d\'eploy\'e, sous-domaine cr\'e\'e et port r\'eseau ouvert constitue autant de points d'entr\'ee potentiels pour des cyberattaquants de plus en plus outill\'es.
 \par Face \`a cette r\'ealit\'e, les audits de s\'ecurit\'e p\'eriodiques traditionnels (annuels ou semestriels) r\'ev\`elent d'importantes limites op\'erationnelles : entre deux campagnes manuelles, l'apparition d'une nouvelle vuln\'erabilit\'e critique peut exposer durablement l'organisation. La gestion continue de la surface d'attaque externe (\textit{External Attack Surface Management} -- EASM) s'impose d\'esormais comme un imp\'eratif strat\'egique pour garantir une visibilit\'e permanente sur l'ensemble des actifs expos\'es.
 
 \section*{2. Probl\'ematique et Approche Propos\'ee}
@@ -15,7 +15,7 @@
     \item \textbf{Exigences l\'egales et \'ethiques :} Risque d'engager des actions de balayage offensif sans mandat formel d'autorisation (\textit{Proof of Authorization} -- PoA).
 \end{itemize}
 
-\par Pour lever ces verrous, ce projet propose une \textbf{plateforme web semi-agentique} combinant l'automatisation lourde des audits (orchestration multi-scanners asynchrone via Redis Streams), la corr\'elation relationnelle par graphe de connaissances (PostgreSQL 16 / Apache AGE / NetworkX) et l'assistance \`a la d\'ecision par une IA locale contrainte (Ollama / \texttt{qwen2.5-coder}). L'approche semi-agentique conserve l'humain dans la boucle (\textit{Human-in-the-Loop}), garantissant que chaque d\'ecision sensible (scans intensifs, validation en bac \`a sable et d\'eploiement de correctifs) demeure sous le contr\^ole d'un analyste accr\'edit\'e.
+\par Pour lever ces verrous, ce projet propose une \textbf{plateforme web semi-agentique} combinant l'automatisation lourde des audits (orchestration multi-scanners asynchrone via Redis Streams), la corr\'elation relationnelle par graphe de connaissances (PostgreSQL 16 / Apache AGE / NetworkX) et l'assistance \`a la d\'ecision par une IA locale contrainte (Ollama / \texttt{qwen2.5-coder}), comme l'illustre la figure~\ref{fig:intro_conceptuelle}. L'approche semi-agentique conserve l'humain dans la boucle (\textit{Human-in-the-Loop}), garantissant que chaque d\'ecision sensible (scans intensifs, validation en bac \`a sable et d\'eploiement de correctifs) demeure sous le contr\^ole d'un analyste accr\'edit\'e.
 
 \begin{figure}[H]
 \centering
@@ -61,6 +61,6 @@
 \begin{itemize}
     \item \textbf{Chapitre 1 -- Cadre G\'en\'eral du Projet :} Pr\'esente l'organisme d'accueil, formalise le contexte m\'etier, analyse l'\'etat des solutions existantes du march\'e, d\'efinit la probl\'ematique et d\'etaille la m\'ethodologie Scrum adopt\'ee.
     \item \textbf{Chapitre 2 -- \'Etat de l'Art et \'Etude Comparative :} Expose les fondements th\'eoriques (OWASP, ASM, DevSecOps, IA locale contrainte, microservices) et justifie le choix des technologies retenues.
-    \item \textbf{Chapitre 3 -- Analyse des Besoins et Conception du Syst\`eme :} D\'efinit les exigences fonctionnelles et non fonctionnelles, la mod\'elisation UML (cas d'utilisation, s\'equences), l'architecture en microservices (7 composants applicatifs, 12 conteneurs Docker), la mod\'elisation des menaces STRIDE et la s\'ecurit\'e de la cha\^ine DevSecOps.
+    \item \textbf{Chapitre 3 -- Analyse des Besoins et Conception du Syst\`eme :} D\'efinit les exigences fonctionnelles et non fonctionnelles, la mod\'elisation UML (cas d'utilisation, s\'equences), l'architecture en microservices (7 composants applicatifs, 13 conteneurs Docker), la mod\'elisation des menaces STRIDE et la s\'ecurit\'e de la cha\^ine DevSecOps.
     \item \textbf{Chapitre 4 -- R\'ealisation et Validation Exp\'erimentale :} D\'etaille l'impl\'ementation des modules (Laravel 11, Flask, Apache AGE, Ollama), illustre les interfaces r\'ealis\'ees, analyse les difficult\'es surmont\'ees, et valide la solution \`a travers 140 tests automatis\'es et des benchmarks sous charge Locust.
 \end{itemize}

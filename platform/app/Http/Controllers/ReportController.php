@@ -32,7 +32,7 @@ class ReportController extends Controller
     {
         $this->authorizeReport($report);
 
-        $report->load(['project', 'scan.findings', 'scan.project']);
+        $report->load(['project', 'scan.findings.remediationScripts', 'scan.project']);
 
         return view('reports.show', compact('report'));
     }
@@ -41,7 +41,7 @@ class ReportController extends Controller
     {
         $this->authorizeReport($report);
 
-        $report->load(['project', 'scan.findings']);
+        $report->load(['project', 'scan.findings.remediationScripts']);
 
         return view('reports.pdf', compact('report'));
     }
@@ -50,14 +50,27 @@ class ReportController extends Controller
     {
         $this->authorizeReport($report);
 
-        $report->load(['project', 'scan.findings']);
+        $report->load(['project', 'scan.findings.remediationScripts']);
         $payload = [
             'title'         => $report->title,
             'project'       => $report->project?->name,
             'generated_at'  => $report->generated_at?->toIso8601String(),
             'summary'       => $report->executive_summary,
-            'findings'      => $report->scan?->findings,
+            'findings'      => $report->scan?->findings?->map(fn ($f) => [
+                'id'          => $f->id,
+                'title'       => $f->title,
+                'severity'    => $f->severity,
+                'cvss_score'  => $f->cvss_score,
+                'cve_id'      => $f->cve_id,
+                'endpoint'    => $f->endpoint,
+                'source_tool' => $f->source_tool,
+                'evidence'    => $f->evidence,
+                'remediation' => $f->remediation,
+                'remediation_scripts' => $f->remediationScripts->map->only(['title', 'language', 'code', 'explanation', 'status']),
+            ]),
             'recommendations' => $report->recommendations,
+            'ai_analysis'   => $report->ai_analysis ?? $report->scan?->config['ai_analysis'] ?? null,
+            'remediation_scripts' => $report->scan?->findings?->flatMap->remediationScripts->map->only(['id', 'title', 'language', 'code', 'explanation', 'status']),
         ];
 
         if ($format === 'json') {
@@ -111,6 +124,7 @@ class ReportController extends Controller
                 'scan'   => $scan->only(['type', 'target_url', 'profile', 'started_at', 'completed_at', 'duration']),
                 'counts' => $severityCounts,
             ],
+            'ai_analysis'  => $scan->config['ai_analysis'] ?? null,
             'recommendations' => $scan->findings->map(fn ($f) => [
                 'priority' => $f->severity,
                 'action'   => $f->remediation ?: "Remediate {$f->title}.",

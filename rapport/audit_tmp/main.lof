@@ -1,0 +1,56 @@
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Comparaison Conceptuelle : D\'emarche d'Audit Traditionnelle vs Plateforme Semi-Agentique Propos\'ee}}{2}{figure.caption.10}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Logo Officiel de l'Organisme d'Accueil -- Designet Web Agency}}{4}{figure.caption.11}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Organigramme Fonctionnel de Designet Web Agency}}{4}{figure.caption.12}%
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Processus S\'equentiel d'Audit Traditionnel et Frictions Op\'erationnelles Associ\'ees}}{6}{figure.caption.13}%
+\contentsline {figure}{\numberline {1.4}{\ignorespaces Vue d'Ensemble du Processus Agile Scrum Appliqu\'e au Projet}}{10}{figure.caption.17}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Matrice des Risques OWASP Top 10 (2021) -- Exploitabilit\'e vs D\'etectabilit\'e}}{13}{figure.caption.18}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Cycle de Vie du Processus d'Attack Surface Management (ASM)}}{14}{figure.caption.19}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Cycle de Livraison DevSecOps : Int\'egration Continue des Portes de S\'ecurit\'e (Shift-Left)}}{16}{figure.caption.20}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Pipeline de l'IA Locale Contrainte pour la Production de Remediation-as-Code}}{18}{figure.caption.21}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Patron d'Architecture Microservices et D\'ecouplage Asynchrone via Redis Streams}}{18}{figure.caption.22}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Diagramme Global des Cas d'Utilisation -- Acteurs et Fonctionnalit\'es Cl\'es}}{25}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Diagramme des Cas d'Utilisation -- Analyste de S\'ecurit\'e}}{26}{figure.caption.30}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Diagramme des Cas d'Utilisation -- Administrateur Syst\`eme}}{27}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Architecture Globale en Microservices -- Vue des Conteneurs Docker et R\'eseaux Segment\'es}}{34}{figure.caption.37}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Flux de Traitement Asynchrone des Scans via Redis Streams et PostgreSQL AGE}}{35}{figure.caption.38}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Mod\`ele Entit\'e-Association (ERD) -- Les 14 Tables de la Plateforme}}{36}{figure.caption.39}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Diagramme de Classes -- Entit\'es M\'etier et Relations du Mod\`ele}}{36}{figure.caption.40}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Diagramme de S\'equence -- Lancement, Traitement Asynchrone et Rem\'ediation IA}}{37}{figure.caption.41}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Diagramme de S\'equence -- G\'en\'eration de Remediation-as-Code Assist\'ee par IA}}{37}{figure.caption.42}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Diagramme de S\'equence -- Exploration du Graphe et Calcul de Blast Radius}}{38}{figure.caption.43}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Machine \`a \'Etats -- Cycle de Vie d'une T\^ache de Scan}}{38}{figure.caption.44}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Diagramme de Flux de Donn\'ees (DFD) -- Processus d'Audit, Graphe de Connaissances et Reporting}}{39}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Cartographie de la Surface d'Attaque et Fronti\`eres de Confiance (Trust Boundaries STRIDE)}}{40}{figure.caption.47}%
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Pipeline DevSecOps Automatis\'e -- Cha\^ine de S\'ecurit\'e Int\'egr\'ee sous GitHub Actions}}{40}{figure.caption.49}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Architecture Modulaire du Framework d'Ex\'ecution et de Parsing des Scanners (\texttt {BaseScannerService})}}{45}{figure.caption.52}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Interface d'Authentification Sécurisée de la Plateforme}}{48}{figure.caption.54}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Interface de Création de Compte et Enregistrement Utilisateur}}{48}{figure.caption.55}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Tableau de Bord Principal -- Indicateurs Cl\'es (KPIs) et Cartographie des Risques}}{49}{figure.caption.56}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Liste des Projets d'Audit et Synth\`ese du Statut des Cibles}}{49}{figure.caption.57}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Formulaire de Cr\'eation de Projet et T\'el\'eversement de la Preuve d'Autorisation (PoA)}}{50}{figure.caption.58}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Fiche D\'etaill\'ee d'un Projet -- Cibles Associ\'ees et Historique des Scans}}{50}{figure.caption.59}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Interface de Configuration et Lancement d'un Scan d'Audit}}{51}{figure.caption.60}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Liste et \'Etat d'Avancement des Scans d'Audit Orchestr\'es}}{52}{figure.caption.61}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Restitution des R\'esultats de Scan et Visualisation des Preuves Techniques}}{53}{figure.caption.62}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Fiche D\'etaill\'ee d'un Constat et Scripts de Remediation-as-Code G\'en\'er\'es par l'IA}}{53}{figure.caption.63}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Visualisation Interactive du Graphe de Connaissances et du Rayon d'Impact}}{54}{figure.caption.64}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Module de Renseignement Passif OSINT -- Analyse DNS, WHOIS et Certificats TLS}}{55}{figure.caption.65}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Gestionnaire du Bac \`a Sable (Sandbox) pour la Validation d'Exploits}}{55}{figure.caption.66}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Centre de Gestion et d'Acquittement des Alertes de S\'ecurit\'e}}{56}{figure.caption.67}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Module de Surveillance Continue et T\'el\'em\'etrie des Actifs Expos\'es}}{56}{figure.caption.68}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Assistant Conversationnel d'Analyse de S\'ecurit\'e Assist\'e par IA Locale}}{57}{figure.caption.69}%
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Module d'Administration des Utilisateurs et Gestion des R\^oles RBAC}}{57}{figure.caption.70}%
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Module de Journalisation d'Audit Immuable pour la Tra\c {c}abilit\'e des \'Ev\'enements}}{58}{figure.caption.71}%
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Supervision de la Sant\'e des Microservices et \'Etat des Conteneurs Docker}}{59}{figure.caption.72}%
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Module de G\'en\'eration et Export Multi-Formats des Rapports d'Audit}}{59}{figure.caption.73}%
+\contentsline {figure}{\numberline {4.22}{\ignorespaces Visualisation et Consultation d'un Rapport d'Expertise de S\'ecurit\'e}}{60}{figure.caption.74}%

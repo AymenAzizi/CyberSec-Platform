@@ -110,7 +110,7 @@ class ChatController extends Controller
             $history = $session->messages()->latest()->limit(10)->get(['role', 'content'])->reverse()->values()->toArray();
             $messages = array_merge($history, [['role' => 'user', 'content' => $content]]);
 
-            $res = Http::timeout(20)->post($aiUrl.'/chat', [
+            $res = Http::timeout(90)->post($aiUrl.'/chat', [
                 'messages'   => $messages,
                 'session_id' => $session->id,
                 'project_id' => $session->project_id,
@@ -130,7 +130,7 @@ class ChatController extends Controller
         // 2. Gateway fallback
         try {
             $gateway = env('API_GATEWAY_URL', 'http://api-gateway:8080');
-            $res = Http::timeout(20)->post($gateway.'/api/ai/chat', [
+            $res = Http::timeout(90)->post($gateway.'/api/ai/chat', [
                 'messages' => $messages ?? [['role' => 'user', 'content' => $content]],
             ]);
             if ($res->ok()) {

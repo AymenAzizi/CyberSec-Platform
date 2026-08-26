@@ -1,10 +1,10 @@
 \chapter*{Conclusion G\'en\'erale et Perspectives}
 \addcontentsline{toc}{chapter}{Conclusion G\'en\'erale et Perspectives}
-\markboth{Conclusion G\'en\'erale et Perspectives}{}
+\markboth{Conclusion G\'en\'erale et Perspectives}{Conclusion G\'en\'erale et Perspectives}
 
 \section*{1. Synth\`ese des Travaux R\'ealis\'es}
 \par Ce projet de fin d'\'etudes d'ing\'enieur, r\'ealis\'e au sein de l'agence num\'erique \textbf{Designet Web Agency}, a port\'e sur la conception et le d\'eveloppement d'une plateforme web semi-agentique de reconnaissance de surface d'attaque, associant une corr\'elation par graphe de connaissances, une g\'en\'eration de rem\'ediations assist\'ee par intelligence artificielle locale contrainte et une cha\^ine de livraison DevSecOps continue.
-\par Pour surmonter les limites des d\'emarches manuelles traditionnelles, nous avons d\'evelopp\'e une architecture microservices d\'ecoupl\'ee et r\'esiliente. Le socle applicatif comprend un back-end en \textbf{Laravel 11}, cinq microservices en \textbf{Python Flask} (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, OSINT passif, IA d'assistance, passerelle API), un moteur d'ex\'ecution \'ev\'enementiel pilot\'e par \textbf{Redis Streams}, une couche de donn\'ees unifi\'ee sous \textbf{PostgreSQL 16 / Apache AGE}, et un moteur d'inf\'erence locale \textbf{Ollama} h\'ebergeant le mod\`ele d\'edi\'e au code \texttt{qwen2.5-coder}.
+\par Pour surmonter les limites des d\'emarches manuelles traditionnelles, nous avons d\'evelopp\'e une architecture en microservices d\'ecoupl\'ee et r\'esiliente. Le socle applicatif comprend un back-end en \textbf{Laravel 11}, cinq microservices en \textbf{Python Flask} (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, OSINT passif, IA d'assistance, passerelle API), un moteur d'ex\'ecution \'ev\'enementiel pilot\'e par \textbf{Redis Streams}, une couche de donn\'ees unifi\'ee sous \textbf{PostgreSQL 16 / Apache AGE}, et un moteur d'inf\'erence locale \textbf{Ollama} h\'ebergeant le mod\`ele d\'edi\'e au code \texttt{qwen2.5-coder}.
 
 \section*{2. Bilan des Contributions et R\'esultats}
 \par Les travaux conduits ont abouti \`a des r\'esultats scientifiques et op\'erationnels majeurs :
@@ -24,7 +24,7 @@
 \end{itemize}
 
 \section*{4. Perspectives d'\'Evolution}
-\par Plusieurs axes d'am\'elioration futurs sont envisag\'es pour \'etendre les capacit\'es de la plateforme :
+\par Plusieurs perspectives d'\'evolution sont envisag\'ees pour \'etendre les capacit\'es de la plateforme :
 \begin{itemize}
     \item \textbf{\`A court terme :} Int\'egration de scanners compl\'ementaires (Nikto, OpenVAS, analyseurs d'Infrastructure as Code tels que tfsec ou Checkov).
     \item \textbf{\`A moyen terme :} D\'eveloppement d'une application mobile d\'edi\'ee aux analystes SOC pour la notification instantan\'ee des alertes critiques et le suivi mobile des audits.

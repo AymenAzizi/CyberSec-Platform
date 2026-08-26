@@ -13,47 +13,41 @@
 %==========================================================%
 
 \thispagestyle{backcover}
-\newgeometry{bottom=25mm,left=15mm,top=20mm,right=15mm}
+\newgeometry{bottom=20mm,left=15mm,top=20mm,right=15mm}
 
 \begin{changemargin}{3mm}{0cm}
     \begin{minipage}[c]{0.96\columnwidth}
         
+        \selectlanguage{french}
+        {\LARGE\textbf{R\'esum\'e}}
+        \vskip2mm
+            \begingroup
+                \normalsize
+                \@frenchAbstract
+            \endgroup
+        \vskip3mm
+        {\textbf{Mots-cl\'es : }
+            \begingroup
+                \@frenchAbstractKeywords
+            \endgroup
+        }
         
-        % {\ifthenelse{\boolean{wantToTypeCompanyAddress}}
-        % {% IF TRUE
-        %     \vskip5mm
-        % }{\vskip8mm}}
+        \vskip12mm
+        \hrule
+        \vskip10mm
         
         \selectlanguage{english}
-        
         {\LARGE\textbf{Abstract}}
-        \vskip1mm
+        \vskip2mm
             \begingroup
-                \large
+                \normalsize
                 \@englishAbstract
             \endgroup
-        \vskip1mm
+        \vskip3mm
         {\textbf{Keywords : }
             \begingroup
                 \@englishAbstractKeywords
             \endgroup
         }
-        
-        {\vskip25mm}
-        
-        \selectlanguage{french}
-        {\LARGE\textbf{R\'esum\'e}}
-        \vskip1mm
-            \begingroup
-                \large
-                \@frenchAbstract
-            \endgroup
-        \vskip1mm
-        {\textbf{Mots cl\'es : }
-            \begingroup
-                \@frenchAbstractKeywords
-            \endgroup
-        }
     \end{minipage}
-    
 \end{changemargin}

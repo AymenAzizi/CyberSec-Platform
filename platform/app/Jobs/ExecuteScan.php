@@ -130,7 +130,7 @@ class ExecuteScan implements ShouldQueue
      */
     protected function buildPayload(): array
     {
-        return [
+        $base = [
             'scan_id' => $this->scan->id,
             'correlation_id' => $this->scan->correlation_id,
             'scan_type' => $this->scan->type,
@@ -148,6 +148,29 @@ class ExecuteScan implements ShouldQueue
                 'generate_citations' => true,
             ],
         ];
+
+        // Sandbox scans require target_app and action fields for DockerSandbox
+        if (in_array($this->scan->type, Scan::SANDBOX_TYPES, true)) {
+            $config = (array) ($this->scan->config ?? []);
+            $base['target_app'] = $config['target_app'] ?? $this->resolveTargetApp();
+            $base['action'] = $config['sandbox_action'] ?? 'start';
+        }
+
+        return $base;
+    }
+
+    /**
+     * Map sandbox scan subtypes to their default vulnerable application.
+     */
+    protected function resolveTargetApp(): string
+    {
+        return match ($this->scan->type) {
+            'sandbox_sqli' => 'sqli-labs',
+            'sandbox_xss'  => 'dvwa',
+            'sandbox_cmdi' => 'dvwa',
+            'sandbox_full' => 'dvwa',
+            default        => 'dvwa',
+        };
     }
 
     /**

@@ -1,15 +1,15 @@
 \chapter{Analyse des Besoins et Conception du Syst\`eme}
 
 \section*{Introduction}
-\par Ce troisi\`eme chapitre pr\'esente la d\'emarche rigoureuse d'analyse des exigences et de conception architecturale de notre plateforme. Nous d\'ebutons par l'analyse exhaustive des besoins fonctionnels, non fonctionnels, des contraintes de s\'ecurit\'e et des exigences l\'egales (PoA). Nous formalisons ensuite la mod\'elisation fonctionnelle \`a travers les diagrammes de cas d'utilisation UML. Par la suite, nous d\'etaillons l'architecture globale en distinguant explicitement les \textbf{7 composants applicatifs m\'etier} et les \textbf{12 conteneurs Docker d'infrastructure}. Nous exposons la conception des donn\'ees (mod\`ele relationnel sur 14 tables, diagramme de classes, graphe openCypher, s\'equences d'ex\'ecution, machine \`a \'etats et DFD). Nous d\'eveloppons l'architecture de s\'ecurit\'e multicouche et menons une mod\'elisation formelle des menaces selon la m\'ethodologie STRIDE. Enfin, nous d\'etaillons la cha\^ine DevSecOps int\'egr\'ee au pipeline de livraison logicielle.
+\par Ce troisi\`eme chapitre pr\'esente la d\'emarche rigoureuse d'analyse des exigences et de conception architecturale de notre plateforme. Nous d\'ebutons par l'analyse exhaustive des besoins fonctionnels, non fonctionnels, des contraintes de s\'ecurit\'e et des exigences l\'egales (PoA). Nous formalisons ensuite la mod\'elisation fonctionnelle \`a travers les diagrammes de cas d'utilisation UML. Par la suite, nous d\'etaillons l'architecture globale en distinguant explicitement les \textbf{7 composants applicatifs m\'etier} et les \textbf{13 conteneurs Docker d'infrastructure}. Nous exposons la conception des donn\'ees (mod\`ele relationnel sur 14 entit\'es m\'etier, diagramme de classes, graphe openCypher, s\'equences d'ex\'ecution, machine \`a \'etats et DFD). Nous d\'eveloppons l'architecture de s\'ecurit\'e multicouche et menons une mod\'elisation formelle des menaces selon la m\'ethodologie STRIDE. Enfin, nous d\'etaillons la cha\^ine DevSecOps int\'egr\'ee au pipeline de livraison logicielle.
 
 \section{Analyse des Besoins}
 \subsection{Identification des Acteurs}
 \par Le syst\`eme interagit avec quatre profils d'acteurs op\'erationnels distincts :
 \begin{itemize}
     \item \textbf{L'Analyste de S\'ecurit\'e (Security Analyst) :} Utilisateur op\'erationnel principal qui configure les cibles d'audit, t\'el\'everse les preuves d'autorisation (PoA), lance les scans, analyse les r\'esultats techniques, explore le graphe de connaissances, valide les scripts de rem\'ediation IA et exporte les rapports d'expertise.
-    \item \textbf{Le Client / Lecteur (Client / Viewer) :} B\'en\'eficiaire des audits, consultant en lecture seule les tableaux de bord synth\'etiques, les rapports valid\'es et acquittant les alertes de s\'ecurit\'e li\'ees \`a son p\'erim\`etre d'actifs.
-    \item \textbf{L'Administrateur Syst\`eme (System Administrator) :} Supervise la gouvernance globale de la plateforme, la gestion des comptes utilisateurs, l'attribution des r\^oles RBAC, la configuration des quotas de scan et la surveillance de l'\'etat de sant\'e des microservices conteneuris\'es.
+    \item \textbf{Le Client / Lecteur (Client / Viewer) :} B\'en\'eficiaire des audits, il consulte en lecture seule les tableaux de bord synth\'etiques ainsi que les rapports valid\'es, et acquitte les alertes de s\'ecurit\'e li\'ees \`a son p\'erim\`etre d'actifs.
+    \item \textbf{L'Administrateur Syst\`eme (System Administrator) :} Responsable de l'infrastructure, il supervise la gouvernance globale de la plateforme, la gestion des comptes utilisateurs, l'attribution des r\^oles RBAC, la configuration des quotas de scan et la surveillance de l'\'etat de sant\'e des microservices conteneuris\'es.
     \item \textbf{L'Auditeur / Responsable Conformit\'e (Auditor / Compliance) :} Profil d\'edi\'e au contr\^ole r\'eglementaire, consultant en lecture seule les journaux d'audit immuables (\textit{Audit Logs}), contr\^olant la validit\'e juridique des mandats PoA et v\'erifiant la tra\c{c}abilit\'e exhaustive de l'ensemble des actions men\'ees.
 \end{itemize}
 \par \textit{Remarque :} Le Responsable Technique (CTO) de l'entreprise d'accueil assure l'encadrement industriel, la revue d'architecture et la gouvernance globale du projet, sans constituer un acteur op\'erationnel direct au sens de la mod\'elisation UML du syst\`eme.
@@ -18,8 +18,8 @@
 \par Conform\'ement au cahier des charges valid\'e avec Designet Web Agency, les besoins fonctionnels prioritaires couvrent :
 \begin{itemize}
     \item \textbf{Gestion des Cibles et Mandats :} Enregistrement s\'ecuris\'e des cibles d'audit (domaines, sous-domaines, plages IP) avec t\'el\'eversement et validation obligatoire d'une preuve d'autorisation (PoA).
-    \item \textbf{Orchestration des Scans :} Configuration et d\'eclenchement asynchrone des scanners (Nmap, Nuclei, Gobuster, Subfinder, WPScan) selon 3 profils d'intensit\'e (Silent, Balanced, Aggressive) avec gestion du jitter anti-blocage.
-    \item \textbf{Normalisation des Constats :} Transformation automatique des sorties brutes h\'et\'erog\`enes en entit\'es normalis\'ees \textit{Finding} avec score de s\'ev\'erit\'e, mapping CVE/CWE et citations des num\'eros de lignes de logs bruts.
+    \item \textbf{Orchestration des Scans :} Configuration et d\'eclenchement asynchrone des scanners (Nmap, Nuclei, Gobuster, Subfinder, WPScan) selon trois profils d'intensit\'e (Silent, Balanced, Aggressive) avec gestion du jitter anti-blocage.
+    \item \textbf{Normalisation des Constats :} Transformation automatique des sorties brutes h\'et\'erog\`enes en entit\'es normalis\'ees \textit{Finding} avec score de s\'ev\'erit\'e, mapping CVE/CWE et citation des num\'eros de ligne des journaux bruts.
     \item \textbf{Mod\'elisation en Graphe de Connaissances :} Projection de la topologie de la cible sous forme de graphe relationnel avec calcul du rayon d'impact (\textit{blast radius}) par l'algorithme BFS sous NetworkX.
     \item \textbf{Assistance IA et Remediation-as-Code :} G\'en\'eration automatis\'ee de synth\`eses manag\'eriales et de scripts durcis de correction (Bash, Ansible, Dockerfile, Terraform) via un mod\`ele de langage local contraint.
     \item \textbf{Modules de S\'ecurit\'e Offensive et Sandbox :} Tests d'injection (SQL, commandes, XSS), analyse de WAF et d\'eploiement \`a la demande d'environnements vuln\'erables isol\'es (DVWA, SQLi-Labs, WebGoat, bWAPP).
@@ -28,21 +28,21 @@
 
 \subsection{Besoins Non Fonctionnels}
 \begin{itemize}
-    \item \textbf{S\'ecurit\'e \& Confidentialit\'e :} Application du principe de moindre privil\`ege, conteneurs non-root (UID 1001), syst\`eme de fichiers en lecture seule, chiffrement des secrets et terminaison TLS 1.3.
-    \item \textbf{Scalabilit\'e \& R\'esilience :} D\'ecouplage des t\^aches lourdes par files Redis Streams avec r\'eessais automatiques et repli exponentiel.
-    \item \textbf{Performance :} Temps de r\'eponse de l'interface inf\'erieur \`a 200 ms (P95) pour les pages du tableau de bord.
+    \item \textbf{S\'ecurit\'e et Confidentialit\'e :} Application du principe de moindre privil\`ege, conteneurs non-root (UID 1001), syst\`eme de fichiers en lecture seule, chiffrement des secrets et terminaison TLS 1.3.
+    \item \textbf{\'Evolutivit\'e et R\'esilience :} D\'ecouplage des t\^aches lourdes par files Redis Streams avec r\'eessais automatiques et temporisation exponentielle (\textit{exponential backoff}).
+    \item \textbf{Performance :} Temps de r\'eponse de l'interface inf\'erieur \`a 200~ms (P95) pour les pages du tableau de bord.
     \item \textbf{Maintenabilit\'e :} Standardisation des microservices via la classe abstraite \texttt{BaseScannerService} et documentation compl\`ete des endpoints REST.
 \end{itemize}
 
 \subsection{Contraintes et Exigences de S\'ecurit\'e}
-\par La plateforme manipule des outils et des informations hautement sensibles. Elle impose par cons\'equent une isolation herm\'etique des processus d'audit, l'interdiction stricte de toute action de d\'efacement ou de d\'eni de service, et une journalisation infalsifiable de toutes les requ\^etes administratives.
+\par La plateforme manipule des outils et des informations hautement sensibles. Elle impose par cons\'equent une isolation herm\'etique des processus d'audit, l'interdiction stricte de toute action de d\'efiguration (\textit{defacement}) ou de d\'eni de service, et une journalisation infalsifiable de toutes les requ\^etes administratives.
 
 \subsection{Contraintes L\'egales et Preuve d'Autorisation (Proof of Authorization -- PoA)}
-\par L'ex\'ecution d'activit\'es de reconnaissance offensive sur des syst\`emes d'information est strictement encadr\'ee par la l\'egislation (Code P\'enal tunisien, Convention de Budapest, r\'eglementations internationales). Afin de renforcer la conformit\'e l\'egale et \'ethique, notre plateforme impl\'emente une barri\`ere bloquante logicielle : aucun scan de reconnaissance actif ne peut \^etre lanc\'e sans qu'un document de preuve d'autorisation (PoA) valide, d\^ument sign\'e par le propri\'etaire de la cible, ne soit attach\'e et valid\'e dans le projet.
+\par L'ex\'ecution d'activit\'es de reconnaissance offensive sur des syst\`emes d'information est strictement encadr\'ee par la l\'egislation (Code P\'enal tunisien, Convention de Budapest, r\'eglementations internationales). Afin de renforcer la conformit\'e l\'egale et \'ethique, notre plateforme impl\'emente une barri\`ere bloquante logicielle : aucun scan de reconnaissance active ne peut \^etre lanc\'e sans qu'un document de preuve d'autorisation (PoA) valide, d\^ument sign\'e par le propri\'etaire de la cible, ne soit attach\'e et valid\'e dans le projet.
 
 \section{Mod\'elisation Fonctionnelle UML}
 \subsection{Diagramme Global des Cas d'Utilisation}
-\par Le diagramme global mod\'elise l'ensemble des cas d'utilisation structur\'es selon les quatre r\^oles du syst\`eme.
+\par Le diagramme global mod\'elise l'ensemble des cas d'utilisation structur\'es selon les quatre r\^oles du syst\`eme, comme l'illustre la figure~\ref{fig:usecase_global}.
 
 \begin{figure}[!htbp]
     \centering
@@ -52,7 +52,7 @@
 \end{figure}
 
 \subsection{Cas d'Utilisation de l'Analyste de S\'ecurit\'e}
-\par L'analyste configure les audits, explore les r\'esultats, manipule le graphe et valide les rem\'ediations.
+\par L'analyste configure les audits, explore les r\'esultats, manipule le graphe et valide les rem\'ediations (figure~\ref{fig:usecase_analyst}).
 
 \begin{figure}[!htbp]
     \centering
@@ -62,7 +62,7 @@
 \end{figure}
 
 \subsection{Cas d'Utilisation de l'Administrateur Syst\`eme}
-\par L'administrateur g\`ere les privil\`eges, supervise la sant\'e des microservices et contr\^ole les pistes d'audit.
+\par L'administrateur g\`ere les privil\`eges, supervise la sant\'e des microservices et contr\^ole les pistes d'audit (figure~\ref{fig:usecase_admin}).
 
 \begin{figure}[!htbp]
     \centering
@@ -77,7 +77,7 @@
 \subsubsection*{CU01 : Lancement et Orchestration d'un Scan d'Audit}
 \begin{table}[H]
 \centering
-\caption{Description Textuelle du Cas d'Utilisation CU01 -- Lancement d'un Scan}
+\caption{Description Textuelle du Cas d'Utilisation CU01 -- Lancement et Orchestration d'un Scan}
 \label{tab:cu01}
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
@@ -108,7 +108,7 @@
 \subsubsection*{CU02 : G\'en\'eration de Remediation-as-Code Assist\'ee par IA}
 \begin{table}[H]
 \centering
-\caption{Description Textuelle du Cas d'Utilisation CU02 -- G\'en\'eration de Remediation}
+\caption{Description Textuelle du Cas d'Utilisation CU02 -- G\'en\'eration de Remediation-as-Code}
 \label{tab:cu02}
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
@@ -118,7 +118,7 @@
 \hline
 \textbf{Pr\'e-conditions} & Scan termin\'e avec succ\`es, constats de vuln\'erabilit\'es normalis\'es pr\'esents en base. \\
 \hline
-\textbf{Post-conditions} & Scripts de durcissement multi-cibles g\'en\'er\'es, valid\'es, sign\'es et attach\'es au constat. \\
+\textbf{Post-conditions} & Scripts de durcissement multicibles g\'en\'er\'es, valid\'es, sign\'es et attach\'es au constat. \\
 \hline
 \textbf{Sc\'enario Nominal} & 
 1. L'analyste consulte la fiche d'une vuln\'erabilit\'e d\'etect\'ee. \newline
@@ -130,7 +130,7 @@
 7. Le script est persist\'e dans la table \texttt{remediation\_scripts} et affich\'e \`a l'\'ecran avec coloration syntaxique. \\
 \hline
 \textbf{Sc\'enarios Alternatifs} & 
-6.a. \textit{R\'eponse JSON invalide ou hallucination de citation d\'etect\'ee} : Le syst\`eme rejette la sortie brute et g\'en\`ere un script de durcissement d\'eterministe durci de repli (fallback). \\
+6.a. \textit{R\'eponse JSON invalide ou hallucination de citation d\'etect\'ee} : Le syst\`eme rejette la sortie brute et g\'en\`ere un script de durcissement d\'eterministe de repli (\textit{fallback}). \\
 \hline
 \end{tabular}
 \end{table}
@@ -138,7 +138,7 @@
 \subsubsection*{CU03 : Consultation et Exploration du Graphe de Connaissances}
 \begin{table}[H]
 \centering
-\caption{Description Textuelle du Cas d'Utilisation CU03 -- Graphe de Connaissances}
+\caption{Description Textuelle du Cas d'Utilisation CU03 -- Exploration du Graphe et Rayon d'Impact}
 \label{tab:cu03}
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
@@ -155,7 +155,7 @@
 2. Le back-end ex\'ecute une requ\^ete openCypher dans Apache AGE pour r\'ecup\'erer les n\oe uds et ar\^etes. \newline
 3. L'interface Cytoscape.js restitue la topologie interactive avec filtres par criticit\'e. \newline
 4. L'analyste clique sur un sommet de vuln\'erabilit\'e pour d\'eclencher le calcul du rayon d'impact. \newline
-5. L'algorithme BFS sous NetworkX calcule les d\'ependances jusqu'\`a une profondeur de 3 sauts. \newline
+5. L'algorithme BFS sous NetworkX calcule les d\'ependances jusqu'\`a une profondeur de trois sauts. \newline
 6. Les actifs et services potentiellement impact\'es sont mis en surbrillance rouge \`a l'\'ecran. \\
 \hline
 \textbf{Sc\'enarios Alternatifs} & 
@@ -167,7 +167,7 @@
 \subsubsection*{CU04 : Gestion des Projets et Validation du Mandat PoA}
 \begin{table}[H]
 \centering
-\caption{Description Textuelle du Cas d'Utilisation CU04 -- Gestion des Projets et PoA}
+\caption{Description Textuelle du Cas d'Utilisation CU04 -- Gestion des Projets et Mandat PoA}
 \label{tab:cu04}
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
@@ -175,13 +175,13 @@
 \hline
 \textbf{Acteur Principal} & Administrateur Syst\`eme / Analyste de S\'ecurit\'e \\
 \hline
-\textbf{Pr\'e-conditions} & Compte utilisateur authentifi\'e avec privil\`ege de gestion de projet. \\
+\textbf{Pr\'e-conditions} & Compte utilisateur authentifi\'e avec privil\`eges de gestion de projet. \\
 \hline
 \textbf{Post-conditions} & Projet cr\'e\'e, cibles valid\'ees, document PoA chiffr\'e et stock\'e sur disque isol\'e. \\
 \hline
 \textbf{Sc\'enario Nominal} & 
 1. L'utilisateur acc\`ede \`a la vue de cr\'eation de projet (\texttt{/projects/create}). \newline
-2. Il saisit le nom du projet, la description, et d\'eclare la liste des domaines/IPs cibles. \newline
+2. Il saisit le nom du projet, la description, et d\'eclare la liste des domaines et adresses IP cibles. \newline
 3. Il t\'el\'everse le document PDF de mandat d'autorisation d\^ument sign\'e par le client. \newline
 4. Le back-end v\'erifie le type MIME du fichier, sa signature num\'erique et calcule son empreinte SHA-256. \newline
 5. Le projet est enregistr\'e et activ\'e, autorisant d\'esormais les scans sur le p\'erim\`etre valid\'e. \\
@@ -195,17 +195,17 @@
 \subsubsection*{CU05 : G\'en\'eration et Export Multi-Formats des Rapports d'Expertise}
 \begin{table}[H]
 \centering
-\caption{Description Textuelle du Cas d'Utilisation CU05 -- G\'en\'eration de Rapports}
+\caption{Description Textuelle du Cas d'Utilisation CU05 -- G\'en\'eration et Export de Rapports}
 \label{tab:cu05}
 \begin{tabular}{|p{3.5cm}|p{11.5cm}|}
 \hline
-\textbf{Cas d'Utilisation} & \textbf{CU05 : Production et T\'el\'echargement de Rapport d'Audit Certifi\'e} \\
+\textbf{Cas d'Utilisation} & \textbf{CU05 : Production et T\'el\'echargement d'un Rapport d'Audit Certifi\'e} \\
 \hline
 \textbf{Acteur Principal} & Analyste de S\'ecurit\'e / Client / Auditeur \\
 \hline
 \textbf{Pr\'e-conditions} & Scans achev\'es, constats \'evalu\'es et rem\'ediations associ\'ees. \\
 \hline
-\textbf{Post-conditions} & Rapport PDF/JSON g\'en\'er\'e, horodat\'e, sign\'e et mis \`a disposition au t\'el\'echargement. \\
+\textbf{Post-conditions} & Rapport PDF/JSON g\'en\'er\'e, horodat\'e, sign\'e et mis \`a disposition en t\'el\'echargement. \\
 \hline
 \textbf{Sc\'enario Nominal} & 
 1. L'utilisateur s\'electionne un scan ou une vue projet et clique sur \og G\'en\'erer Rapport \fg. \newline
@@ -222,7 +222,7 @@
 
 \section{Architecture Globale du Syst\`eme}
 \subsection{Vue d'Ensemble du Syst\`eme}
-\par La plateforme adopte une architecture microservices distribu\'ee et segment\'ee, assurant une s\'eparation nette des responsabilit\'es, une meilleure r\'esilience et une s\'ecurit\'e renforc\'ee par conception.
+\par La plateforme adopte une architecture en microservices distribu\'ee et segment\'ee (figure~\ref{fig:component_diagram}), assurant une s\'eparation nette des responsabilit\'es, une meilleure r\'esilience et une s\'ecurit\'e renforc\'ee par conception.
 
 \subsection{Composants Applicatifs M\'etier (7 Composants Logiques)}
 \par Sur le plan fonctionnel, l'application est r\'epartie en sept composants logiciels autonomes :
@@ -236,15 +236,16 @@
     \item \textbf{Worker Asynchrone (Python) :} Processus d'arri\`ere-plan consommant les \'ev\'enements de scan via \texttt{XREADGROUP} sur Redis Streams, coordonnant les t\^aches longues et persistant les constats dans PostgreSQL.
 \end{enumerate}
 
-\subsection{Conteneurs d'Infrastructure Docker (12 Services Conteneuris\'es)}
-\par Sur le plan infrastructurel, le d\'eploiement orchestre douze conteneurs Docker compl\'ementaires :
+\subsection{Conteneurs d'Infrastructure Docker (13 Services Conteneuris\'es)}
+\par Sur le plan infrastructurel, le d\'eploiement orchestre treize conteneurs Docker compl\'ementaires :
 \begin{itemize}
     \item Les 7 conteneurs h\'ebergeant les 7 composants applicatifs d\'ecrits ci-dessus.
-    \item \textbf{8. Nginx 1.27 :} Serveur mandataire inverse (\textit{reverse proxy}) assurant la terminaison TLS 1.3 et le durcissement des en-t\^etes HTTP.
-    \item \textbf{9. PostgreSQL 16 + Apache AGE :} Syst\`eme de gestion de base de donn\'ees unifi\'e relationnel (14 tables) et graphe openCypher.
-    \item \textbf{10. Redis 7 :} Magasin de donn\'ees en m\'emoire servant de Message Broker Streams, cache applicatif et gestionnaire de sessions.
-    \item \textbf{11. Ollama :} Serveur d'inf\'erence local ex\'ecutant le mod\`ele d\'edi\'e au code \texttt{qwen2.5-coder}.
-    \item \textbf{12. Docker-Socket-Proxy :} Proxy de s\'ecurit\'e interdisant les acc\`es directs au socket Unix de Docker pour pr\'evenir toute \'evasion de conteneur.
+    \item \textbf{8. Laravel Queue Worker :} Processus de file Laravel d\'edi\'e (\texttt{php artisan queue:work}) pour l'orchestration interne.
+    \item \textbf{9. Nginx 1.27 :} Serveur mandataire inverse (\textit{reverse proxy}) assurant la terminaison TLS 1.3 et le durcissement des en-t\^etes HTTP.
+    \item \textbf{10. PostgreSQL 16 + Apache AGE :} Syst\`eme de gestion de base de donn\'ees unifi\'e relationnel et graphe openCypher.
+    \item \textbf{11. Redis 7 :} Magasin de donn\'ees en m\'emoire servant de Message Broker Streams, cache applicatif et gestionnaire de sessions.
+    \item \textbf{12. Ollama :} Serveur d'inf\'erence local ex\'ecutant le mod\`ele d\'edi\'e au code \texttt{qwen2.5-coder}.
+    \item \textbf{13. Docker-Socket-Proxy :} Proxy de s\'ecurit\'e interdisant les acc\`es directs au socket Unix de Docker pour pr\'evenir toute \'evasion de conteneur.
 \end{itemize}
 
 \begin{figure}[H]
@@ -273,7 +274,7 @@
 
 \section{Conception des Donn\'ees et Dynamique du Syst\`eme}
 \subsection{Mod\`ele Entit\'e-Association (ERD)}
-\par La base de donn\'ees structure 14 tables relationnelles li\'ees par des contraintes d'int\'egrit\'e r\'ef\'erentielle strictes et enrichies de colonnes \texttt{JSONB} index\'ees par index GIN.
+\par La base de donn\'ees structure 14 entit\'es m\'etier fondamentales li\'ees par des contraintes d'int\'egrit\'e r\'ef\'erentielle strictes et enrichies de colonnes \texttt{JSONB} index\'ees au moyen d'index GIN, mat\'erialis\'ees par 25 tables physiques au sein de PostgreSQL (incluant les jointures RBAC Spatie, les sessions et le cache), comme le montre la figure~\ref{fig:erd_diagram}.
 
 \begin{figure}[!htbp]
     \centering
@@ -334,9 +335,9 @@
 \draw[msg, draw=blue!70] (2.8,-1.5) -- node[above]{2. Contexte + Logs bruts} (5.6,-1.5);
 \draw[msg, draw=purple!70] (5.6,-2.0) -- node[above]{3. Prompt contraint JSON} (8.4,-2.0);
 \draw[reply, draw=purple!70] (8.4,-2.7) -- node[above]{4. Script JSON g\'en\'er\'e} (5.6,-2.7);
-\draw[msg, draw=green!60!black] (5.6,-3.3) -- node[above]{5. Valid. Pydantic \& Citations} (5.6,-3.3);
+\draw[msg, draw=green!60!black] (5.6,-3.3) -- ++(0.6,0) -- ++(0,-0.3) -- node[right, font=\tiny]{5. Valid. Pydantic \& Citations} ++(-0.6,0);
 \draw[reply, draw=blue!70] (5.6,-3.9) -- node[above]{6. Script valid\'e + type} (2.8,-3.9);
-\draw[msg, draw=orange!70] (2.8,-4.4) -- node[above]{7. Persistance en DB} (2.8,-4.4);
+\draw[msg, draw=orange!70] (2.8,-4.4) -- ++(0.6,0) -- ++(0,-0.3) -- node[right, font=\tiny]{7. Persistance en DB} ++(-0.6,0);
 \draw[reply, draw=blue!70] (2.8,-4.9) -- node[above]{8. Rendu IHM coloration} (0,-4.9);
 \end{tikzpicture}
 \caption{Diagramme de S\'equence -- G\'en\'eration de Remediation-as-Code Assist\'ee par IA}
@@ -377,7 +378,7 @@
 \end{figure}
 
 \subsection{Machine \`a \'Etats d'un Scan}
-\par Le cycle de vie d'une t\^ache de scan est r\'egi par une machine \`a \'etats finis d\'eterministe comprenant les \'etats \texttt{Pending}, \texttt{Queued}, \texttt{Running}, \texttt{Completed}, \texttt{Failed} et \texttt{Cancelled}.
+\par Le cycle de vie d'une t\^ache de scan est r\'egi par une machine \`a \'etats finis d\'eterministe comprenant les \'etats \texttt{Pending}, \texttt{Queued}, \texttt{Running}, \texttt{Completed}, \texttt{Failed} et \texttt{Cancelled}, pr\'esent\'ee sur la figure~\ref{fig:state_machine}.
 
 \begin{figure}[!htbp]
     \centering
@@ -408,17 +409,17 @@
 \hline
 \textbf{Couche de S\'ecurit\'e} & \textbf{M\'ecanismes Impl\'ement\'es} & \textbf{Objectif de Protection} \\
 \hline
-\textbf{1. R\'eseau \& DMZ} & Nginx TLS 1.3, r\'eseaux bridges isol\'es (\texttt{internal} vs \texttt{external}) & Isolation des flux inter-services et terminaison s\'ecuris\'ee. \\
+\textbf{1. R\'eseau \& DMZ} & Nginx TLS 1.3, r\'eseaux bridges isol\'es (\texttt{cybersec-internal} et \texttt{cybersec-external}) & Isolation des flux inter-services et terminaison s\'ecuris\'ee. \\
 \hline
 \textbf{2. Conteneurs Docker} & Utilisateur non-root (UID 1001), \texttt{read\_only: true}, \texttt{cap\_drop: ALL} & Pr\'evention de l'\'evasion de conteneurs et de l'\'el\'evation de privil\`eges. \\
 \hline
-\textbf{3. Applicative Web} & Tokens CSRF, assainissement XSS, requ\^etes pr\'epar\'ees Eloquent & Neutralisation compl\`ete des risques OWASP Top 10 web. \\
+\textbf{3. Couche Applicative Web} & Tokens CSRF, assainissement XSS, requ\^etes pr\'epar\'ees Eloquent & Neutralisation compl\`ete des risques OWASP Top 10 web. \\
 \hline
-\textbf{4. Donn\'ees \& Secrets} & Chiffrement \texttt{bcrypt}, cl\'es d'API chiffr\'ees, pistes d'audit immuables & Int\'egrit\'e, confidentialit\'e et tra\c{c}abilit\'e sans faille. \\
+\textbf{4. Donn\'ees \& Secrets} & Hachage s\'ecuris\'e \texttt{bcrypt} des mots de passe, chiffrement AES-256 des cl\'es d'API au repos & Int\'egrit\'e, confidentialit\'e et tra\c{c}abilit\'e sans faille. \\
 \hline
 \textbf{5. Contr\^ole d'Acc\`es} & Mod\`ele RBAC strict (4 r\^oles), validation syst\'ematique de PoA & Respect du principe de moindre privil\`ege et conformit\'e l\'egale. \\
 \hline
-\textbf{6. Bac \`a Sable (Sandbox)} & Docker Socket Proxy filtrant les appels d'API du daemon & Confinement strict des tests sur environnements vuln\'erables. \\
+\textbf{6. Bac \`a Sable (Sandbox)} & Docker Socket Proxy filtrant les appels d'API du d\'emon & Confinement strict des tests sur environnements vuln\'erables. \\
 \hline
 \end{tabular}}%
 \end{table}
@@ -453,7 +454,7 @@ Back-end Laravel & \textbf{T}ampering / Alt\'eration des donn\'ees & \'Elev\'e &
 \hline
 Syst\`eme de Journalisation & \textbf{R}epudiation / R\'epudiation d'actions & Moyen & Piste d'audit immuable (\textit{Audit Log}) horodat\'ee avec tra\c{c}abilit\'e \texttt{X-Correlation-ID} \\
 \hline
-Base PostgreSQL / AGE & \textbf{I}nformation Disclosure / Fuite d'infos & Critique & R\'eseau priv\'e \texttt{cybersec-internal} non expos\'e, chiffrement des cl\'es d'API au repos \\
+Base PostgreSQL / AGE & \textbf{I}nformation Disclosure / Divulgation d'informations & Critique & R\'eseau priv\'e \texttt{cybersec-internal} non expos\'e, chiffrement des cl\'es d'API au repos \\
 \hline
 Files Redis Streams & \textbf{D}enial of Service / D\'eni de service & \'Elev\'e & Quotas stricts de scans simultan\'es par utilisateur, limitation de d\'ebit (\textit{rate limiting}) \\
 \hline
@@ -461,14 +462,14 @@ Microservice Sandbox & \textbf{E}levation of Privilege / \'Evasion Docker & Crit
 \hline
 Microservice IA (Ollama) & \textbf{T}ampering / Injection de Prompts & \'Elev\'e & \textit{System prompt} fig\'e, validation de sch\'ema JSON strict et v\'erification des citations de logs \\
 \hline
-Moteur de Scanners & Ex\'ecution sur cible non autoris\'ee & Critique & Barri\`ere logicielle bloquante : v\'erification obligatoire du mandat d'autorisation (PoA) \\
+Moteur de Scanners & \textbf{E}levation of Privilege / Ex\'ecution sur cible non autoris\'ee & Critique & Barri\`ere logicielle bloquante : v\'erification obligatoire du mandat d'autorisation (PoA) \\
 \hline
 \end{tabular}}%
 \end{table}
 
 \section{Architecture DevSecOps D\'etaill\'ee}
 \subsection{Pipeline CI/CD sous GitHub Actions}
-\par La s\'ecurit\'e de la cha\^ine logicielle est enti\`erement automatis\'ee au sein du d\'ep\^ot de code via le workflow GitHub Actions d\'eclar\'e dans \texttt{.github/workflows/devsecops.yml}. Chaque commit et requ\^ete de tirage (\textit{pull request}) d\'eclenche l'ex\'ecution de huit \'etapes successives bloquantes.
+\par La s\'ecurit\'e de la cha\^ine logicielle est enti\`erement automatis\'ee au sein du d\'ep\^ot de code via le workflow GitHub Actions d\'eclar\'e dans \texttt{.github/workflows/devsecops.yml}, comme l'illustre la figure~\ref{fig:devsecops_pipeline}. Chaque commit et requ\^ete de tirage (\textit{pull request}) d\'eclenche l'ex\'ecution de huit \'etapes successives bloquantes.
 
 \begin{figure}[!htbp]
     \centering
@@ -480,15 +481,15 @@ Moteur de Scanners & Ex\'ecution sur cible non autoris\'ee & Critique & Barri\`e
 \subsection{Description des Portes de S\'ecurit\'e (Security Gates)}
 \par Le pipeline GitHub Actions applique des barri\`eres de contr\^ole strictes interdisant tout d\'eploiement si une anomalie critique est d\'etect\'ee :
 \begin{itemize}
-    \item \textbf{\'Etape 1 -- D\'eclenchement (Trigger) :} Analyse automatique sur push/PR ciblant la branche \texttt{main}.
-    \item \textbf{\'Etape 2 -- Analyse SAST :} Analyse statique PHP (Psalm niveau 3) et Python (Bandit). Si une vuln\'erabilit\'e haute s\'ev\'erit\'e est d\'etect\'ee, le build \'echoue imm\'ediatement.
-    \item \textbf{\'Etape 3 -- Analyse SCA (Software Composition Analysis) :} Trivy scanne l'arbre des d\'ependances (\texttt{composer.lock} et \texttt{requirements.txt}). Toute CVE de niveau \textit{HIGH} ou \textit{CRITICAL} non corrig\'ee bloque la cha\^ine.
+    \item \textbf{\'Etape 1 -- D\'eclenchement (Trigger) :} Analyse automatique lors d'un \textit{push} ou d'une demande d'int\'egration (\textit{Pull Request}) ciblant la branche \texttt{main}.
+    \item \textbf{\'Etape 2 -- Analyse SAST :} Analyse statique PHP (Psalm niveau 3) et Python (Bandit). Si une vuln\'erabilit\'e de s\'ev\'erit\'e \'elev\'ee est d\'etect\'ee, la cha\^ine d'int\'egration \'echoue imm\'ediatement.
+    \item \textbf{\'Etape 3 -- Analyse SCA (Software Composition Analysis) :} Trivy analyse l'arbre des d\'ependances (\texttt{composer.lock} et \texttt{requirements.txt}). Toute CVE de niveau \textit{HIGH} ou \textit{CRITICAL} non corrig\'ee bloque la cha\^ine.
     \item \textbf{\'Etape 4 -- G\'en\'eration du SBOM :} L'outil Syft inventorie l'ensemble des paquets et g\'en\`ere un fichier conforme \`a la norme CycloneDX JSON.
     \item \textbf{\'Etape 5 -- Construction de l'Image :} Docker BuildKit compile l'image conteneuris\'ee de production avec mise en cache optimis\'ee.
-    \item \textbf{\'Etape 6 -- Scan de l'Image Conteneur :} Trivy analyse l'image Docker finale (syst\`eme de fichiers racine et paquets OS).
-    \item \textbf{\'Etape 7 -- Signature Cryptographique :} Cosign (Sigstore) signe l'image conteneur et pousse la signature sur le registre GitHub Container Registry (GHCR).
+    \item \textbf{\'Etape 6 -- Analyse de Vuln\'erabilit\'es de l'Image :} Trivy analyse l'image Docker finale (syst\`eme de fichiers racine et paquets OS).
+    \item \textbf{\'Etape 7 -- Signature Cryptographique :} Cosign (Sigstore) signe l'image conteneur et publie la signature dans le registre GitHub Container Registry (GHCR).
     \item \textbf{\'Etape 8 -- D\'eploiement en Production :} D\'eploiement sur le serveur VPS uniquement si toutes les \'etapes pr\'ec\'edentes sont au statut \textit{PASS}.
 \end{itemize}
 
 \section*{Conclusion}
-\par Ce chapitre a pr\'esent\'e la formalisation compl\`ete des besoins, la mod\'elisation fonctionnelle UML, l'architecture d\'ecoupl\'ee en microservices (7 composants applicatifs et 12 conteneurs Docker), la conception relationnelle et en graphe de connaissances, la mod\'elisation formelle des menaces STRIDE, ainsi que la politique de d\'efense en profondeur et le pipeline DevSecOps. Le chapitre suivant expose la r\'ealisation logicielle concr\`ete et la validation exp\'erimentale du syst\`eme.
+\par Ce chapitre a pr\'esent\'e la formalisation compl\`ete des besoins, la mod\'elisation fonctionnelle UML, l'architecture d\'ecoupl\'ee en microservices (7 composants applicatifs et 13 conteneurs Docker), la conception relationnelle et en graphe de connaissances, la mod\'elisation formelle des menaces STRIDE, ainsi que la politique de d\'efense en profondeur et le pipeline DevSecOps. Le chapitre suivant expose la r\'ealisation logicielle concr\`ete et la validation exp\'erimentale du syst\`eme.

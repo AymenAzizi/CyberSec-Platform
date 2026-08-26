@@ -79,6 +79,7 @@ class ScanController extends Controller
             'config.custom_ports'  => ['nullable', 'string', 'max:255'],
             'config.excluded_paths' => ['nullable', 'string', 'max:5000'],
             'config.custom_flags'  => ['nullable', 'string', 'max:500'],
+            'config.target_app'    => ['nullable', 'string', Rule::in(['dvwa', 'sqli-labs', 'webgoat', 'bwapp'])],
         ]);
 
         $target = Target::with('project')->findOrFail($validated['target_id']);
@@ -108,6 +109,7 @@ class ScanController extends Controller
                 'custom_ports'   => $request->input('config.custom_ports'),
                 'excluded_paths' => $request->input('config.excluded_paths'),
                 'custom_flags'   => $request->input('config.custom_flags'),
+                'target_app'     => $request->input('config.target_app'),
             ],
         ]);
 
@@ -177,14 +179,16 @@ class ScanController extends Controller
     {
         $this->authorizeScan($scan);
 
-        $scan->load(['findings', 'project', 'target']);
+        $scan->load(['findings.remediationScripts', 'project', 'target']);
 
         return response()->json([
             'scan'     => $scan->only(['id', 'type', 'target_url', 'profile', 'status', 'started_at', 'completed_at']),
             'project'  => $scan->project?->only(['id', 'name', 'client_name']),
-            'findings' => $scan->findings->map(fn ($f) => $f->only([
-                'id', 'title', 'severity', 'cvss_score', 'cve_id', 'endpoint', 'source_tool', 'evidence', 'remediation',
-            ])),
+            'findings' => $scan->findings->map(fn ($f) => array_merge(
+                $f->only(['id', 'title', 'severity', 'cvss_score', 'cve_id', 'endpoint', 'source_tool', 'evidence', 'remediation']),
+                ['remediation_scripts' => $f->remediationScripts->map->only(['title', 'language', 'code', 'explanation', 'status'])],
+            )),
+            'ai_analysis' => $scan->config['ai_analysis'] ?? null,
         ], 200, ['Content-Disposition' => 'attachment; filename="scan-'.$scan->id.'.json"']);
     }
 

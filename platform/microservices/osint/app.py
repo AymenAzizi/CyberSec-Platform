@@ -222,14 +222,124 @@ def passive_endpoint() -> Any:
                 results[name] = future.result()
             except Exception as exc:  # noqa: BLE001
                 logger.warning("passive module %s failed: %s", name, exc)
-                results[name] = {"error": str(exc)}
+    findings = _normalize_osint_findings(domain, results)
 
     return jsonify({
+        "status": "completed",
         "target": domain,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "modules": list(tasks.keys()),
+        "findings": findings,
         "results": results,
     })
+
+
+def _normalize_osint_findings(domain: str, results: Dict[str, Any]) -> List[Dict[str, Any]]:
+    findings: List[Dict[str, Any]] = []
+
+    # 1. Tech Stack
+    tech = results.get("tech_stack") or {}
+    technologies = tech.get("technologies") or []
+    if technologies:
+        tech_list_str = ", ".join(technologies)
+        findings.append({
+            "title": f"Technologies Detected: {tech_list_str}",
+            "severity": "info",
+            "description": f"Passive fingerprinting identified software components on {domain}: {tech_list_str}.",
+            "evidence": json.dumps(tech.get("headers") or {}, indent=2)[:500],
+            "endpoint": tech.get("target") or f"https://{domain}",
+            "source_tool": "osint",
+            "cve_id": None,
+            "citations": [],
+        })
+
+        if any("wordpress" in str(t).lower() for t in technologies):
+            findings.append({
+                "title": "WordPress CMS Identified",
+                "severity": "low",
+                "description": f"Target {domain} is running WordPress CMS. REST API endpoints and plugins may be enumerated.",
+                "evidence": str(tech.get("headers", {}).get("Link", "WordPress REST API Header Detected")),
+                "endpoint": f"https://{domain}/wp-json/",
+                "source_tool": "osint",
+                "cve_id": None,
+                "citations": [],
+            })
+
+    # 2. SSL/TLS Configuration
+    ssl_data = results.get("ssl") or {}
+    if ssl_data and "cipher" in ssl_data and not ssl_data.get("error"):
+        cipher = ssl_data.get("cipher") or {}
+        tls_ver = ssl_data.get("tls_version") or "TLS"
+        findings.append({
+            "title": f"SSL/TLS Configuration: {tls_ver} ({cipher.get('name', 'Active')})",
+            "severity": "info",
+            "description": f"Host {domain} exposes HTTPS on port {ssl_data.get('port', 443)} with SHA-256 fingerprint {str(ssl_data.get('cert_sha256_fingerprint', ''))[:24]}...",
+            "evidence": f"Cipher: {cipher.get('name')} | Bits: {cipher.get('secret_bits')} | Protocol: {tls_ver}",
+            "endpoint": f"https://{domain}:{ssl_data.get('port', 443)}",
+            "source_tool": "osint",
+            "cve_id": None,
+            "citations": [],
+        })
+
+    # 3. DNS Infrastructure
+    dns_data = results.get("dns") or {}
+    records = dns_data.get("records") or {}
+    if records:
+        a_records = records.get("A", {}).get("values", [])
+        mx_records = records.get("MX", {}).get("values", [])
+        ns_records = records.get("NS", {}).get("values", [])
+        evidence_parts = []
+        if a_records:
+            evidence_parts.append(f"A: {', '.join(a_records)}")
+        if mx_records:
+            evidence_parts.append(f"MX: {', '.join(mx_records)}")
+        if ns_records:
+            evidence_parts.append(f"NS: {', '.join(ns_records)}")
+
+        findings.append({
+            "title": f"DNS Infrastructure & Records ({len(a_records)} IP, {len(mx_records)} MX)",
+            "severity": "info",
+            "description": f"DNS mapping for {domain}. Primary A records point to {', '.join(a_records)}.",
+            "evidence": " | ".join(evidence_parts),
+            "endpoint": a_records[0] if a_records else domain,
+            "source_tool": "osint",
+            "cve_id": None,
+            "citations": [],
+        })
+
+    # 4. WHOIS Registration
+    whois_data = results.get("whois") or {}
+    if whois_data and whois_data.get("registrar") and not whois_data.get("error"):
+        findings.append({
+            "title": f"WHOIS Registration: Registrar {whois_data.get('registrar')}",
+            "severity": "info",
+            "description": f"Domain {domain} registered with {whois_data.get('registrar')} since {whois_data.get('creation_date', 'N/A')}. Status: {whois_data.get('status', 'Active')}.",
+            "evidence": f"Registrar: {whois_data.get('registrar')} | Nameservers: {', '.join(whois_data.get('name_servers') or [])}",
+            "endpoint": domain,
+            "source_tool": "osint",
+            "cve_id": None,
+            "citations": [],
+        })
+
+    # 5. Discovered Subdomains
+    sub_data = results.get("subdomains") or {}
+    subdomains = sub_data.get("subdomains") or []
+    if isinstance(subdomains, list) and subdomains:
+        for sub in subdomains[:20]:
+            sub_name = sub if isinstance(sub, str) else sub.get("name", "")
+            if sub_name:
+                findings.append({
+                    "title": f"Passively Discovered Subdomain: {sub_name}",
+                    "severity": "info",
+                    "description": f"Certificate Transparency log reconnaissance identified active subdomain {sub_name}.",
+                    "evidence": f"crt.sh CT Log entry for {domain}",
+                    "endpoint": f"https://{sub_name}",
+                    "source_tool": "osint",
+                    "cve_id": None,
+                    "citations": [],
+                })
+
+    return findings
 
 
 @app.errorhandler(404)

@@ -1,0 +1,156 @@
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{R\'esum\'e}{iv}{chapter*.3}%
+\babel@toc {french}{}\relax 
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{Abstract}{v}{chapter*.4}%
+\babel@toc {english}{}\relax 
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{Liste des Abr\'eviations}{xiv}{chapter*.8}%
+\contentsline {chapter}{Introduction G\'en\'erale}{1}{chapter*.9}%
+\contentsline {chapter}{\numberline {1}Cadre G\'en\'eral du Projet}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Pr\'esentation de l'Organisme d'Accueil}{3}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Identit\'e et Domaines d'Activit\'e}{3}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Organigramme de l'Entreprise}{4}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Cadre Institutionnel du Stage}{5}{subsection.1.1.3}%
+\contentsline {section}{\numberline {1.2}Contexte Industriel et Motivations}{5}{section.1.2}%
+\contentsline {section}{\numberline {1.3}\'Etude de l'Existant et Analyse Critique}{5}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Proc\'edure d'Audit Traditionnelle}{5}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Limites de la D\'emarche Traditionnelle}{6}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Comparatif des Solutions Existantes sur le March\'e}{6}{subsection.1.3.3}%
+\contentsline {section}{\numberline {1.4}Probl\'ematique}{7}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Solution Propos\'ee}{7}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Objectifs du Projet}{7}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Objectif G\'en\'eral}{7}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Objectifs Sp\'ecifiques}{8}{subsection.1.6.2}%
+\contentsline {section}{\numberline {1.7}P\'erim\`etre du Projet (Scope)}{8}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}P\'erim\`etre Inclus}{8}{subsection.1.7.1}%
+\contentsline {subsection}{\numberline {1.7.2}P\'erim\`etre Exclu (par conception)}{9}{subsection.1.7.2}%
+\contentsline {section}{\numberline {1.8}M\'ethodologie de Travail et Conduite du Projet}{9}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}Justification de la D\'emarche Agile}{9}{subsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.8.2}Le Cadre M\'ethodologique Scrum}{9}{subsection.1.8.2}%
+\contentsline {subsubsection}{\numberline {1.8.2.1}Description des R\^oles Scrum}{9}{subsubsection.1.8.2.1}%
+\contentsline {subsubsection}{\numberline {1.8.2.2}Art\'efacts et C\'er\'emonies Scrum}{9}{subsubsection.1.8.2.2}%
+\contentsline {subsection}{\numberline {1.8.3}Planification des Sprints et Calendrier Global}{10}{subsection.1.8.3}%
+\contentsline {chapter}{\numberline {2}\'Etat de l'Art et \'Etude Comparative}{11}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Fondements de la Cybers\'ecurit\'e}{11}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}D\'efinition et Enjeux Contemporains}{11}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Piliers Fondamentaux de la S\'ecurit\'e}{11}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Le R\'ef\'erentiel OWASP Top 10}{12}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Gestion Continue de la Surface d'Attaque (ASM)}{14}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}D\'efinition et Principes}{14}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Cycle de Vie du Processus ASM}{14}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Reconnaissance et Outils d'Audit de S\'ecurit\'e}{15}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}R\^ole et Typologie de la Reconnaissance}{15}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Outils d'Audit Int\'egr\'es dans la Plateforme}{15}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}DevSecOps et S\'ecurit\'e de la Cha\^ine Logicielle}{16}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Origine et Philosophie Shift-Left}{16}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}S\'ecurit\'e de la Cha\^ine d'Approvisionnement Logicielle (Software Supply Chain)}{16}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Intelligence Artificielle Locale et Grands Mod\`eles de Langage (LLM)}{17}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Apport des LLM dans l'Audit de S\'ecurit\'e}{17}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Imp\'eratif de Confidentialit\'e et Mod\`eles Contraints}{17}{subsection.2.6.2}%
+\contentsline {section}{\numberline {2.7}Architectures Microservices et Syst\`emes \'Ev\'enementiels}{18}{section.2.7}%
+\contentsline {section}{\numberline {2.8}\'Etude Comparative et Justification des Choix Technologiques}{18}{section.2.8}%
+\contentsline {subsection}{\numberline {2.8.1}Comparatif des Frameworks Backend Web}{19}{subsection.2.8.1}%
+\contentsline {subsection}{\numberline {2.8.2}Comparatif des Frameworks de Microservices Python}{19}{subsection.2.8.2}%
+\contentsline {subsection}{\numberline {2.8.3}Comparatif des Moteurs d'IA Locale (LLM)}{20}{subsection.2.8.3}%
+\contentsline {subsection}{\numberline {2.8.4}Comparatif de la Base de Donn\'ees et du Moteur de Graphe}{20}{subsection.2.8.4}%
+\contentsline {subsection}{\numberline {2.8.5}Comparatif du Message Broker pour Traitement Asynchrone}{21}{subsection.2.8.5}%
+\contentsline {subsection}{\numberline {2.8.6}Synth\`ese Globale des Choix Technologiques}{21}{subsection.2.8.6}%
+\contentsline {chapter}{\numberline {3}Analyse des Besoins et Conception du Syst\`eme}{22}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Analyse des Besoins}{22}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Identification des Acteurs}{22}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Besoins Fonctionnels}{23}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Besoins Non Fonctionnels}{24}{subsection.3.1.3}%
+\contentsline {subsection}{\numberline {3.1.4}Contraintes et Exigences de S\'ecurit\'e}{24}{subsection.3.1.4}%
+\contentsline {subsection}{\numberline {3.1.5}Contraintes L\'egales et Preuve d'Autorisation (Proof of Authorization -- PoA)}{24}{subsection.3.1.5}%
+\contentsline {section}{\numberline {3.2}Mod\'elisation Fonctionnelle UML}{24}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Diagramme Global des Cas d'Utilisation}{24}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Cas d'Utilisation de l'Analyste de S\'ecurit\'e}{24}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Cas d'Utilisation de l'Administrateur Syst\`eme}{25}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Description Textuelle D\'etaill\'ee des Cas d'Utilisation Cl\'es}{25}{subsection.3.2.4}%
+\contentsline {section}{\numberline {3.3}Architecture Globale du Syst\`eme}{32}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Vue d'Ensemble du Syst\`eme}{32}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Composants Applicatifs M\'etier (7 Composants Logiques)}{32}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Conteneurs d'Infrastructure Docker (12 Services Conteneuris\'es)}{33}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Communication Inter-Services et Flux Asynchrone}{35}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Communication Synchrone REST vs Asynchrone par \'Ev\'enements}{35}{subsection.3.3.5}%
+\contentsline {section}{\numberline {3.4}Conception des Donn\'ees et Dynamique du Syst\`eme}{35}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Mod\`ele Entit\'e-Association (ERD)}{35}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Diagramme de Classes du Mod\`ele de Donn\'ees}{35}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Mod\`ele du Graphe de Connaissances et Projection Apache AGE}{35}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Diagrammes de S\'equence du Syst\`eme}{36}{subsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.4.1}Orchestration Asynchrone d'un Scan}{36}{subsubsection.3.4.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.4.2}G\'en\'eration de Remediation-as-Code Assist\'ee par IA}{36}{subsubsection.3.4.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.4.3}Consultation du Graphe et Propagation du Rayon d'Impact}{37}{subsubsection.3.4.4.3}%
+\contentsline {subsection}{\numberline {3.4.5}Machine \`a \'Etats d'un Scan}{38}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.6}Diagramme de Flux de Donn\'ees (DFD)}{39}{subsection.3.4.6}%
+\contentsline {section}{\numberline {3.5}Architecture de S\'ecurit\'e Multicouche}{39}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Mod\'elisation Formelle des Menaces (Threat Modeling STRIDE)}{39}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}M\'ethodologie et Fronti\`eres de Confiance}{39}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Matrice des Menaces STRIDE et Contre-Mesures Appliqu\'ees}{40}{subsection.3.6.2}%
+\contentsline {section}{\numberline {3.7}Architecture DevSecOps D\'etaill\'ee}{40}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}Pipeline CI/CD sous GitHub Actions}{40}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}Description des Portes de S\'ecurit\'e (Security Gates)}{40}{subsection.3.7.2}%
+\contentsline {chapter}{\numberline {4}R\'ealisation et Validation Exp\'erimentale}{42}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Environnement de D\'eveloppement et Outillage}{42}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Impl\'ementation du Back-end Applicatif (Laravel 11)}{43}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Architecture Interne en Couches du Back-end}{43}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Authentification, RBAC et Middlewares de S\'ecurit\'e}{43}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Orchestration Asynchrone des Scans (Jobs \& Queues)}{44}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}Impl\'ementation des Microservices Python Flask}{44}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Microservice de Reconnaissance (Port 5000)}{44}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Microservice de S\'ecurit\'e Offensive et Bac \`a Sable (Port 5001)}{44}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Microservice OSINT (Port 5002)}{44}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Microservice d'IA Contrainte (Port 5003)}{45}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Architecture du Framework de Scanners (\texttt {BaseScannerService})}{45}{subsection.4.3.5}%
+\contentsline {subsection}{\numberline {4.3.6}Pipeline de Normalisation des Donn\'ees (\texttt {ResultParser})}{46}{subsection.4.3.6}%
+\contentsline {section}{\numberline {4.4}Sp\'ecification et Conception de l'API RESTful}{46}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Exemple de Requ\^ete et R\'eponse JSON Normalis\'ee}{47}{subsection.4.4.1}%
+\contentsline {section}{\numberline {4.5}Interfaces Utilisateurs de la Plateforme}{47}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Authentification et Enregistrement S\'ecuris\'e}{47}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Tableau de Bord Principal (Dashboard ASM)}{48}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Gestion des Projets et Cibles d'Audit}{49}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Lancement et Suivi des Scans de Reconnaissance}{50}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4.5.5}Restitution des R\'esultats et Preuves Brutes}{52}{subsection.4.5.5}%
+\contentsline {subsection}{\numberline {4.5.6}Fiche de Constat et Remediation-as-Code Assist\'ee par IA}{53}{subsection.4.5.6}%
+\contentsline {subsection}{\numberline {4.5.7}Visualisation Interactive du Graphe de Connaissances}{53}{subsection.4.5.7}%
+\contentsline {subsection}{\numberline {4.5.8}Module de Renseignement Passif (OSINT)}{54}{subsection.4.5.8}%
+\contentsline {subsection}{\numberline {4.5.9}Gestionnaire du Bac \`a Sable (Sandbox Isol\'ee)}{55}{subsection.4.5.9}%
+\contentsline {subsection}{\numberline {4.5.10}Alertes de S\'ecurit\'e et Surveillance Continue}{56}{subsection.4.5.10}%
+\contentsline {subsection}{\numberline {4.5.11}Co-pilote Conversationnel de S\'ecurit\'e (AI Assistant)}{57}{subsection.4.5.11}%
+\contentsline {subsection}{\numberline {4.5.12}Administration des Utilisateurs et R\^oles RBAC}{57}{subsection.4.5.12}%
+\contentsline {subsection}{\numberline {4.5.13}Journalisation d'Audit Immuable (Audit Logs)}{57}{subsection.4.5.13}%
+\contentsline {subsection}{\numberline {4.5.14}Surveillance de la Sant\'e des Microservices (System Health)}{58}{subsection.4.5.14}%
+\contentsline {subsection}{\numberline {4.5.15}G\'en\'eration et Consultation des Rapports d'Expertise}{59}{subsection.4.5.15}%
+\contentsline {section}{\numberline {4.6}Conception et Impl\'ementation Avanc\'ee du Graphe de Connais\-sances}{60}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Mod\`ele de Donn\'ees en Graphe (N\oe uds et Ar\^etes)}{60}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Pipeline de Construction et Requ\^etage openCypher}{60}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Algorithme de Calcul du Rayon d'Impact (Blast Radius)}{61}{subsection.4.6.3}%
+\contentsline {section}{\numberline {4.7}Moteur d'Intelligence Artificielle Contrainte et Re\-me\-diation-as-Code}{62}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Pipeline de Traitement IA}{62}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Sch\'ema de Sortie Strict et R\'eduction des Hallucinations}{62}{subsection.4.7.2}%
+\contentsline {section}{\numberline {4.8}D\'eploiement en Production et Durcissement VPS}{63}{section.4.8}%
+\contentsline {section}{\numberline {4.9}Ex\'ecution du Pipeline DevSecOps}{63}{section.4.9}%
+\contentsline {section}{\numberline {4.10}Difficult\'es Rencontr\'ees et Solutions Apport\'ees}{63}{section.4.10}%
+\contentsline {subsection}{\numberline {4.10.1}Difficult\'e 1 : Int\'egration et Compatibilit\'e d'Apache AGE avec PostgreSQL 16}{64}{subsection.4.10.1}%
+\contentsline {subsection}{\numberline {4.10.2}Difficult\'e 2 : Optimisation de la Latence du LLM Local et \'Elimination des Hallucinations}{64}{subsection.4.10.2}%
+\contentsline {subsection}{\numberline {4.10.3}Difficult\'e 3 : Isolation Herm\'etique du Bac \`a Sable (Docker Socket Proxy)}{64}{subsection.4.10.3}%
+\contentsline {subsection}{\numberline {4.10.4}Difficult\'e 4 : Normalisation H\'et\'erog\`ene des Sorties Scanners}{64}{subsection.4.10.4}%
+\contentsline {subsection}{\numberline {4.10.5}Difficult\'e 5 : Gestion de la Concurrence et R\'esilience des Workers Redis Streams}{65}{subsection.4.10.5}%
+\contentsline {section}{\numberline {4.11}Matrice de Tra\c {c}abilit\'e des Exigences (RTM)}{65}{section.4.11}%
+\contentsline {section}{\numberline {4.12}Protocole Exp\'erimental et R\'esultats des Tests}{65}{section.4.12}%
+\contentsline {subsection}{\numberline {4.12.1}Protocole Exp\'erimental}{65}{subsection.4.12.1}%
+\contentsline {subsection}{\numberline {4.12.2}Synth\`ese des Tests Automatis\'es (140/140 Tests)}{66}{subsection.4.12.2}%
+\contentsline {subsection}{\numberline {4.12.3}D\'etail des Cas de Tests Repr\'esentatifs}{66}{subsection.4.12.3}%
+\contentsline {section}{\numberline {4.13}\'Evaluation des Performances sous Charge (Locust)}{67}{section.4.13}%
+\contentsline {subsection}{\numberline {4.13.1}Conditions du Benchmark et M\'etriques Recueillies}{67}{subsection.4.13.1}%
+\contentsline {subsection}{\numberline {4.13.2}Analyse Approfondie des \'Ecarts de Latence}{67}{subsection.4.13.2}%
+\contentsline {section}{\numberline {4.14}Conformit\'e au Cahier des Charges (CDC)}{67}{section.4.14}%
+\contentsline {section}{\numberline {4.15}Discussion Approfondie des R\'esultats}{68}{section.4.15}%
+\contentsline {section}{\numberline {4.16}Limites du Syst\`eme}{69}{section.4.16}%
+\contentsline {chapter}{Conclusion G\'en\'erale et Perspectives}{70}{chapter*.80}%
+\contentsline {chapter}{Annexe A : Catalogue de l'API RESTful}{72}{chapter*.81}%
+\contentsline {chapter}{Annexe B : Art\'efacts DevSecOps}{73}{chapter*.83}%
+\contentsline {chapter}{Annexe C : Nginx et Requ\^etes openCypher}{76}{chapter*.84}%
+\contentsline {chapter}{Bibliographie et Webographie}{78}{chapter*.85}%

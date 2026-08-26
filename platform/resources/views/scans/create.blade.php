@@ -95,6 +95,39 @@
             @error('type')<p class="text-xs text-red-400 mt-1">{{ $message }}</p>@enderror
         </div>
 
+        {{-- Sandbox App Selection (Visible only when sandbox type is chosen) --}}
+        <div id="sandbox-app-section" class="card p-6 space-y-4 hidden border-primary/40 bg-primary/5">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-rounded text-cyan-400">deployed_code</span>
+                <h2 class="font-display text-lg text-white">Target Vulnerable Application (Sandbox Container)</h2>
+            </div>
+            <p class="text-xs text-gray-400">
+                Sandbox scans are executed in isolated Docker containers via the docker-socket-proxy. Select the target application image to instantiate:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                @php
+                    $sandboxApps = [
+                        'dvwa' => ['name' => 'DVWA', 'desc' => 'Damn Vulnerable Web App (SQLi, XSS, CMDi, CSRF)', 'tag' => 'vulnerables/web-dvwa'],
+                        'sqli-labs' => ['name' => 'SQLi-Labs', 'desc' => 'Comprehensive SQL injection practice suite', 'tag' => 'acgpiano/sqli-labs'],
+                        'webgoat' => ['name' => 'WebGoat', 'desc' => 'OWASP WebGoat vulnerable benchmark', 'tag' => 'webgoat/goatandwolf'],
+                        'bwapp' => ['name' => 'bWAPP', 'desc' => 'buggy Web Application (100+ vulnerabilities)', 'tag' => 'raesene/bwapp'],
+                    ];
+                @endphp
+                @foreach ($sandboxApps as $appKey => $app)
+                    <label class="relative">
+                        <input type="radio" name="config[target_app]" value="{{ $appKey }}"
+                               class="peer absolute opacity-0"
+                               @checked(old('config.target_app', 'dvwa') === $appKey)>
+                        <div class="card !rounded-lg p-3 cursor-pointer hover:border-primary/40 peer-checked:border-primary peer-checked:bg-primary/20 transition-all h-full">
+                            <div class="text-sm font-semibold text-white">{{ $app['name'] }}</div>
+                            <div class="text-[11px] text-gray-400 mt-1">{{ $app['desc'] }}</div>
+                            <div class="text-[10px] font-mono text-cyan-400 mt-2">{{ $app['tag'] }}</div>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
         {{-- Profiles --}}
         <div class="card p-6 space-y-4">
             <h2 class="font-display text-lg text-white">Profile</h2>
@@ -228,7 +261,15 @@
         if (confirmBox) confirmBox.classList.toggle('hidden', !aggressive);
     }
     document.querySelectorAll('input[name="profile"]').forEach((r) => r.addEventListener('change', syncAggressive));
-    syncAggressive();
+    // Sandbox application toggle
+    function syncSandbox() {
+        const typeInput = document.querySelector('input[name="type"]:checked');
+        const isSandbox = typeInput && typeInput.value.startsWith('sandbox_');
+        const sandboxBox = document.getElementById('sandbox-app-section');
+        if (sandboxBox) sandboxBox.classList.toggle('hidden', !isSandbox);
+    }
+    document.querySelectorAll('input[name="type"]').forEach((r) => r.addEventListener('change', syncSandbox));
+    syncSandbox();
 
     if (scanForm) {
         scanForm.addEventListener('submit', (e) => {

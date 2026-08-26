@@ -22,15 +22,17 @@
 \begin{itemize}
     \item \textbf{A01:2021 -- Rupture du Contr\^ole d'Acc\`es (Broken Access Control) :} D\'efaillances dans l'application des restrictions d'acc\`es permettant \`a des utilisateurs non privil\'egi\'es d'acc\'eder \`a des ressources prot\'eg\'ees ou d'alt\'erer des enregistrements appartenant \`a des tiers (failles IDOR, contournement de contr\^ole RBAC).
     \item \textbf{A02:2021 -- D\'efaillances Cryptographiques (Cryptographic Failures) :} Utilisation d'algorithmes obsol\`etes (MD5, SHA1), absence de chiffrement des donn\'ees sensibles ou transmission non s\'ecuris\'ee en clair sur le r\'eseau.
-    \item \textbf{A03:2021 -- Injections (Injection) :} D\'efaut de neutralisation des donn\'ees fournies par l'utilisateur, permettant d'ex\'ecuter des instructions arbitraires dans un interpr\'eteur (injections SQL, injection de commandes syst\`eme, Cross-Site Scripting).
+    \item \textbf{A03:2021 -- Injections (Injection) :} D\'efaut de neutralisation des donn\'ees fournies par l'utilisateur, permettant d'ex\'ecuter des instructions arbitraires dans un interpr\'eteur (injections SQL, injections de commandes syst\`eme, Cross-Site Scripting).
     \item \textbf{A04:2021 -- Conception Non S\'ecuris\'ee (Insecure Design) :} Faiblesses architecturales r\'esultant de l'absence de mod\'elisation des menaces et d'application des principes de conception s\'ecuris\'ee d\`es l'amont du projet.
-    \item \textbf{A05:2021 -- Mauvaise Configuration de S\'ecurit\'e (Security Misconfiguration) :} Services ou ports superflus activ\'es, messages d'erreurs verbeux r\'ev\'elant des traces de pile, identifiants par d\'efaut non modifi\'es ou absence d'en-t\^etes de s\'ecurit\'e (HSTS, CSP).
+    \item \textbf{A05:2021 -- Mauvaise Configuration de S\'ecurit\'e (Security Misconfiguration) :} Services ou ports superflus activ\'es, messages d'erreur verbeux r\'ev\'elant des traces de pile, identifiants par d\'efaut non modifi\'es ou absence d'en-t\^etes de s\'ecurit\'e (HSTS, CSP).
     \item \textbf{A06:2021 -- Composants Vuln\'erables et Obsol\`etes :} Utilisation de biblioth\`eques, d\'ependances logicielles ou modules tiers contenant des failles document\'ees dans les bases de vuln\'erabilit\'es publiques (CVEs).
     \item \textbf{A07:2021 -- D\'efaillances d'Identification et d'Authentification :} Vuln\'erabilit\'es facilitant le bourrage d'identifiants (\textit{credential stuffing}), l'\'enum\'eration de comptes ou le d\'etournement de session.
     \item \textbf{A08:2021 -- Manque d'Int\'egrit\'e des Donn\'ees et du Logiciel :} Risques li\'es \`a la d\'es\'erialisation d'objets non s\'ecuris\'ee ou \`a l'inclusion de composants logiciels non v\'erifi\'es dans les cha\^ines CI/CD.
     \item \textbf{A09:2021 -- D\'efaillances de Journalisation et de Surveillance :} Absence ou insuffisance de journaux d'audit, retardant la d\'etection des intrusions et rendant impossibles les investigations m\'edico-l\'egales.
     \item \textbf{A10:2021 -- Falsification de Requ\^ete C\^ot\'e Serveur (SSRF) :} Vuln\'erabilit\'e permettant \`a un attaquant d'inciter l'application c\^ot\'e serveur \`a \'emettre une requ\^ete HTTP/TCP vers une ressource interne non expos\'ee.
 \end{itemize}
+
+\par La figure~\ref{fig:owasp_heat} positionne ces dix cat\'egories de risques selon leur niveau d'exploitabilit\'e et de d\'etectabilit\'e.
 
 \begin{figure}[H]
 \centering
@@ -63,7 +65,7 @@
 \par La surface d'attaque d'une organisation repr\'esente l'ensemble cumul\'e des points d'entr\'ee et vecteurs d'exposition par lesquels un attaquant potentiel peut tenter d'infiltrer un r\'eseau, de corrompre un syst\`eme ou d'exfiltrer des donn\'ees. L'\textit{Attack Surface Management} (ASM) est la discipline d'ing\'enierie consistant \`a identifier, cartographier, analyser et r\'eduire en continu cette surface d'exposition num\'erique externe.
 
 \subsection{Cycle de Vie du Processus ASM}
-\par Une d\'emarche ASM mature s'organise selon un cycle it\'eratif structur\'e en six phases interd\'ependantes :
+\par Une d\'emarche ASM mature s'organise selon un cycle it\'eratif structur\'e en six phases interd\'ependantes, illustr\'e sur la figure~\ref{fig:asm_flow} :
 \begin{enumerate}
     \item \textbf{D\'ecouverte (Discovery) :} Recherche et d\'etection exhaustive de tous les actifs expos\'es sur Internet associ\'es \`a l'organisation (domaines, sous-domaines, plages IP, services Cloud, certificats).
     \item \textbf{Inventaire (Inventory) :} Structuration et centralisation des donn\'ees d'actifs au sein d'un r\'ef\'erentiel d'inventaire unifi\'e.
@@ -102,7 +104,7 @@
 \section{DevSecOps et S\'ecurit\'e de la Cha\^ine Logicielle}
 \subsection{Origine et Philosophie Shift-Left}
 \par Le mod\`ele traditionnel de d\'eveloppement logiciel r\'eservait les contr\^oles de s\'ecurit\'e \`a la fin du cycle de livraison, juste avant le passage en production. Cette approche tardive engendrait des goulots d'\'etranglement op\'erationnels majeurs : la correction d'une faille architecturale ou d'une d\'ependance vuln\'erable d\'ecouverte tardivement entra\^inant des co\^uts prohibitifs et des retards de d\'eploiement importants.
-\par Le paradigme \textbf{DevSecOps}~\cite{devsecops} propose de fusionner le d\'eveloppement (\textit{Dev}), la s\'ecurit\'e (\textit{Sec}) et les op\'erations (\textit{Ops}) en int\'egrant des contr\^oles automatis\'es \`a chaque \'etape du cycle de vie logiciel. Cette philosophie, qualifi\'ee de \textbf{\textit{Shift-Left Security}}, consiste \`a d\'eplacer les v\'erifications de s\'ecurit\'e le plus t\^ot possible dans la cha\^ine de fabrication logicielle, permettant aux d\'eveloppeurs d'identifier et de corriger les vuln\'erabilit\'es d\`es la phase d'\'ecriture du code source.
+\par Le paradigme \textbf{DevSecOps}~\cite{devsecops} propose de fusionner le d\'eveloppement (\textit{Dev}), la s\'ecurit\'e (\textit{Sec}) et les op\'erations (\textit{Ops}) en int\'egrant des contr\^oles automatis\'es \`a chaque \'etape du cycle de vie logiciel, comme l'illustre la figure~\ref{fig:devsecops_cycle}. Cette philosophie, qualifi\'ee de \textbf{\textit{Shift-Left Security}}, consiste \`a d\'eplacer les v\'erifications de s\'ecurit\'e le plus t\^ot possible dans la cha\^ine de fabrication logicielle, permettant aux d\'eveloppeurs d'identifier et de corriger les vuln\'erabilit\'es d\`es la phase d'\'ecriture du code source.
 
 \begin{figure}[H]
 \centering
@@ -155,7 +157,7 @@
 
 \subsection{Imp\'eratif de Confidentialit\'e et Mod\`eles Contraints}
 \par Le recours \`a des API d'IA h\'eberg\'ees dans le Cloud public (telles qu'OpenAI ou Anthropic) soul\`eve des probl\`emes majeurs de confidentialit\'e industrielle : les vuln\'erabilit\'es critiques d'infrastructures sensibles et les adresses IP d'actifs audit\'es seraient transmises \`a des serveurs tiers.
-\par Pour r\'esoudre ce d\'efi, nous avons fait le choix strat\'egique d'un moteur d'inf\'erence local (\textbf{Ollama}) h\'ebergeant le mod\`ele \textbf{\texttt{qwen2.5-coder}}. Cette approche contribue \`a pr\'eserver la confidentialit\'e des donn\'ees en \'evitant leur transmission \`a un fournisseur externe de LLM. De plus, le microservice contribue \`a r\'eduire le risque d'hallucination inh\'erent aux mod\`eles g\'en\'eratifs en imposant un gabarit de prompt syst\`eme (\textit{system prompt}) contraignant la sortie \`a un format JSON strict et exigeant des r\'ef\'erences explicites aux num\'eros de lignes des journaux bruts d'audit.
+\par Pour r\'esoudre ce d\'efi, nous avons fait le choix strat\'egique d'un moteur d'inf\'erence local (\textbf{Ollama}) h\'ebergeant le mod\`ele \textbf{\texttt{qwen2.5-coder}}. Cette approche contribue \`a pr\'eserver la confidentialit\'e des donn\'ees en \'evitant leur transmission \`a un fournisseur externe de LLM. De plus, le microservice contribue \`a r\'eduire le risque d'hallucination inh\'erent aux mod\`eles g\'en\'eratifs en imposant un gabarit de prompt syst\`eme (\textit{system prompt}) contraignant la sortie \`a un format JSON strict et exigeant des r\'ef\'erences explicites aux num\'eros de lignes des journaux bruts d'audit (figure~\ref{fig:ai_pipeline}).
 
 \begin{figure}[H]
 \centering
@@ -183,7 +185,7 @@
 
 \section{Architectures Microservices et Syst\`emes \'Ev\'enementiels}
 \par L'architecture microservices d\'ecompose une application complexe en un ensemble de services autonomes, ind\'ependamment d\'eployables et hautement sp\'ecialis\'es, communiquant via des protocoles r\'eseau l\'egers.
-\par Pour une plateforme d'audit o\`u les t\^aches de balayage (scans Nmap, Gobuster) peuvent durer de plusieurs secondes \`a plusieurs dizaines de minutes, une architecture purement synchrone HTTP conduirait in\'evitablement \`a des blocages de requ\^etes (\textit{timeouts}). L'adoption d'un mod\`ele asynchrone pilot\'e par \'ev\'enements via \textbf{Redis Streams} permet de d\'ecoupler le portail web de l'ex\'ecution des scanners : les requ\^etes d'audit sont ins\'er\'ees dans un flux persistant, puis consomm\'ees par des processus d\'edi\'es (\textit{workers}) capables de g\'erer les r\'eessais automatiques avec repli exponentiel.
+\par Pour une plateforme d'audit o\`u les t\^aches de balayage (scans Nmap, Gobuster) peuvent durer de plusieurs secondes \`a plusieurs dizaines de minutes, une architecture purement synchrone HTTP conduirait in\'evitablement \`a des blocages de requ\^etes (\textit{timeouts}). L'adoption d'un mod\`ele asynchrone pilot\'e par \'ev\'enements via \textbf{Redis Streams} permet de d\'ecoupler le portail web de l'ex\'ecution des scanners (figure~\ref{fig:microservices_pattern}) : les requ\^etes d'audit sont ins\'er\'ees dans un flux persistant, puis consomm\'ees par des processus d\'edi\'es (\textit{workers}) capables de g\'erer les r\'eessais automatiques avec repli exponentiel.
 
 \begin{figure}[H]
 \centering
@@ -215,6 +217,8 @@
 \par Afin de garantir la robustesse et la p\'erennit\'e du syst\`eme, nous avons men\'e des \'etudes comparatives syst\'ematiques sur chaque brique technologique.
 
 \subsection{Comparatif des Frameworks Backend Web}
+\par Le tableau~\ref{tab:comp_backend} synth\'etise l'analyse comparative des principaux frameworks web du march\'e.
+
 \begin{table}[H]
 \centering
 \caption{Analyse Comparative des Frameworks Web Backend}
@@ -240,9 +244,11 @@ Expertise Organisme & \'Elev\'ee (Designet Web) & Mod\'er\'ee & Faible & Mod\'er
 \hline
 \end{tabular}}%
 \end{table}
-\par \textbf{Justification du Choix de Laravel 11 :} Laravel 11 a \'et\'e retenu car il offre une gestion native et \'eprouv\'ee de l'authentification et du contr\^ole d'acc\`es RBAC via Spatie Permission, un ORM Eloquent permettant de manipuler de fa\c{c}on expressive les 14 tables du mod\`ele, et une int\'egration directe des files de messages Redis. Enfin, ce choix capitalise sur l'expertise forte de Designet Web Agency, garantissant la maintenabilit\'e \`a long terme.
+\par \textbf{Justification du Choix de Laravel 11 :} Laravel 11 a \'et\'e retenu car il offre une gestion native et \'eprouv\'ee de l'authentification et du contr\^ole d'acc\`es RBAC via Spatie Permission, un ORM Eloquent permettant de manipuler de fa\c{c}on expressive les 14 entit\'es m\'etier du mod\`ele (25 tables physiques au total), et une int\'egration directe des files de messages Redis. Enfin, ce choix capitalise sur l'expertise forte de Designet Web Agency, garantissant la maintenabilit\'e \`a long terme.
 
 \subsection{Comparatif des Frameworks de Microservices Python}
+\par Le tableau~\ref{tab:comp_micro} d\'etaille l'\'etude comparative des frameworks l\'egers pour le d\'eveloppement des microservices.
+
 \begin{table}[H]
 \centering
 \caption{Analyse Comparative des Frameworks de Microservices}
@@ -267,6 +273,8 @@ Courbe d'apprentissage & Tr\`es faible & Mod\'er\'ee & \'Elev\'ee & \'Elev\'ee \
 \par \textbf{Justification du Choix de Flask :} Flask a \'et\'e s\'electionn\'e pour sa l\'eg\`eret\'e, sa stabilit\'e et son contr\^ole absolu sur les processus syst\`eme (\texttt{subprocess.Popen}) encapsulant Nmap, Nuclei et Gobuster. L'ex\'ecution d'outils CLI lourds s'accommode id\'ealement du mod\`ele synchrone ma\^itris\'e de Flask au sein de conteneurs d\'edi\'es.
 
 \subsection{Comparatif des Moteurs d'IA Locale (LLM)}
+\par Le tableau~\ref{tab:comp_ai} pr\'esente la comparaison des moteurs d'inf\'erence locale h\'ebergeant des mod\`eles de langage.
+
 \begin{table}[H]
 \centering
 \caption{Analyse Comparative des Moteurs d'IA Locale}
@@ -291,6 +299,8 @@ Gestion des mod\`eles & Int\'egr\'ee (\texttt{pull}, \texttt{run}) & Manuelle & 
 \par \textbf{Justification du Choix d'Ollama et de Qwen2.5-Coder :} Ollama s'int\`egre parfaitement dans un environnement Docker Compose en mode conteneuris\'e sans interface graphique. Le mod\`ele \texttt{qwen2.5-coder} offre un ratio performances/taille optimal pour la production de code syst\`eme (Bash, Ansible, Dockerfile) et respecte fid\`element les structures JSON impos\'ees.
 
 \subsection{Comparatif de la Base de Donn\'ees et du Moteur de Graphe}
+\par Le tableau~\ref{tab:comp_db} compare les architectures de persistance de donn\'ees et de mod\'elisation de graphe.
+
 \begin{table}[H]
 \centering
 \caption{Analyse Comparative des Solutions de Base de Donn\'ees et Graphes}
@@ -315,6 +325,8 @@ Empreinte m\'emoire & R\'eduite (une seule instance DB) & \'Elev\'ee (JVM Neo4j 
 \par \textbf{Justification du Choix de PostgreSQL 16 avec Apache AGE :} L'extension Apache AGE permet de manipuler des requ\^etes relationnelles SQL et des graphes openCypher au sein d'une seule et m\^eme instance PostgreSQL. Cette architecture \'evite la redondance et la surcharge m\'emoire li\'ees au d\'eploiement d'un moteur de graphe d\'edi\'e sous JVM (comme Neo4j).
 
 \subsection{Comparatif du Message Broker pour Traitement Asynchrone}
+\par Le tableau~\ref{tab:comp_broker} pr\'esente le comparatif des solutions de messagerie et de files d'attente asynchrones.
+
 \begin{table}[H]
 \centering
 \caption{Analyse Comparative des Syst\`emes de Message Broker}
@@ -352,7 +364,7 @@ Usage multifonction & Broker + Cache + Sessions & Broker uniquement & Streaming 
 \hline
 Portail Web Backend & Laravel 11 (PHP 8.3) & ORM Eloquent expressif, RBAC Spatie, queues Redis natives. \\
 \hline
-Microservices d'Audit & Flask 3.1 (Python 3.12) & L\'eg\`erement conteneuris\'e, contr\^ole absolu sur les sous-processus CLI. \\
+Microservices d'Audit & Flask 3.1 (Python 3.12) & Empreinte m\'emoire tr\`es l\'eg\`ere, conteneurisation isol\'ee, contr\^ole absolu sur les sous-processus CLI. \\
 \hline
 Base de Donn\'ees & PostgreSQL 16 + Apache AGE & Instance unifi\'ee supportant \`a la fois SQL relationnel et graphe openCypher. \\
 \hline

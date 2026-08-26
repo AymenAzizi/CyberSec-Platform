@@ -1,6 +1,6 @@
 \chapter*{Annexe A : Catalogue de l'API RESTful}
 \addcontentsline{toc}{chapter}{Annexe A : Catalogue de l'API RESTful}
-\markboth{Annexe A : Sp\'ecifications de l'API RESTful}{Annexe A : Sp\'ecifications de l'API RESTful}
+\markboth{Annexe A : Catalogue de l'API RESTful}{Annexe A : Catalogue de l'API RESTful}
 
 \par Cette premi\`ere annexe d\'etaille le catalogue exhaustif des points d'entr\'ee de l'API RESTful expos\'es par la plateforme, avec leurs param\`etres de filtrage et les formats de r\'eponse normalis\'es.
 
@@ -19,7 +19,7 @@
 \hline
 \texttt{/api/v1/projects} & POST & \texttt{name}, \texttt{targets[]}, \texttt{poa\_file} & Cr\'eation de projet avec validation de mandat PoA & 201 \\
 \hline
-\texttt{/api/v1/scans} & POST & \texttt{project\_id}, \texttt{type}, \texttt{profile} & Enfilement asynchrone Redis Streams d'un scan & 202 \\
+\texttt{/api/v1/scans} & POST & \texttt{project\_id}, \texttt{type}, \texttt{profile} & Mise en file d'attente asynchrone (Redis Streams) d'un scan & 202 \\
 \hline
 \texttt{/api/v1/scans/\{id\}} & GET & \texttt{id} & R\'ecup\'eration de l'\'etat et des r\'esultats du scan & 200 \\
 \hline
