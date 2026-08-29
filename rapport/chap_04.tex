@@ -383,6 +383,30 @@ Cha\^ine DevSecOps & Psalm, Bandit, Trivy, Syft, Cosign & Psalm 5.24, Bandit 1.7
     \label{fig:report_view}
 \end{figure}
 
+\subsection{Interfaces Sp\'ecifiques des R\^oles Client et Auditeur}
+\par Afin de mat\'erialiser la stricte s\'eparation des privil\`eges RBAC mise en avant par le mod\`ele de conception, la plateforme fournit des interfaces d\'edi\'ees et restreintes pour le \textbf{Client} (figure~\ref{fig:client_view}) et l'\textbf{Auditeur de Conformit\'e} (figure~\ref{fig:auditor_view}) :
+\begin{itemize}
+    \item \textbf{Vue Client / Audit\'e :} Acc\`es filtr\'e en lecture seule sur ses propres projets, synth\`ese de la posture de s\'ecurit\'e globale et t\'el\'echargement s\'ecuris\'e des rapports d'audit finalis\'es.
+    \item \textbf{Vue Auditeur / Conformit\'e :} Espace d'inspection juridique permettant de valider l'int\'egrit\'e des preuves d'autorisation (PoA), de v\'erifier la cha\^ine des journaux d'audit immuables et d'examiner les certificats d'int\'egrit\'e SHA-256.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.49\textwidth]{img/client_dashboard.png}\hfill
+    \includegraphics[width=0.49\textwidth]{img/client_reports.png}
+    \caption{Espace Client / Audit\'e -- Tableau de Bord Restreint et Consultation des Rapports}
+    \label{fig:client_view}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.49\textwidth]{img/auditor_dashboard.png}\hfill
+    \includegraphics[width=0.49\textwidth]{img/auditor_audit_logs.png}
+    \caption{Espace Auditeur de Conformit\'e -- Supervision Juridique et Tra\c{c}abilit\'e Immuable}
+    \label{fig:auditor_view}
+\end{figure}
+
+
 \section{Conception et Impl\'ementation Avanc\'ee du Graphe de Connaissances}
 \subsection{Mod\`ele de Donn\'ees en Graphe (N\oe uds et Ar\^etes)}
 \par La mod\'elisation en graphe permet de capturer la topologie relationnelle de la cible d'audit. Les entit\'es sont d\'efinies selon six types de n\oe uds :
