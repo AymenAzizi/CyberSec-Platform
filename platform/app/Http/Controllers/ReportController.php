@@ -105,6 +105,7 @@ class ReportController extends Controller
 
     public function generate(Scan $scan)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Report generation is restricted to Analysts and Admins.');
         $this->authorizeScan($scan);
         abort_unless($scan->status === Scan::STATUS_COMPLETED, 422, 'Scan must be completed first.');
 

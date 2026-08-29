@@ -32,13 +32,15 @@
                 </div>
             </div>
             <div class="flex flex-col gap-2 shrink-0">
-                @if (in_array($finding->severity, ['high','critical']) && $finding->remediationScripts->isEmpty())
-                    <form method="POST" action="{{ route('remediation.generate', $finding) }}">
-                        @csrf
-                        <button type="submit" class="btn-secondary w-full">
-                            <span class="material-symbols-rounded text-base">auto_fix_high</span> Generate Remediation
-                        </button>
-                    </form>
+                @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
+                    @if (in_array($finding->severity, ['high','critical']) && $finding->remediationScripts->isEmpty())
+                        <form method="POST" action="{{ route('remediation.generate', $finding) }}">
+                            @csrf
+                            <button type="submit" class="btn-secondary w-full">
+                                <span class="material-symbols-rounded text-base">auto_fix_high</span> Generate Remediation
+                            </button>
+                        </form>
+                    @endif
                 @endif
                 @if ($finding->scan && $finding->scan->report)
                     <a href="{{ route('reports.show', $finding->scan->report) }}" class="btn-outline">
@@ -95,6 +97,7 @@
                             @if ($script->status === 'verified') <span class="badge-success"><span class="material-symbols-rounded text-[12px]">verified</span> Verified</span> @endif
                             @if ($script->status === 'applied') <span class="badge-success"><span class="material-symbols-rounded text-[12px]">task_alt</span> Applied</span> @endif
                         </div>
+                        @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
                         <div class="flex items-center gap-1">
                             <a href="{{ route('remediation.download', $script) }}" class="btn-ghost !p-1.5 text-xs" title="Download"><span class="material-symbols-rounded text-[16px]">download</span></a>
                             @if ($script->status === 'generated')
@@ -108,6 +111,7 @@
                                 </form>
                             @endif
                         </div>
+                        @endif
                     </div>
                     @if ($script->explanation)
                         <p class="px-4 py-2 text-xs text-gray-400 border-b border-white/5">{{ $script->explanation }}</p>

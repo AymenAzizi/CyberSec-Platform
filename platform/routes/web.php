@@ -66,25 +66,47 @@ Route::post('/logout', [LoginController::class, 'logout'])
 // Authenticated area
 // ---------------------------------------------------------------------------
 Route::middleware('auth')->group(function (): void {
-    // Dashboard
+    // Dashboard (all authenticated users, scoped internally)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Projects (resource — owner/admin scoped internally).
-    Route::resource('projects', ProjectController::class);
+    // Projects:
+    // - Index & Show are accessible to all authenticated users (scoped by controller).
+    // - Create, Store, Edit, Update, Destroy are restricted to Admin & Analyst.
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 
-    // Knowledge graph (uses ProjectController::graph / graphData per current
-    // implementation; GraphController exposes the impact-analysis endpoint).
-    Route::get('/projects/{project}/graph', [ProjectController::class, 'graph'])->name('projects.graph');
-    Route::get('/projects/{project}/graph/data', [ProjectController::class, 'graphData'])->name('projects.graph.data');
-    Route::get('/assets/{asset}/impact', [GraphController::class, 'impactAnalysis'])->name('assets.impact');
+    Route::middleware('role:admin|analyst')->group(function (): void {
+        Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+        Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+        Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+        Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+        Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
-    // Scans
-    Route::resource('scans', ScanController::class)->except(['edit', 'update', 'destroy']);
-    Route::post('/scans/{scan}/cancel', [ScanController::class, 'cancel'])->name('scans.cancel');
-    Route::post('/scans/{scan}/retry', [ScanController::class, 'retry'])->name('scans.retry');
-    Route::get('/scans/{scan}/export', [ScanController::class, 'export'])->name('scans.export');
+        // Knowledge graph (Admin & Analyst only)
+        Route::get('/projects/{project}/graph', [ProjectController::class, 'graph'])->name('projects.graph');
+        Route::get('/projects/{project}/graph/data', [ProjectController::class, 'graphData'])->name('projects.graph.data');
+        Route::get('/assets/{asset}/impact', [GraphController::class, 'impactAnalysis'])->name('assets.impact');
+    });
 
-    // Reports
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+
+    // Scans:
+    // - Create, Store, Cancel, Retry: Admin & Analyst only.
+    Route::middleware('role:admin|analyst')->group(function (): void {
+        Route::get('/scans/create', [ScanController::class, 'create'])->name('scans.create');
+        Route::post('/scans', [ScanController::class, 'store'])->name('scans.store');
+        Route::post('/scans/{scan}/cancel', [ScanController::class, 'cancel'])->name('scans.cancel');
+        Route::post('/scans/{scan}/retry', [ScanController::class, 'retry'])->name('scans.retry');
+        Route::get('/scans/{scan}/report/generate', [ReportController::class, 'generate'])->name('reports.generate');
+    });
+
+    // - Index, Show, Export: Admin, Analyst, Auditor (Client forbidden).
+    Route::middleware('role:admin|analyst|auditor')->group(function (): void {
+        Route::get('/scans', [ScanController::class, 'index'])->name('scans.index');
+        Route::get('/scans/{scan}', [ScanController::class, 'show'])->name('scans.show');
+        Route::get('/scans/{scan}/export', [ScanController::class, 'export'])->name('scans.export');
+    });
+
+    // Reports (viewing/exporting available to all; generation restricted to admin|analyst above)
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/{report}/pdf', [ReportController::class, 'pdf'])->name('reports.pdf');
@@ -92,46 +114,49 @@ Route::middleware('auth')->group(function (): void {
         ->name('reports.export')
         ->where('format', 'pdf|html|json|markdown');
     Route::get('/reports/{report}/download', [ReportController::class, 'download'])->name('reports.download');
-    Route::get('/scans/{scan}/report/generate', [ReportController::class, 'generate'])->name('reports.generate');
 
-    // Security operations (alerts, monitoring, sandbox).
+    // Security operations: Alerts available to all users (scoped)
     Route::get('/security/alerts', [SecurityController::class, 'alerts'])->name('security.alerts');
     Route::post('/security/alerts/{alert}/acknowledge', [SecurityController::class, 'acknowledge'])
         ->name('security.alerts.acknowledge');
-    Route::get('/security/monitoring', [SecurityController::class, 'monitoring'])->name('security.monitoring');
-    Route::get('/security/sandbox', [SecurityController::class, 'sandbox'])->name('security.sandbox');
-    Route::match(['GET', 'POST'], '/security/sandbox/launch', [SecurityController::class, 'launchSandbox'])
-        ->name('security.sandbox.launch')
-        ->middleware('role:admin|analyst');
-    Route::post('/security/sandbox/{id}/stop', [SecurityController::class, 'stopSandbox'])
-        ->name('security.sandbox.stop')
-        ->middleware('role:admin|analyst');
 
-    // OSINT (passive reconnaissance).
-    Route::get('/osint', [OsintController::class, 'index'])->name('osint.index');
-    Route::post('/osint/{target}/run', [OsintController::class, 'run'])->name('osint.run');
-    Route::get('/osint/{target}/results', [OsintController::class, 'results'])->name('osint.results');
+    // Monitoring & Sandbox: Admin & Analyst only
+    Route::middleware('role:admin|analyst')->group(function (): void {
+        Route::get('/security/monitoring', [SecurityController::class, 'monitoring'])->name('security.monitoring');
+        Route::get('/security/sandbox', [SecurityController::class, 'sandbox'])->name('security.sandbox');
+        Route::match(['GET', 'POST'], '/security/sandbox/launch', [SecurityController::class, 'launchSandbox'])
+            ->name('security.sandbox.launch');
+        Route::post('/security/sandbox/{id}/stop', [SecurityController::class, 'stopSandbox'])
+            ->name('security.sandbox.stop');
+    });
 
-    // Findings
-    Route::get('/findings', [FindingController::class, 'index'])->name('findings.index');
-    Route::get('/findings/{finding}', [FindingController::class, 'show'])->name('findings.show');
+    // OSINT: Admin & Analyst only
+    Route::middleware('role:admin|analyst')->group(function (): void {
+        Route::get('/osint', [OsintController::class, 'index'])->name('osint.index');
+        Route::post('/osint/{target}/run', [OsintController::class, 'run'])->name('osint.run');
+        Route::get('/osint/{target}/results', [OsintController::class, 'results'])->name('osint.results');
+    });
 
-    // Remediation-as-Code (FindingController exposes the same surface under
-    // the /findings/* URL namespace; RemediationController is also wired up
-    // so the task-spec naming remains reachable for tooling).
-    Route::get('/findings/{finding}/remediation', [RemediationController::class, 'show'])->name('remediation.show');
-    Route::post('/findings/{finding}/remediation/generate', [RemediationController::class, 'generate'])
-        ->name('remediation.generate');
-    Route::get('/remediation/{script}/download', [RemediationController::class, 'downloadScript'])
-        ->name('remediation.download');
-    Route::post('/remediation/{script}/verify', [RemediationController::class, 'verify'])
-        ->name('remediation.verify');
-    Route::post('/remediation/{script}/apply', [RemediationController::class, 'apply'])
-        ->name('remediation.apply');
+    // Findings: Admin, Analyst, Auditor (Client forbidden)
+    Route::middleware('role:admin|analyst|auditor')->group(function (): void {
+        Route::get('/findings', [FindingController::class, 'index'])->name('findings.index');
+        Route::get('/findings/{finding}', [FindingController::class, 'show'])->name('findings.show');
+    });
 
-    // AI Co-pilot chat. The ChatController exposes `messagesStore` for the
-    // message-submission endpoint (singular `message` is aliased below for
-    // task-spec callers).
+    // Remediation-as-Code: Admin & Analyst only
+    Route::middleware('role:admin|analyst')->group(function (): void {
+        Route::get('/findings/{finding}/remediation', [RemediationController::class, 'show'])->name('remediation.show');
+        Route::post('/findings/{finding}/remediation/generate', [RemediationController::class, 'generate'])
+            ->name('remediation.generate');
+        Route::get('/remediation/{script}/download', [RemediationController::class, 'downloadScript'])
+            ->name('remediation.download');
+        Route::post('/remediation/{script}/verify', [RemediationController::class, 'verify'])
+            ->name('remediation.verify');
+        Route::post('/remediation/{script}/apply', [RemediationController::class, 'apply'])
+            ->name('remediation.apply');
+    });
+
+    // AI Co-pilot chat (accessible to all authenticated users)
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/create', [ChatController::class, 'create'])->name('chat.create');
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
@@ -139,14 +164,14 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/chat/{session}/messages', [ChatController::class, 'messagesStore'])->name('chat.messages.store');
     Route::delete('/chat/{session}', [ChatController::class, 'destroy'])->name('chat.destroy');
 
-    // Admin area (audit logs, system health, user management). User CRUD
-    // is exposed as methods on AdminController itself (usersIndex, usersStore, ...)
-    // rather than a separate Admin\UserController, matching the current
-    // implementation on disk.
-    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function (): void {
+    // Audit and Compliance area (accessible to Admin and Auditor)
+    Route::middleware('role:admin|auditor')->prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/audit-logs', [AdminController::class, 'auditLogs'])->name('audit-logs');
         Route::get('/system-health', [AdminController::class, 'systemHealth'])->name('system-health');
+    });
 
+    // Admin exclusive area (User Management & RBAC)
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/users', [AdminController::class, 'usersIndex'])->name('users.index');
         Route::get('/users/create', [AdminController::class, 'usersCreate'])->name('users.create');
         Route::post('/users', [AdminController::class, 'usersStore'])->name('users.store');

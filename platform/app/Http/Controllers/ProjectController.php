@@ -31,11 +31,14 @@ class ProjectController extends Controller
 
     public function create()
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Clients and Auditors have read-only access.');
         return view('projects.create');
     }
 
     public function store(Request $request)
     {
+        abort_if($request->user()->isClient() || $request->user()->isAuditor(), 403, 'Clients and Auditors have read-only access.');
+
         $data = $this->validateData($request);
 
         $data['user_id'] = $request->user()->id;
@@ -130,6 +133,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $this->authorizeProject($project);
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Clients and Auditors cannot modify projects.');
 
         return view('projects.edit', compact('project'));
     }
@@ -137,6 +141,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $this->authorizeProject($project);
+        abort_if($request->user()->isClient() || $request->user()->isAuditor(), 403, 'Clients and Auditors cannot modify projects.');
 
         $data = $this->validateData($request, $project->id);
 
@@ -159,6 +164,7 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $this->authorizeProject($project);
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Clients and Auditors cannot modify projects.');
 
         $project->delete();
 
@@ -169,6 +175,7 @@ class ProjectController extends Controller
     public function graph(Project $project)
     {
         $this->authorizeProject($project);
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Knowledge Graph is restricted to Analysts and Admins.');
 
         $project->load(['assets.sourceRelations']);
 
@@ -178,6 +185,7 @@ class ProjectController extends Controller
     public function graphData(Project $project)
     {
         $this->authorizeProject($project);
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Knowledge Graph is restricted to Analysts and Admins.');
 
         $nodes = $project->assets()->with('sourceRelations')->get()->map(function (Asset $a) {
             return [

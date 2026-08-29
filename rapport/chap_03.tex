@@ -1,17 +1,73 @@
 \chapter{Analyse des Besoins et Conception du Syst\`eme}
+\label{chap:conception}
 
 \section*{Introduction}
 \par Ce troisi\`eme chapitre pr\'esente la d\'emarche rigoureuse d'analyse des exigences et de conception architecturale de notre plateforme. Nous d\'ebutons par l'analyse exhaustive des besoins fonctionnels, non fonctionnels, des contraintes de s\'ecurit\'e et des exigences l\'egales (PoA). Nous formalisons ensuite la mod\'elisation fonctionnelle \`a travers les diagrammes de cas d'utilisation UML. Par la suite, nous d\'etaillons l'architecture globale en distinguant explicitement les \textbf{7 composants applicatifs m\'etier} et les \textbf{13 conteneurs Docker d'infrastructure}. Nous exposons la conception des donn\'ees (mod\`ele relationnel sur 14 entit\'es m\'etier, diagramme de classes, graphe openCypher, s\'equences d'ex\'ecution, machine \`a \'etats et DFD). Nous d\'eveloppons l'architecture de s\'ecurit\'e multicouche et menons une mod\'elisation formelle des menaces selon la m\'ethodologie STRIDE. Enfin, nous d\'etaillons la cha\^ine DevSecOps int\'egr\'ee au pipeline de livraison logicielle.
 
 \section{Analyse des Besoins}
 \subsection{Identification des Acteurs}
-\par Le syst\`eme interagit avec quatre profils d'acteurs op\'erationnels distincts :
-\begin{itemize}
-    \item \textbf{L'Analyste de S\'ecurit\'e (Security Analyst) :} Utilisateur op\'erationnel principal qui configure les cibles d'audit, t\'el\'everse les preuves d'autorisation (PoA), lance les scans, analyse les r\'esultats techniques, explore le graphe de connaissances, valide les scripts de rem\'ediation IA et exporte les rapports d'expertise.
-    \item \textbf{Le Client / Lecteur (Client / Viewer) :} B\'en\'eficiaire des audits, il consulte en lecture seule les tableaux de bord synth\'etiques ainsi que les rapports valid\'es, et acquitte les alertes de s\'ecurit\'e li\'ees \`a son p\'erim\`etre d'actifs.
-    \item \textbf{L'Administrateur Syst\`eme (System Administrator) :} Responsable de l'infrastructure, il supervise la gouvernance globale de la plateforme, la gestion des comptes utilisateurs, l'attribution des r\^oles RBAC, la configuration des quotas de scan et la surveillance de l'\'etat de sant\'e des microservices conteneuris\'es.
-    \item \textbf{L'Auditeur / Responsable Conformit\'e (Auditor / Compliance) :} Profil d\'edi\'e au contr\^ole r\'eglementaire, consultant en lecture seule les journaux d'audit immuables (\textit{Audit Logs}), contr\^olant la validit\'e juridique des mandats PoA et v\'erifiant la tra\c{c}abilit\'e exhaustive de l'ensemble des actions men\'ees.
-\end{itemize}
+\par L'application \textbf{CyberSec-ASM} repose sur quatre profils d'acteurs op\'erationnels, chacun disposant d'un p\'erim\`etre de responsabilit\'es et de droits d'acc\`es rigoureusement d\'elimit\'e. Le tableau~\ref{tab:acteurs} d\'efinit formellement ces r\^oles au sein du syst\`eme.
+
+\begin{table}[H]
+\centering
+\caption{Identification et R\^oles des Acteurs du Syst\`eme CyberSec-ASM}
+\label{tab:acteurs}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|p{3.8cm}|p{12cm}|}
+\hline
+\textbf{Acteur} & \textbf{R\^ole et Responsabilit\'es dans le Syst\`eme} \\
+\hline
+\textbf{Analyste de S\'ecurit\'e} \newline \textit{(Security Analyst)} & Acteur op\'erationnel principal. Il d\'eclare les cibles d'audit, t\'el\'everse et v\'erifie les mandats PoA, configure et d\'eclenche les scans asynchrones, analyse les constats de vuln\'erabilit\'e (\textit{findings}), explore le graphe de connaissances et le rayon d'impact, valide les scripts de rem\'ediation IA et exporte les rapports d'expertise. \\
+\hline
+\textbf{Administrateur Syst\`eme} \newline \textit{(System Administrator)} & Super-utilisateur et gestionnaire d'infrastructure. H\'eritant de l'Analyste, il supervise en outre la gouvernance globale de la plateforme, la gestion des comptes utilisateurs, l'attribution des r\^oles RBAC, la d\'efinition des quotas journaliers de scan, la surveillance de l'\'etat de sant\'e des microservices et la consultation des journaux d'audit immuables. \\
+\hline
+\textbf{Client / Audit\'e} \newline \textit{(Client / Viewer)} & B\'en\'eficiaire direct des prestations d'audit. Il dispose d'un acc\`es en lecture seule restreint \`a ses propres projets, consulte les tableaux de bord synth\'etiques de posture de s\'ecurit\'e, t\'el\'echarge les rapports d'audit valid\'es, acquitte les alertes de s\'ecurit\'e et interagit avec le chatbot d'assistance IA. \\
+\hline
+\textbf{Auditeur / Conformit\'e} \newline \textit{(Compliance Auditor)} & Profil d\'edi\'e au contr\^ole r\'eglementaire et juridique. Il inspecte en lecture seule les journaux d'audit immuables (\textit{Audit Logs}), contr\^ole la validit\'e l\'egale des preuves d'autorisation (PoA), v\'erifie la disponibilit\'e des services et examine les rapports d'expertise certifi\'es. \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\par Le tableau~\ref{tab:rbac_matrix} synth\'etise la matrice d\'etaill\'ee des permissions et des droits d'acc\`es (RBAC) pour chaque profil d'utilisateur au sein de la plateforme.
+
+\begin{table}[H]
+\centering
+\caption{Matrice des Droits d'Acc\`es et Permissions RBAC par Profil d'Utilisateur}
+\label{tab:rbac_matrix}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|L|C|C|C|C|}
+\hline
+\textbf{Fonctionnalit\'e / Module IHM} & \textbf{Administrateur} & \textbf{Analyste de S\'ecurit\'e} & \textbf{Client / Audit\'e} & \textbf{Auditeur / Conformit\'e} \\
+\hline
+Tableau de Bord \& M\'etriques & Total & Total & Restreint (Scope) & Vue globale \\
+\hline
+Cr\'eation \& \'Edition de Projets & Total & Total & Lecture seule & Lecture seule \\
+\hline
+T\'el\'eversement de Mandats PoA & Total & Total & Interdit & Contr\^ole juridique \\
+\hline
+Lancement de Scans d'Audit & Total & Total & Interdit & Interdit \\
+\hline
+Consultation des Constats (Findings) & Total & Total & Interdit & Inspection compl\`ete \\
+\hline
+Exploration du Graphe \& Blast Radius & Total & Total & Interdit & Interdit \\
+\hline
+G\'en\'eration \& Application Rem\'ediations IA & Total & Total & Interdit & Interdit \\
+\hline
+Consultation \& Export Rapports & Total & Total & Rapports valid\'es & Rapports certifi\'es \\
+\hline
+Acc\`es au Chatbot d'Assistance IA & Total & Total & Scope limit\'e & Total \\
+\hline
+Acc\`es aux Bacs \`a Sable (Sandbox) & Total & Total & Interdit & Interdit \\
+\hline
+Consultation des Journaux d'Audit Immuables & Total & Interdit & Interdit & Lecture seule \\
+\hline
+Gestion des Utilisateurs \& R\^oles RBAC & Total & Interdit & Interdit & Interdit \\
+\hline
+Surveillance de l'\'Etat de Sant\'e Syst\`eme & Total & Interdit & Interdit & Lecture seule \\
+\hline
+\end{tabular}}%
+\end{table}
+
 \par \textit{Remarque :} Le Responsable Technique (CTO) de l'entreprise d'accueil assure l'encadrement industriel, la revue d'architecture et la gouvernance globale du projet, sans constituer un acteur op\'erationnel direct au sens de la mod\'elisation UML du syst\`eme.
 
 \subsection{Besoins Fonctionnels}
@@ -42,12 +98,17 @@
 
 \section{Mod\'elisation Fonctionnelle UML}
 \subsection{Diagramme Global des Cas d'Utilisation}
-\par Le diagramme global mod\'elise l'ensemble des cas d'utilisation structur\'es selon les quatre r\^oles du syst\`eme, comme l'illustre la figure~\ref{fig:usecase_global}.
+\par Le diagramme global mod\'elise l'ensemble des interactions homme-syst\`eme selon les normes UML 2.5, comme l'illustre la figure~\ref{fig:usecase_global}. L'architecture fonctionnelle repose sur les principes de conception suivants :
+\begin{itemize}
+    \item \textbf{Inclusion Syst\'ematique de l'Authentification (\texttt{<<include>>}) :} Tout acc\`es aux fonctionnalit\'es m\'etier de la plateforme requiert obligatoirement le passage pr\'ealable par le cas d'utilisation \textit{S'authentifier}, garantissant la s\'ecurit\'e des sessions et la tra\c{c}abilit\'e nominative.
+    \item \textbf{G\'en\'eralisation et H\'eritage d'Acteurs :} Conform\'ement au principe de sp\'ecialisation UML, l'\textbf{Administrateur Syst\`eme h\'erite directement de l'Analyste de S\'ecurit\'e} (\texttt{Admin --|> Analyst}). Il dispose ainsi intrins\`equement de l'ensemble des capacit\'es op\'erationnelles de l'analyste (cr\'eation de projet, lancement de scan, analyse de graphe, export de rapport) tout en d\'etenant les pr\'erogatives exclusives d'administration (gestion des comptes, r\^oles RBAC, quotas et surveillance de l'infrastructure).
+    \item \textbf{Profils Sp\'ecialis\'es en Lecture :} Le \textbf{Client} dispose d'un acc\`es restreint en consultation sur son p\'erim\`etre d'actifs, tandis que l'\textbf{Auditeur de Conformit\'e} est d\'edi\'e au contr\^ole r\'eglementaire des preuves d'autorisation (PoA) et \`a l'inspection des journaux immuables.
+\end{itemize}
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.80\textwidth]{img/fig_3_1_global_usecases.png}
-    \caption{Diagramme Global des Cas d'Utilisation -- Acteurs et Fonctionnalit\'es Cl\'es}
+    \includegraphics[width=0.82\textwidth,height=0.40\textheight,keepaspectratio]{img/fig_3_1_global_usecases.png}
+    \caption{Diagramme Global des Cas d'Utilisation -- Acteurs, H\'eritage et Fonctionnalit\'es Cl\'es}
     \label{fig:usecase_global}
 \end{figure}
 
@@ -56,7 +117,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.76\textwidth]{img/fig_3_2_analyst_usecases.png}
+    \includegraphics[width=0.75\textwidth,height=0.38\textheight,keepaspectratio]{img/fig_3_2_analyst_usecases.png}
     \caption{Diagramme des Cas d'Utilisation -- Analyste de S\'ecurit\'e}
     \label{fig:usecase_analyst}
 \end{figure}
@@ -66,9 +127,39 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.76\textwidth]{img/fig_3_3_admin_usecases.png}
+    \includegraphics[width=0.75\textwidth,height=0.36\textheight,keepaspectratio]{img/fig_3_3_admin_usecases.png}
     \caption{Diagramme des Cas d'Utilisation -- Administrateur Syst\`eme}
     \label{fig:usecase_admin}
+\end{figure}
+
+\subsection{Cas d'Utilisation du Client / Audit\'e}
+\par Le profil Client dispose d'une interface d\'edi\'ee et simplifi\'ee pour suivre la posture de s\'ecurit\'e de ses actifs sans acc\'eder aux outils offensifs, comme mod\'elis\'e sur la figure~\ref{fig:usecase_client}.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth,height=0.36\textheight,keepaspectratio]{img/fig_3_13_client_usecases.png}
+    \caption{Diagramme des Cas d'Utilisation -- Client / Audit\'e}
+    \label{fig:usecase_client}
+\end{figure}
+
+\subsection{Cas d'Utilisation de l'Auditeur / Responsable Conformit\'e}
+\par L'Auditeur supervise les aspects l\'egaux, contr\^ole l'int\'egrit\'e des preuves PoA et examine les journaux d'audit immuables (\textit{Audit Logs}) pour garantir la conformit\'e r\'eglementaire (figure~\ref{fig:usecase_auditor}).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth,height=0.36\textheight,keepaspectratio]{img/fig_3_14_auditor_usecases.png}
+    \caption{Diagramme des Cas d'Utilisation -- Auditeur / Responsable Conformit\'e}
+    \label{fig:usecase_auditor}
+\end{figure}
+
+\subsection{Diagramme d'Activit\'e : Flux d'Ex\'ecution d'un Scan d'Audit}
+\par Afin de mod\'eliser le d\'eroulement dynamique et les d\'ecisions logiques associ\'ees \`a l'ex\'ecution d'une op\'eration de scan, la figure~\ref{fig:activity_scan} pr\'esente le diagramme d'activit\'e UML couvrant l'ensemble du cycle de vie, du contr\^ole PoA bloquant jusqu'\`a la projection dans le graphe et la rem\'ediation IA.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.78\textwidth,height=0.40\textheight,keepaspectratio]{img/fig_2_3_activity_scan.png}
+    \caption{Diagramme d'Activit\'e UML -- Flux d'Orchestration et d'Ex\'ecution d'un Scan d'Audit}
+    \label{fig:activity_scan}
 \end{figure}
 
 \subsection{Description Textuelle D\'etaill\'ee des Cas d'Utilisation Cl\'es}
@@ -250,7 +341,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.70\textwidth]{img/fig_3_4_architecture.png}
+    \includegraphics[width=0.78\textwidth,height=0.38\textheight,keepaspectratio]{img/fig_3_4_architecture.png}
     \caption{Architecture Globale en Microservices -- Vue des Conteneurs Docker et R\'eseaux Segment\'es}
     \label{fig:component_diagram}
 \end{figure}
@@ -260,7 +351,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{img/fig_3_5_async_flow.png}
+    \includegraphics[width=0.78\textwidth,height=0.38\textheight,keepaspectratio]{img/fig_3_5_async_flow.png}
     \caption{Flux de Traitement Asynchrone des Scans via Redis Streams et PostgreSQL AGE}
     \label{fig:ms_comms}
 \end{figure}
@@ -278,7 +369,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.98\textwidth]{img/fig_3_6_erd.png}
+    \includegraphics[width=0.92\textwidth,height=0.36\textheight,keepaspectratio]{img/fig_3_6_erd.png}
     \caption{Mod\`ele Entit\'e-Association (ERD) -- Les 14 Tables de la Plateforme}
     \label{fig:erd_diagram}
 \end{figure}
@@ -288,7 +379,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{img/fig_3_7_classes.png}
+    \includegraphics[width=0.85\textwidth,height=0.38\textheight,keepaspectratio]{img/fig_3_7_classes.png}
     \caption{Diagramme de Classes -- Entit\'es M\'etier et Relations du Mod\`ele}
     \label{fig:class_diagram}
 \end{figure}
@@ -304,7 +395,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{img/fig_3_8_sequence.png}
+    \includegraphics[width=0.85\textwidth,height=0.38\textheight,keepaspectratio]{img/fig_3_8_sequence.png}
     \caption{Diagramme de S\'equence -- Lancement, Traitement Asynchrone et Rem\'ediation IA}
     \label{fig:sequence_scan}
 \end{figure}
@@ -382,7 +473,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.88\textwidth]{img/fig_3_9_state_machine.png}
+    \includegraphics[width=0.88\textwidth,height=0.28\textheight,keepaspectratio]{img/fig_3_9_state_machine.png}
     \caption{Machine \`a \'Etats -- Cycle de Vie d'une T\^ache de Scan}
     \label{fig:state_machine}
 \end{figure}
@@ -392,7 +483,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{img/fig_3_10_dfd.png}
+    \includegraphics[width=0.88\textwidth,height=0.35\textheight,keepaspectratio]{img/fig_3_10_dfd.png}
     \caption{Diagramme de Flux de Donn\'ees (DFD) -- Processus d'Audit, Graphe de Connaissances et Reporting}
     \label{fig:data_flow}
 \end{figure}
@@ -431,7 +522,7 @@
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{img/fig_3_11_trust_boundaries.png}
+    \includegraphics[width=0.88\textwidth,height=0.28\textheight,keepaspectratio]{img/fig_3_11_trust_boundaries.png}
     \caption{Cartographie de la Surface d'Attaque et Fronti\`eres de Confiance (Trust Boundaries STRIDE)}
     \label{fig:trust_boundaries}
 \end{figure}
@@ -473,7 +564,7 @@ Moteur de Scanners & \textbf{E}levation of Privilege / Ex\'ecution sur cible non
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{img/fig_3_12_devsecops.png}
+    \includegraphics[width=0.90\textwidth,height=0.26\textheight,keepaspectratio]{img/fig_3_12_devsecops.png}
     \caption{Pipeline DevSecOps Automatis\'e -- Cha\^ine de S\'ecurit\'e Int\'egr\'ee sous GitHub Actions}
     \label{fig:devsecops_pipeline}
 \end{figure}

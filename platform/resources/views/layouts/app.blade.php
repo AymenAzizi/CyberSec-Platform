@@ -42,19 +42,31 @@
         {{-- Navigation --}}
         <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             @php
+                $user = auth()->user();
+                $isClient = $user?->isClient();
+                $isAuditor = $user?->isAuditor();
+
                 $navItems = [
                     ['route' => 'dashboard',          'label' => 'Dashboard',        'icon' => 'grid_view'],
                     ['route' => 'projects.index',     'label' => 'Projects',         'icon' => 'folder'],
-                    ['route' => 'scans.index',        'label' => 'Scans',            'icon' => 'radar'],
-                    ['route' => 'findings.index',     'label' => 'Findings',         'icon' => 'bug_report'],
-                    ['route' => 'reports.index',      'label' => 'Reports',          'icon' => 'description'],
-                    ['route' => 'security.alerts',    'label' => 'Security Alerts',  'icon' => 'notifications_active', 'badge' => $unacknowledgedAlerts ?? 0],
-                    ['route' => 'security.monitoring','label' => 'Monitoring',       'icon' => 'monitoring'],
-                    ['route' => 'security.sandbox',   'label' => 'Sandbox',          'icon' => 'science'],
-                    ['route' => 'projects.graph',     'label' => 'Knowledge Graph',  'icon' => 'hub', 'params' => (!empty($defaultProject) ? [$defaultProject] : null), 'fallback' => 'projects.create'],
-                    ['route' => 'osint.index',        'label' => 'OSINT',            'icon' => 'travel_explore'],
-                    ['route' => 'chat.index',         'label' => 'AI Chatbot',       'icon' => 'smart_toy'],
                 ];
+
+                if (!$isClient) {
+                    $navItems[] = ['route' => 'scans.index',    'label' => 'Scans',    'icon' => 'radar'];
+                    $navItems[] = ['route' => 'findings.index', 'label' => 'Findings', 'icon' => 'bug_report'];
+                }
+
+                $navItems[] = ['route' => 'reports.index',   'label' => 'Reports',         'icon' => 'description'];
+                $navItems[] = ['route' => 'security.alerts', 'label' => 'Security Alerts', 'icon' => 'notifications_active', 'badge' => $unacknowledgedAlerts ?? 0];
+
+                if (!$isClient && !$isAuditor) {
+                    $navItems[] = ['route' => 'security.monitoring','label' => 'Monitoring',      'icon' => 'monitoring'];
+                    $navItems[] = ['route' => 'security.sandbox',   'label' => 'Sandbox',         'icon' => 'science'];
+                    $navItems[] = ['route' => 'projects.graph',     'label' => 'Knowledge Graph', 'icon' => 'hub', 'params' => (!empty($defaultProject) ? [$defaultProject] : null), 'fallback' => 'projects.create'];
+                    $navItems[] = ['route' => 'osint.index',        'label' => 'OSINT',           'icon' => 'travel_explore'];
+                }
+
+                $navItems[] = ['route' => 'chat.index', 'label' => 'AI Chatbot', 'icon' => 'smart_toy'];
             @endphp
 
             @foreach ($navItems as $item)
@@ -78,14 +90,17 @@
                 </a>
             @endforeach
 
-            @if (auth()->check() && auth()->user()->isAdmin())
-                <div class="pt-4 pb-1 px-3 text-[10px] uppercase tracking-wider text-gray-600">Administration</div>
+            @if (auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isAuditor()))
+                <div class="pt-4 pb-1 px-3 text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                    {{ auth()->user()->isAdmin() ? 'Administration' : 'Audit & Compliance' }}
+                </div>
                 @php
-                    $adminItems = [
-                        ['route' => 'admin.users.index',    'label' => 'Users',         'icon' => 'group'],
-                        ['route' => 'admin.audit-logs',     'label' => 'Audit Logs',    'icon' => 'receipt_long'],
-                        ['route' => 'admin.system-health',  'label' => 'System Health', 'icon' => 'health_and_safety'],
-                    ];
+                    $adminItems = [];
+                    if (auth()->user()->isAdmin()) {
+                        $adminItems[] = ['route' => 'admin.users.index', 'label' => 'Users', 'icon' => 'group'];
+                    }
+                    $adminItems[] = ['route' => 'admin.audit-logs', 'label' => 'Audit Logs', 'icon' => 'receipt_long'];
+                    $adminItems[] = ['route' => 'admin.system-health', 'label' => 'System Health', 'icon' => 'health_and_safety'];
                 @endphp
                 @foreach ($adminItems as $item)
                     <a href="{{ route($item['route']) }}"

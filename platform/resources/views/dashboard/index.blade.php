@@ -8,6 +8,11 @@
 @endsection
 
 @section('content')
+@php
+    $user = auth()->user();
+    $isClient = $user?->isClient();
+    $isAuditor = $user?->isAuditor();
+@endphp
 <div class="space-y-6">
     {{-- Page header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -16,12 +21,14 @@
             <p class="text-sm text-gray-400">Welcome back, {{ auth()->user()->name }}.</p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('projects.create') }}" class="btn-primary">
-                <span class="material-symbols-rounded text-base">add</span> New Project
-            </a>
-            <a href="{{ route('scans.create') }}" class="btn-secondary">
-                <span class="material-symbols-rounded text-base">radar</span> New Scan
-            </a>
+            @if (!$isClient && !$isAuditor)
+                <a href="{{ route('projects.create') }}" class="btn-primary">
+                    <span class="material-symbols-rounded text-base">add</span> New Project
+                </a>
+                <a href="{{ route('scans.create') }}" class="btn-secondary">
+                    <span class="material-symbols-rounded text-base">radar</span> New Scan
+                </a>
+            @endif
             <a href="{{ route('reports.index') }}" class="btn-outline">
                 <span class="material-symbols-rounded text-base">description</span> Reports
             </a>
@@ -31,12 +38,19 @@
     {{-- KPI cards (real counts) --}}
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         <x-kpi-card icon="folder"            label="Total Projects"           :value="$kpis['projects']"          color="violet" href="{{ route('projects.index') }}" />
-        <x-kpi-card icon="radar"             label="Active Scans"             :value="$kpis['active_scans']"      color="cyan"   :pulse="true" href="{{ route('scans.index', ['status' => 'running']) }}" />
-        <x-kpi-card icon="check_circle"      label="Completed Scans (today)"  :value="$kpis['completed_today']"   color="emerald" href="{{ route('scans.index') }}" />
-        <x-kpi-card icon="priority_high"     label="Critical Findings"        :value="$kpis['critical']"          color="red"    href="{{ route('findings.index', ['severity' => 'critical']) }}" />
-        <x-kpi-card icon="warning"           label="High Findings"            :value="$kpis['high']"              color="orange" href="{{ route('findings.index', ['severity' => 'high']) }}" />
+        @if (!$isClient)
+            <x-kpi-card icon="radar"             label="Active Scans"             :value="$kpis['active_scans']"      color="cyan"   :pulse="true" href="{{ route('scans.index', ['status' => 'running']) }}" />
+            <x-kpi-card icon="check_circle"      label="Completed Scans (today)"  :value="$kpis['completed_today']"   color="emerald" href="{{ route('scans.index') }}" />
+            <x-kpi-card icon="priority_high"     label="Critical Findings"        :value="$kpis['critical']"          color="red"    href="{{ route('findings.index', ['severity' => 'critical']) }}" />
+            <x-kpi-card icon="warning"           label="High Findings"            :value="$kpis['high']"              color="orange" href="{{ route('findings.index', ['severity' => 'high']) }}" />
+        @else
+            <x-kpi-card icon="priority_high"     label="Critical Findings"        :value="$kpis['critical']"          color="red" />
+            <x-kpi-card icon="warning"           label="High Findings"            :value="$kpis['high']"              color="orange" />
+        @endif
         <x-kpi-card icon="notifications_active" label="Unacknowledged Alerts" :value="$kpis['unack_alerts']"      color="red"    href="{{ route('security.alerts') }}" />
-        <x-kpi-card icon="summarize"         label="Total Findings"           :value="$kpis['total_findings']"    color="violet" href="{{ route('findings.index') }}" />
+        @if (!$isClient)
+            <x-kpi-card icon="summarize"         label="Total Findings"           :value="$kpis['total_findings']"    color="violet" href="{{ route('findings.index') }}" />
+        @endif
     </div>
 
     {{-- Charts --}}

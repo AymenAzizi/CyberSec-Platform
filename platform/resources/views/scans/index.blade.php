@@ -14,9 +14,11 @@
             <h1 class="font-display text-2xl font-semibold text-white">Scans</h1>
             <p class="text-sm text-gray-4600">{{ $scans->total() }} scan{{ $scans->total() === 1 ? '' : 's' }} · {{ $scans->where('status','running')->count() + $scans->where('status','queued')->count() }} in flight</p>
         </div>
+        @if(!auth()->user()->isClient() && !auth()->user()->isAuditor())
         <a href="{{ route('scans.create') }}" class="btn-primary">
             <span class="material-symbols-rounded text-base">add</span> New Scan
         </a>
+        @endif
     </div>
 
     {{-- Filter bar --}}

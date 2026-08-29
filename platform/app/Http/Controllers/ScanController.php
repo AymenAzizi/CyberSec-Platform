@@ -15,6 +15,7 @@ class ScanController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        abort_if($user->isClient(), 403, 'Scans are restricted to Analysts, Auditors, and Admins.');
 
         $scans = Scan::query()
             ->with(['project', 'target'])
@@ -36,6 +37,8 @@ class ScanController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
+        abort_if($user->isClient() || $user->isAuditor(), 403, 'Clients and Auditors have read-only access.');
+
         $projects = $this->visibleProjects($user);
 
         $targetsByProject = $projects->mapWithKeys(function (Project $p) {
@@ -70,6 +73,9 @@ class ScanController extends Controller
 
     public function store(Request $request)
     {
+        $user = $request->user();
+        abort_if($user->isClient() || $user->isAuditor(), 403, 'Clients and Auditors cannot launch scans.');
+
         $validated = $request->validate([
             'project_id'    => ['required', 'exists:projects,id'],
             'target_id'     => ['required', 'exists:targets,id'],
@@ -137,6 +143,7 @@ class ScanController extends Controller
 
     public function show(Scan $scan)
     {
+        abort_if(auth()->user()->isClient(), 403, 'Scans are restricted to Analysts, Auditors, and Admins.');
         $this->authorizeScan($scan);
 
         $scan->load([
@@ -149,6 +156,7 @@ class ScanController extends Controller
 
     public function cancel(Scan $scan)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Clients and Auditors cannot cancel scans.');
         $this->authorizeScan($scan);
 
         if (in_array($scan->status, [Scan::STATUS_QUEUED, Scan::STATUS_RUNNING, Scan::STATUS_PENDING], true)) {
@@ -160,6 +168,7 @@ class ScanController extends Controller
 
     public function retry(Scan $scan)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Clients and Auditors cannot retry scans.');
         $this->authorizeScan($scan);
 
         if ($scan->canRetry()) {
@@ -177,6 +186,7 @@ class ScanController extends Controller
 
     public function export(Scan $scan)
     {
+        abort_if(auth()->user()->isClient(), 403, 'Scans are restricted to Analysts, Auditors, and Admins.');
         $this->authorizeScan($scan);
 
         $scan->load(['findings.remediationScripts', 'project', 'target']);

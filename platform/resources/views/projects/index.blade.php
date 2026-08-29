@@ -14,15 +14,18 @@
             <h1 class="font-display text-2xl font-semibold text-white">Projects</h1>
             <p class="text-sm text-gray-400">{{ $projects->total() }} engagement{{ $projects->total() === 1 ? '' : 's' }} · {{ $projects->pluck('targets')->flatten()->count() }} targets</p>
         </div>
+        @if(!auth()->user()->isClient() && !auth()->user()->isAuditor())
         <a href="{{ route('projects.create') }}" class="btn-primary">
             <span class="material-symbols-rounded text-base">add</span> New Project
         </a>
+        @endif
     </div>
 
     @if ($projects->isEmpty())
         <x-empty-state icon="folder_off" title="No projects yet"
-            message="Create your first engagement to declare scope, attach authorization and queue scans."
-            action-label="New Project" action-href="{{ route('projects.create') }}" />
+            message="{{ auth()->user()->isClient() ? 'No projects are assigned to your client account yet.' : (auth()->user()->isAuditor() ? 'No projects available for audit inspection.' : 'Create your first engagement to declare scope, attach authorization and queue scans.') }}"
+            :action-label="(!auth()->user()->isClient() && !auth()->user()->isAuditor()) ? 'New Project' : null"
+            :action-href="(!auth()->user()->isClient() && !auth()->user()->isAuditor()) ? route('projects.create') : null" />
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             @foreach ($projects as $project)

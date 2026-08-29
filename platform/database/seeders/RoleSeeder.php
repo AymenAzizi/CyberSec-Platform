@@ -55,6 +55,12 @@ class RoleSeeder extends Seeder
             'view-all-projects',
             'manage-system',
             'view-audit-logs',
+            'create-projects',
+            'create-scans',
+            'view-reports',
+            'manage-alerts',
+            'use-chatbot',
+            'view-osint',
         ],
         'analyst' => [
             'create-projects',
@@ -66,10 +72,15 @@ class RoleSeeder extends Seeder
         ],
         'client' => [
             'view-reports',
+            'manage-alerts',
+            'use-chatbot',
         ],
         'auditor' => [
             'view-audit-logs',
             'view-reports',
+            'view-all-projects',
+            'manage-alerts',
+            'use-chatbot',
         ],
     ];
 

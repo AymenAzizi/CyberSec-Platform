@@ -1,4 +1,5 @@
 \chapter{Cadre G\'en\'eral du Projet}
+\label{chap:cadre}
 
 \section*{Introduction}
 \par Ce premier chapitre pose le cadre m\'ethodologique, industriel et op\'erationnel de notre projet de fin d'\'etudes. Nous commen\c{c}ons par pr\'esenter l'organisme d'accueil, \textbf{Designet Web Agency}, ainsi que son positionnement sur le march\'e des technologies de l'information. Nous d\'ecrivons ensuite le contexte industriel marqu\'e par l'expansion exponentielle des cybermenaces ciblant les surfaces d'attaque externes. Nous dressons un \'etat des lieux critique des proc\'edures d'audit traditionnelles et une analyse comparative approfondie des solutions du march\'e, avant de formaliser la probl\'ematique, la solution propos\'ee, les objectifs g\'en\'eraux et sp\'ecifiques ainsi que le p\'erim\`etre d'application du projet. Enfin, nous d\'etaillons la m\'ethodologie Agile Scrum retenue, ses art\'efacts et le calendrier complet des r\'ealisations.
@@ -99,38 +100,15 @@
     \item \textbf{Manque d'encadrement l\'egal int\'egr\'e :} Aucun m\'ecanisme automatis\'e n'emp\^eche l'ex\'ecution d'un scan sur une cible pour laquelle aucun mandat formel n'a \'et\'e \'etabli.
 \end{itemize}
 
-\subsection{Comparatif des Solutions Existantes sur le March\'e}
-\par Pour positionner notre projet, nous avons analys\'e les solutions logicielles d'audit et d'ASM existantes, qu'elles soient open-source ou commerciales. Le tableau~\ref{tab:existing_solutions} synth\'etise cette \'etude comparative.
-
-\begin{table}[H]
-\centering
-\caption{Analyse Comparative des Solutions d'Audit et de Gestion de Surface d'Attaque}
-\label{tab:existing_solutions}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|L|C|C|C|C|C|C|}
-\hline
-\textbf{Crit\`ere d'\'Evaluation} & \textbf{Shodan} & \textbf{OWASP Amass} & \textbf{SpiderFoot} & \textbf{Intruder.io} & \textbf{Recon-ng} & \textbf{Notre Plateforme} \\
-\hline
-Type d'Audit & Passif uniquement & Passif / Actif DNS & Passif / OSINT & Actif Cloud & Passif OSINT & \textbf{Passif + Actif Unifi\'e} \\
-\hline
-Mod\'elisation en Graphe & Non & Graphe local (d3) & Graphe basique & Non & Non & \textbf{PostgreSQL + Apache AGE} \\
-\hline
-Calcul de Rayon d'Impact & Non & Non & Non & Non & Non & \textbf{Oui (BFS NetworkX)} \\
-\hline
-G\'en\'eration de Rem\'ediation IA & Non & Non & Non & Recommandations fixes & Non & \textbf{Oui (LLM Local Contraint)} \\
-\hline
-Contr\^ole L\'egal (PoA requis) & Non & Non & Non & Manuel (d\'eclaratif) & Non & \textbf{Bloquant Logiciel Obligatoire} \\
-\hline
-Bac \`a Sable (Sandbox Isol\'ee) & Non & Non & Non & Non & Non & \textbf{Oui (Docker Socket Proxy)} \\
-\hline
-Cha\^ine DevSecOps Int\'egr\'ee & Non & Non & Non & Non & Non & \textbf{Oui (SAST/SCA/SBOM/Cosign)} \\
-\hline
-Mod\`ele de D\'eploiement & SaaS Externe & CLI Local & Web Auto-h\'eberg\'e & SaaS Propri\'etaire & CLI Local & \textbf{Web Auto-h\'eberg\'e / VPS} \\
-\hline
-Confidentialit\'e des Donn\'ees & Publique & Locale & Locale & H\'eberg\'ee (Cloud tiers) & Locale & \textbf{100\,\% Locale} \\
-\hline
-\end{tabular}}%
-\end{table}
+\subsection{Synth\`ese des Lacunes des Outils Actuels}
+\par L'analyse des solutions d'audit et de d\'ecouverte d'actifs disponibles sur le march\'e (qu'elles soient open-source comme OWASP Amass, Recon-ng et SpiderFoot, ou commerciales comme Shodan et Intruder.io) met en \'evidence des manques structurels r\'ecurrents :
+\begin{itemize}
+    \item \textbf{Approche fragment\'ee et absence d'unification :} Les outils d'inventaire passif (OSINT) et les scanners actifs fonctionnent g\'en\'eralement en silos \'etanches, n\'ecessitant des manipulations manuelles r\'ep\'etitives pour agr\'eger les donn\'ees.
+    \item \textbf{Absence de mod\'elisation relationnelle :} Les r\'esultats sont restitu\'es sous forme de listes plates sans repr\'esentation topologique des d\'ependances entre les cibles, les adresses IP, les ports ouverts et les services sous-jacents.
+    \item \textbf{Manque de rem\'ediation actionnable :} Aucun outil n'int\`egre de moteur d'assistance capable de g\'en\'erer automatiquement des scripts de durcissement adapt\'es \`a l'environnement d\'etect\'e.
+    \item \textbf{N\'egligence de la conformit\'e l\'egale :} Les solutions existantes n'int\`egrent aucun verrou logiciel imposant la validation d'un mandat d'autorisation avant l'ex\'ecution des balayages offensifs.
+\end{itemize}
+\par Une \'etude comparative d\'etaill\'ee de ces diff\'erentes solutions du march\'e est d\'evelopp\'ee dans le chapitre~\ref{chap:etat_art}.
 
 \section{Probl\'ematique}
 \par \`A la lumi\`ere des limites identifi\'ees et des lacunes des solutions existantes, la probl\'ematique centrale de ce travail d'ing\'enierie s'\'enonce ainsi :
@@ -139,14 +117,13 @@ Confidentialit\'e des Donn\'ees & Publique & Locale & Locale & H\'eberg\'ee (Clo
 \end{center}
 
 \section{Solution Propos\'ee}
-\par Pour r\'epondre \`a cette probl\'ematique, nous proposons la r\'ealisation d'une \textbf{plateforme web semi-agentique de reconnaissance de surface d'attaque}. La solution s'appuie sur une architecture en microservices d\'ecoupl\'ee associant :
+\par Pour r\'epondre \`a cette probl\'ematique, nous proposons la r\'ealisation d'une \textbf{plateforme unifi\'ee de gestion de surface d'attaque (ASM) et d'aide \`a la rem\'ediation}. Au niveau macroscopique, la solution s'articule autour de cinq piliers fonctionnels compl\'ementaires :
 \begin{itemize}
-    \item Un portail web applicatif d\'evelopp\'e avec \textbf{Laravel 11} assurant l'authentification s\'ecuris\'ee, le contr\^ole d'acc\`es RBAC granulaire, la gestion des projets et le rendu ergonomique.
-    \item Cinq microservices sp\'ecialis\'es en \textbf{Python Flask} (reconnaissance multi-outils, s\'ecurit\'e offensive / sandbox, renseignement passif OSINT, moteur IA contraint, passerelle d'API).
-    \item Un moteur d'ex\'ecution asynchrone pilot\'e par \textbf{Redis Streams} garantissant la r\'esilience, la tol\'erance aux pannes et le passage \`a l'\'echelle.
-    \item Une base de donn\'ees unifi\'ee sous \textbf{PostgreSQL 16} avec l'extension \textbf{Apache AGE} permettant la persistance relationnelle et le requ\^etage openCypher du graphe de connaissances.
-    \item Un moteur d'inf\'erence locale (\textbf{Ollama}) h\'ebergeant le mod\`ele \texttt{qwen2.5-coder} pour la synth\`ese contextuelle et la production de code de rem\'ediation (\textit{Remediation-as-Code}).
-    \item Une cha\^ine \textbf{DevSecOps} automatis\'ee sous GitHub Actions assurant la s\'ecurit\'e intrins\`eque du code source et des conteneurs de production.
+    \item \textbf{Un portail unifi\'e d'administration et de gestion des acc\`es :} Une interface centrale assurant la gestion s\'ecuris\'ee des utilisateurs selon quatre profils d'acteurs (\textit{Analyste}, \textit{Administrateur}, \textit{Client}, \textit{Auditeur}) avec un contr\^ole d'acc\`es strict bas\'e sur les r\^oles (RBAC).
+    \item \textbf{Un moteur d'orchestration asynchrone multi-scanners :} Un syst\`eme capable de planifier, cadencer et ex\'ecuter en arri\`ere-plan des t\^aches de reconnaissance passive (OSINT) et active, avec r\'egulation de d\'ebit et d\'elais de dispersion (\textit{jitter}) pour \'eviter les blocages r\'eseau.
+    \item \textbf{Un m\'ecanisme de mod\'elisation en graphe de connaissances :} Un r\'ef\'erentiel corr\'elant les actifs d\'ecouverts et calculant en temps r\'eel le rayon d'impact (\textit{blast radius}) potentiel des vuln\'erabilit\'es identifi\'ees.
+    \item \textbf{Un moteur d'assistance \`a la d\'ecision et de rem\'ediation automatis\'ee :} Un module d'intelligence artificielle op\'erant localement pour synth\'etiser les rapports d'expertise et produire du code de durcissement (\textit{Remediation-as-Code}) imm\'ediatement exploitable.
+    \item \textbf{Un cadre de gouvernance l\'egale et de tra\c{c}abilit\'e immuable :} Une barri\`ere bloquante logicielle subordonnant tout lancement de scan \`a la validation d'une preuve d'autorisation (\textit{Proof of Authorization} -- PoA), coupl\'ee \`a une journalisation compl\`ete et infalsifiable de l'ensemble des actions r\'ealis\'ees.
 \end{itemize}
 
 \section{Objectifs du Projet}
@@ -219,7 +196,7 @@ Confidentialit\'e des Donn\'ees & Publique & Locale & Locale & H\'eberg\'ee (Clo
 \end{itemize}
 
 \subsection{Planification des Sprints et Calendrier Global}
-\par Le projet s'est articul\'e autour de 6 Sprints successifs de deux \`a trois semaines, d\'etaill\'es dans le tableau~\ref{tab:sprint_planning}, suivis d'une phase finale de recette et de validation exp\'erimentale sur la p\'eriode du 2 f\'evrier au 2 juillet 2026. La figure~\ref{fig:scrum-process} illustre la dynamique it\'erative globale de cette m\'ethodologie.
+\par Le projet s'est articul\'e autour de 6 Sprints successifs de deux \`a trois semaines, d\'etaill\'es dans le tableau~\ref{tab:sprint_planning}, suivis d'une phase finale de recette et de validation exp\'erimentale sur la p\'eriode du 2 f\'evrier au 2 juillet 2026. La figure~\ref{fig:scrum_process} illustre la dynamique it\'erative globale de cette m\'ethodologie.
 
 \begin{table}[H]
 \centering
@@ -230,7 +207,7 @@ Confidentialit\'e des Donn\'ees & Publique & Locale & Locale & H\'eberg\'ee (Clo
 \hline
 \textbf{Sprint / Phase} & \textbf{P\'eriode} & \textbf{Livrables Majeurs} & \textbf{Revue et Validation} \\
 \hline
-Sprint 1 & 2 f\'ev. -- 22 f\'ev. & Cahier des charges, mod\'elisation UML/ERD, socle Laravel 11 et Flask & Validation de l'architecture avec le CTO \\
+Sprint 1 & 2 f\'ev. -- 22 f\'ev. & Socle Laravel 11, mod\'elisation UML/ERD, authentification RBAC \& gestion PoA & Validation de l'architecture avec le CTO \\
 \hline
 Sprint 2 & 23 f\'ev. -- 15 mar. & Microservice reconnaissance (Nmap, Nuclei, Gobuster, Subfinder, WPScan) & D\'emonstration d'ex\'ecution des scanners \\
 \hline
@@ -249,10 +226,160 @@ Recette \& Cl\^oture & 2 juin -- 2 juil. & Tests de charge Locust, audits Trivy/
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{img/fig_1_1_scrum.png}
-    \caption{Vue d'Ensemble du Processus Agile Scrum Appliqu\'e au Projet}
-    \label{fig:scrum-process}
+    \includegraphics[width=0.88\textwidth,height=0.35\textheight,keepaspectratio]{img/fig_1_1_scrum.png}
+    \caption{Processus M\'ethodologique Scrum Appliqu\'e au Projet CyberSec-ASM}
+    \label{fig:scrum_process}
 \end{figure}
+
+\subsection{Product Backlog Global}
+\par Le \textit{Product Backlog} constitue le r\'epertoire central de l'ensemble des exigences fonctionnelles et techniques du projet. Chaque exigence est formul\'ee sous la forme d'une \textit{User Story} (US) selon le formalisme standard : \textit{\og En tant que [Acteur], je veux [Action] afin de [B\'en\'efice] \fg{}}. Le tableau~\ref{tab:product_backlog} pr\'esente la liste ordonnanc\'ee des 30 User Stories prioritaires r\'eparties sur les six sprints.
+
+\begin{table}[H]
+\centering
+\caption{Product Backlog Global du Projet CyberSec-ASM (30 User Stories)}
+\label{tab:product_backlog}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|L|L|c|c|c|}
+\hline
+\textbf{ID} & \textbf{Acteur} & \textbf{User Story (Description)} & \textbf{Priorit\'e} & \textbf{Est. (j)} & \textbf{Sprint} \\
+\hline
+US01 & Analyste / Admin & S'authentifier de mani\`ere s\'ecuris\'ee avec gestion des sessions JWT & Must Have & 2 & Sprint 1 \\
+\hline
+US02 & Administrateur & G\'erer les utilisateurs, assigner les r\^oles RBAC et les quotas & Must Have & 3 & Sprint 1 \\
+\hline
+US03 & Analyste & Cr\'eer un projet d'audit et configurer le p\'erim\`etre des cibles & Must Have & 3 & Sprint 1 \\
+\hline
+US04 & Analyste & T\'el\'everser et valider le document de preuve d'autorisation (PoA) & Must Have & 2 & Sprint 1 \\
+\hline
+US05 & Auditeur & V\'erifier la validit\'e juridique et l'historique des mandats PoA & Should Have & 2 & Sprint 1 \\
+\hline
+US06 & Analyste & Lancer un scan de reconnaissance (Nmap, Nuclei, Gobuster, etc.) & Must Have & 4 & Sprint 2 \\
+\hline
+US07 & Analyste & Choisir le profil d'intensit\'e de scan (Silent, Balanced, Aggressive) & Must Have & 2 & Sprint 2 \\
+\hline
+US08 & Analyste & Normaliser automatiquement les sorties brutes en format structur\'e JSON & Must Have & 4 & Sprint 2 \\
+\hline
+US09 & Analyste & Suivre l'\'etat d'avancement d'un scan en temps r\'eel via Redis Streams & Must Have & 3 & Sprint 2 \\
+\hline
+US10 & Analyste & Consulter les journaux bruts (\textit{raw logs}) avec citations de lignes & Should Have & 2 & Sprint 2 \\
+\hline
+US11 & Analyste & Ex\'ecuter des tests d'injection (SQLi, XSS, Command Injection) & Must Have & 4 & Sprint 3 \\
+\hline
+US12 & Analyste & D\'eployer un conteneur sandbox vuln\'erable isol\'e (DVWA, bWAPP) & Must Have & 4 & Sprint 3 \\
+\hline
+US13 & Analyste & D\'etruire et r\'einitialiser l'environnement de bac \`a sable & Must Have & 2 & Sprint 3 \\
+\hline
+US14 & Analyste & Tester la pr\'esence et le comportement d'un WAF externe & Should Have & 3 & Sprint 3 \\
+\hline
+US15 & Administrateur & Isoler le socket Docker via socket-proxy pour prot\'eger l'h\^ote & Must Have & 2 & Sprint 3 \\
+\hline
+US16 & Analyste & Solliciter l'IA locale pour analyser les constats de vuln\'erabilit\'e & Must Have & 4 & Sprint 4 \\
+\hline
+US17 & Analyste & G\'en\'erer des scripts de rem\'ediation durcis (Bash, Ansible, Dockerfile) & Must Have & 4 & Sprint 4 \\
+\hline
+US18 & Analyste & Valider le respect du sch\'ema Pydantic strict pour \'eviter les hallucinations & Must Have & 3 & Sprint 4 \\
+\hline
+US19 & Analyste & Appliquer et t\'el\'echarger les correctifs de s\'ecurit\'e propos\'es & Should Have & 2 & Sprint 4 \\
+\hline
+US20 & Analyste & Consulter la synth\`ese manag\'eriale et l'impact m\'etier g\'en\'er\'es par l'IA & Should Have & 2 & Sprint 4 \\
+\hline
+US21 & Analyste & Visualiser la topologie des actifs sous forme de graphe relationnel & Must Have & 4 & Sprint 5 \\
+\hline
+US22 & Analyste & Calculer le rayon d'impact (\textit{blast radius}) par l'algorithme BFS & Must Have & 3 & Sprint 5 \\
+\hline
+US23 & Analyste & Collecter des renseignements passifs OSINT (DNS, WHOIS, SSL) & Must Have & 3 & Sprint 5 \\
+\hline
+US24 & Client & Consulter la vue synth\'etique du tableau de bord restreinte \`a son scope & Must Have & 2 & Sprint 5 \\
+\hline
+US25 & Client / Analyste & Poser des questions de s\'ecurit\'e au Chatbot conversationnel IA & Should Have & 3 & Sprint 5 \\
+\hline
+US26 & Analyste / Client & G\'en\'erer et exporter les rapports d'expertise (PDF sign\'e, HTML, JSON) & Must Have & 4 & Sprint 6 \\
+\hline
+US27 & Client & Recevoir et acquitter les alertes de s\'ecurit\'e critiques & Must Have & 2 & Sprint 6 \\
+\hline
+US28 & Auditeur / Admin & Consulter le journal d'audit immuable (\textit{Audit Logs}) infalsifiable & Must Have & 3 & Sprint 6 \\
+\hline
+US29 & Auditeur / Admin & Superviser l'\'etat de sant\'e et la disponibilit\'e des microservices & Must Have & 2 & Sprint 6 \\
+\hline
+US30 & DevSecOps & Ex\'ecuter le pipeline CI/CD automatis\'e avec portes de s\'ecurit\'e & Must Have & 4 & Sprint 6 \\
+\hline
+\end{tabular}}%
+\end{table}
+
+\subsection{Sprint Backlogs D\'etaill\'es}
+\par Afin de garantir une ex\'ecution m\'ethodique, les User Stories ont \'et\'e ventil\'ees en six \textit{Sprint Backlogs}. Chaque sprint comporte des objectifs pr\'ecis, des crit\`eres de validation et une charge estim\'ee en jours-homme.
+
+\begin{table}[H]
+\centering
+\caption{D\'ecomposition D\'etaill\'ee des Sprint Backlogs (Sprints 1 \`a 6)}
+\label{tab:sprint_backlogs_detail}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|L|c|c|L|}
+\hline
+\textbf{Sprint} & \textbf{US ID} & \textbf{Intitul\'e de la T\^ache / User Story} & \textbf{Priorit\'e} & \textbf{Est. (j)} & \textbf{Crit\`ere d'Acceptation (DoD)} \\
+\hline
+\multirow{5}{*}{\textbf{Sprint 1}} & US01 & Authentification JWT et contr\^ole des sessions & Must & 2 & Token valide \'emis, expiration contr\^ol\'ee \\
+\cline{2-6}
+ & US02 & Gestion des r\^oles RBAC (Admin, Analyst, Auditor, Client) & Must & 3 & Middleware de filtrage par r\^ole actif \\
+\cline{2-6}
+ & US03 & Cr\'eation de projet et saisie du p\'erim\`etre des cibles & Must & 3 & Enregistrement en base PostgreSQL valid\'e \\
+\cline{2-6}
+ & US04 & T\'el\'eversement et validation du mandat PoA obligatoire & Must & 2 & V\'erification de signature et hachage SHA-256 \\
+\cline{2-6}
+ & US05 & Contr\^ole juridique des preuves d'autorisation & Should & 2 & Blocage logiciel si PoA absent ou expir\'e \\
+\hline
+\multirow{5}{*}{\textbf{Sprint 2}} & US06 & Int\'egration du moteur d'orchestration des scanners & Must & 4 & Ex\'ecution asynchrone de Nmap, Nuclei, etc. \\
+\cline{2-6}
+ & US07 & Gestion des profils de scan et param\'etrage du jitter & Must & 2 & Profils Silent, Balanced, Aggressive op\'erationnels \\
+\cline{2-6}
+ & US08 & Pipeline de normalisation des r\'esultats \texttt{ResultParser} & Must & 4 & Sorties JSON unifi\'ees avec s\'ev\'erit\'e et CVE \\
+\cline{2-6}
+ & US09 & T\'el\'em\'etrie temps r\'eel et suivi de progression Redis Streams & Must & 3 & \'Ev\'enements publi\'es et consomm\'es sans perte \\
+\cline{2-6}
+ & US10 & Visualisation des logs bruts et tra\c{c}abilit\'e des lignes & Should & 2 & Lignes de preuves surlign\'ees dans l'IHM \\
+\hline
+\multirow{5}{*}{\textbf{Sprint 3}} & US11 & Module d'audit d'injections et vuln\'erabilit\'es applicatives & Must & 4 & D\'etection confirm\'ee de failles OWASP Top 10 \\
+\cline{2-6}
+ & US12 & D\'eploiement dynamique de conteneurs sandbox isol\'es & Must & 4 & Instanciation DVWA/bWAPP en r\'eseau isol\'e \\
+\cline{2-6}
+ & US13 & Cycle de vie et destruction automatique des sandboxes & Must & 2 & Nettoyage complet des ressources apr\`es test \\
+\cline{2-6}
+ & US14 & D\'etection et \'evaluation de contournement WAF & Should & 3 & Rapports d'analyse WAF d\'etaill\'es \\
+\cline{2-6}
+ & US15 & Durcissement de l'acc\`es Docker via \texttt{socket-proxy} & Must & 2 & Interdiction des privil\`eges root sur l'h\^ote \\
+\hline
+\multirow{5}{*}{\textbf{Sprint 4}} & US16 & Int\'egration du serveur d'inf\'erence local Ollama & Must & 4 & Mod\`ele \texttt{qwen2.5-coder:7b} op\'erationnel \\
+\cline{2-6}
+ & US17 & G\'en\'eration automatis\'ee de scripts Remediation-as-Code & Must & 4 & Scripts Bash, Ansible et Dockerfile syntaxiques \\
+\cline{2-6}
+ & US18 & Validation stricte du format JSON via sch\'ema Pydantic & Must & 3 & 0\% d'hallucination de format en sortie \\
+\cline{2-6}
+ & US19 & T\'el\'echargement s\'ecuris\'e des correctifs de s\'ecurit\'e & Should & 2 & Fichiers de correction g\'en\'er\'es et sign\'es \\
+\cline{2-6}
+ & US20 & G\'en\'eration de synth\`eses d'impact pour d\'ecideurs & Should & 2 & R\'esum\'e manag\'erial clair et actionnable \\
+\hline
+\multirow{5}{*}{\textbf{Sprint 5}} & US21 & Mod\'elisation et affichage du Graphe de Connaissances & Must & 4 & Rendu interactif via Cytoscape.js \\
+\cline{2-6}
+ & US22 & Impl\'ementation du calcul de Blast Radius (BFS NetworkX) & Must & 3 & Propagation d'impact calcul\'ee en $<75$~ms \\
+\cline{2-6}
+ & US23 & Renseignement passif OSINT (DNS, WHOIS, Certificats) & Must & 3 & Donn\'ees agr\'eg\'ees sans envoi de paquets actifs \\
+\cline{2-6}
+ & US24 & Vue IHM restreinte pour le profil Client & Must & 2 & Dashboard filtr\'e sur les actifs autoris\'es \\
+\cline{2-6}
+ & US25 & Co-pilote conversationnel IA d'assistance & Should & 3 & R\'eponses contextuelles bas\'ees sur l'audit \\
+\hline
+\multirow{5}{*}{\textbf{Sprint 6}} & US26 & Moteur de g\'en\'eration et export de rapports d'expertise & Must & 4 & Rapports PDF, HTML et JSON t\'el\'echargeables \\
+\cline{2-6}
+ & US27 & Centre de notification et d'acquittement d'alertes & Must & 2 & Alertes par e-mail et interface web \\
+\cline{2-6}
+ & US28 & Journalisation immuable d'audit (\textit{Audit Logs}) & Must & 3 & \'Ev\'enements infalsifiables horodat\'es \\
+\cline{2-6}
+ & US29 & Surveillance de l'\'etat de sant\'e du syst\`eme (\textit{Health}) & Must & 2 & M\'etriques CPU, RAM, conteneurs affich\'ees \\
+\cline{2-6}
+ & US30 & Int\'egration du pipeline DevSecOps CI/CD sous GitHub & Must & 4 & 8 portes de s\'ecurit\'e bloquantes valid\'ees \\
+\hline
+\end{tabular}}%
+\end{table}
 
 \section*{Conclusion}
 \par Ce premier chapitre a permis d'exposer le cadre g\'en\'eral du projet, en d\'emontrant par une analyse comparative approfondie les lacunes des outils existants et l'int\'er\^et d'une approche unifi\'ee semi-agentique. Nous avons d\'efini la probl\'ematique, les objectifs, le p\'erim\`etre et la m\'ethodologie de conduite Agile Scrum. Le chapitre suivant d\'eveloppe l'\'etat de l'art scientifique et l'\'etude comparative des technologies de r\'ef\'erence.

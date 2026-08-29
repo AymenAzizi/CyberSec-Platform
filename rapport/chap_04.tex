@@ -1,4 +1,5 @@
 \chapter{R\'ealisation et Validation Exp\'erimentale}
+\label{chap:realisation}
 
 \section*{Introduction}
 \par Ce quatri\`eme chapitre d\'etaille la r\'ealisation technique de notre plateforme et pr\'esente les r\'esultats rigoureux de sa validation exp\'erimentale. Nous commen\c{c}ons par d\'ecrire l'environnement de d\'eveloppement, puis nous d\'etaillons l'architecture interne du back-end Laravel 11, le framework d'encapsulation des scanners Python, le pipeline de normalisation des r\'esultats et la sp\'ecification de l'API RESTful. Nous pr\'esentons ensuite les interfaces utilisateur cl\'es, avant d'approfondir l'impl\'ementation algorithmique du graphe de connaissances (Apache AGE / NetworkX) et du moteur d'IA locale contrainte (Ollama / \texttt{qwen2.5-coder}). Nous exposons les modalit\'es de d\'eploiement durci en production et l'ex\'ecution de la cha\^ine DevSecOps. Enfin, nous dressons la matrice de tra\c{c}abilit\'e des exigences, analysons les r\'esultats des 140 tests unitaires et d'int\'egration, d\'etaillons les benchmarks de charge men\'es avec Locust, et conduisons une discussion approfondie sur les performances et les limites du syst\`eme.
@@ -101,7 +102,7 @@ Cha\^ine DevSecOps & Psalm, Bandit, Trivy, Syft, Cosign & Psalm 5.24, Bandit 1.7
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.90\textwidth]{img/fig_4_1_scanner_framework.png}
+    \includegraphics[width=0.85\textwidth,height=0.38\textheight,keepaspectratio]{img/fig_4_1_scanner_framework.png}
     \caption{Architecture Modulaire du Framework d'Ex\'ecution et de Parsing des Scanners (\texttt{BaseScannerService})}
     \label{fig:scanner_framework}
 \end{figure}
@@ -414,28 +415,21 @@ $$) as (v agtype);
 \small
 \textbf{Entr\'ees :} Graphe de connaissances $G = (V, E)$, Sommet source $v_{src} \in V$, Profondeur maximale $k_{max} = 3$\\
 \textbf{Sortie :} Ensemble des n\oe uds impact\'es $R_{impact} = \{(v, d) \mid v \in V, d \le k_{max}\}$
-\begin{enumerate}
-    \item Initialiser une file FIFO $Queue \leftarrow \text{FileVide()}$
-    \item Initialiser les ensembles $Visited \leftarrow \{v_{src}\}$ et $R_{impact} \leftarrow \emptyset$
-    \item $Queue.\text{enfiler}((v_{src}, 0))$
-    \item \textbf{Tant que} $Queue$ n'est pas vide \textbf{faire} :
-    \begin{itemize}
-        \item $(u, d) \leftarrow Queue.\text{d\'efiler}()$
-        \item \textbf{Si} $d < k_{max}$ \textbf{alors} :
-        \begin{itemize}
-            \item \textbf{Pour chaque} voisin $v \in G.\text{voisins}(u)$ \textbf{faire} :
-            \begin{itemize}
-                \item \textbf{Si} $v \notin Visited$ \textbf{alors} :
-                \begin{itemize}
-                    \item $Visited.\text{ajouter}(v)$
-                    \item $Queue.\text{enfiler}((v, d + 1))$
-                    \item $R_{impact} \leftarrow R_{impact} \cup \{(v, d + 1)\}$
-                \end{itemize}
-            \end{itemize}
-        \end{itemize}
-    \end{itemize}
-    \item \textbf{Retourner} $R_{impact}$
-\end{enumerate}
+\vspace{2mm}
+\hrule
+\vspace{2mm}
+\textbf{1.} Initialiser une file FIFO $Queue \leftarrow \text{FileVide()}$\\
+\textbf{2.} Initialiser les ensembles $Visited \leftarrow \{v_{src}\}$ et $R_{impact} \leftarrow \emptyset$\\
+\textbf{3.} $Queue.\text{enfiler}((v_{src}, 0))$\\
+\textbf{4.} \textbf{Tant que} $Queue$ n'est pas vide \textbf{faire} :\\
+\hspace*{6mm} \textbf{a.} $(u, d) \leftarrow Queue.\text{d\'efiler}()$\\
+\hspace*{6mm} \textbf{b.} \textbf{Si} $d < k_{max}$ \textbf{alors} :\\
+\hspace*{12mm} \textbf{i.} \textbf{Pour chaque} voisin $v \in G.\text{voisins}(u)$ \textbf{faire} :\\
+\hspace*{18mm} $\bullet$ \textbf{Si} $v \notin Visited$ \textbf{alors} :\\
+\hspace*{24mm} - $Visited.\text{ajouter}(v)$\\
+\hspace*{24mm} - $Queue.\text{enfiler}((v, d + 1))$\\
+\hspace*{24mm} - $R_{impact} \leftarrow R_{impact} \cup \{(v, d + 1)\}$\\
+\textbf{5.} \textbf{Retourner} $R_{impact}$
 \end{tcolorbox}
 
 \par \textbf{Analyse de Complexit\'e :} L'algorithme BFS s'ex\'ecute en temps $O(|V| + |E|)$, o\`u $|V|$ repr\'esente le nombre de sommets et $|E|$ le nombre d'ar\^etes du sous-graphe de la cible. En limitant le parcours \`a $k=3$, la recherche s'effectue en moins de 75 ms sur un graphe comptant plusieurs milliers de n\oe uds, permettant un calcul instantan\'e \`a chaque consultation de faille par l'analyste.

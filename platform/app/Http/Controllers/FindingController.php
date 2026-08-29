@@ -13,6 +13,7 @@ class FindingController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        abort_if($user->isClient(), 403, 'Findings are restricted to Analysts, Auditors, and Admins.');
 
         $findings = Finding::query()
             ->with(['project', 'scan'])
@@ -50,6 +51,7 @@ class FindingController extends Controller
 
     public function show(Finding $finding)
     {
+        abort_if(auth()->user()->isClient(), 403, 'Findings are restricted to Analysts, Auditors, and Admins.');
         $this->authorizeFinding($finding);
 
         $finding->load(['scan.project', 'project', 'target', 'remediationScripts']);
@@ -59,6 +61,7 @@ class FindingController extends Controller
 
     public function generateRemediation(Finding $finding)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Remediation is restricted to Analysts and Admins.');
         $this->authorizeFinding($finding);
         abort_unless(in_array($finding->severity, [Finding::SEVERITY_HIGH, Finding::SEVERITY_CRITICAL]),
             422, 'Remediation scripts can only be generated for high or critical findings.');
@@ -99,6 +102,7 @@ class FindingController extends Controller
 
     public function downloadScript(RemediationScript $script)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Remediation scripts are restricted to Analysts and Admins.');
         $this->authorizeScript($script);
 
         $extensions = [
@@ -115,6 +119,7 @@ class FindingController extends Controller
 
     public function verifyScript(RemediationScript $script)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Remediation verification is restricted to Analysts and Admins.');
         $this->authorizeScript($script);
         $script->update([
             'status'          => RemediationScript::STATUS_VERIFIED,
@@ -126,6 +131,7 @@ class FindingController extends Controller
 
     public function applyScript(RemediationScript $script)
     {
+        abort_if(auth()->user()->isClient() || auth()->user()->isAuditor(), 403, 'Remediation application is restricted to Analysts and Admins.');
         $this->authorizeScript($script);
         $script->update(['status' => RemediationScript::STATUS_APPLIED]);
         return back()->with('success', 'Script marked as applied.');

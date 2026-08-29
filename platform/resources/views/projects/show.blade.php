@@ -39,12 +39,14 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('projects.edit', $project) }}" class="btn-outline">
-                    <span class="material-symbols-rounded text-base">edit</span> Edit
-                </a>
-                <a href="{{ route('scans.create', ['project' => $project->id]) }}" class="btn-primary">
-                    <span class="material-symbols-rounded text-base">radar</span> New Scan
-                </a>
+                @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
+                    <a href="{{ route('projects.edit', $project) }}" class="btn-outline">
+                        <span class="material-symbols-rounded text-base">edit</span> Edit
+                    </a>
+                    <a href="{{ route('scans.create', ['project' => $project->id]) }}" class="btn-primary">
+                        <span class="material-symbols-rounded text-base">radar</span> New Scan
+                    </a>
+                @endif
             </div>
         </div>
     </div>
@@ -54,9 +56,13 @@
         <nav class="flex gap-1 overflow-x-auto tab-scroll">
             <button data-tab="overview"  class="nav-link !rounded-none border-b-2 border-transparent tab-active">Overview</button>
             <button data-tab="targets"   class="nav-link !rounded-none border-b-2 border-transparent">Targets</button>
-            <button data-tab="scans"     class="nav-link !rounded-none border-b-2 border-transparent">Scans</button>
-            <button data-tab="findings"  class="nav-link !rounded-none border-b-2 border-transparent">Findings</button>
-            <button data-tab="graph"     class="nav-link !rounded-none border-b-2 border-transparent">Graph</button>
+            @if (!auth()->user()->isClient())
+                <button data-tab="scans"     class="nav-link !rounded-none border-b-2 border-transparent">Scans</button>
+                <button data-tab="findings"  class="nav-link !rounded-none border-b-2 border-transparent">Findings</button>
+            @endif
+            @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
+                <button data-tab="graph"     class="nav-link !rounded-none border-b-2 border-transparent">Graph</button>
+            @endif
             <button data-tab="reports"   class="nav-link !rounded-none border-b-2 border-transparent">Reports</button>
         </nav>
     </div>
@@ -176,19 +182,23 @@
                                     @if ($target->osint_data) <span class="badge-success">Available</span> @else <span class="badge-neutral">None</span> @endif
                                 </td>
                                 <td>
-                                    <div class="flex items-center gap-1">
-                                        <form method="POST" action="{{ route('osint.run', $target) }}">
-                                            @csrf
-                                            <button type="submit" class="btn-ghost !p-1.5 text-xs" title="Run passive OSINT">
-                                                <span class="material-symbols-rounded text-[18px]">travel_explore</span>
-                                            </button>
-                                        </form>
-                                        @if ($target->osint_data)
-                                            <a href="{{ route('osint.results', $target) }}" class="btn-ghost !p-1.5 text-xs" title="View OSINT">
-                                                <span class="material-symbols-rounded text-[18px]">visibility</span>
-                                            </a>
-                                        @endif
-                                    </div>
+                                    @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
+                                        <div class="flex items-center gap-1">
+                                            <form method="POST" action="{{ route('osint.run', $target) }}">
+                                                @csrf
+                                                <button type="submit" class="btn-ghost !p-1.5 text-xs" title="Run passive OSINT">
+                                                    <span class="material-symbols-rounded text-[18px]">travel_explore</span>
+                                                </button>
+                                            </form>
+                                            @if ($target->osint_data)
+                                                <a href="{{ route('osint.results', $target) }}" class="btn-ghost !p-1.5 text-xs" title="View OSINT">
+                                                    <span class="material-symbols-rounded text-[18px]">visibility</span>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-500">—</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -200,6 +210,7 @@
         </div>
     </div>
 
+    @if (!auth()->user()->isClient())
     {{-- Scans --}}
     <div data-tab-panel="scans" data-tab-group="project-tabs" class="hidden">
         <div class="card overflow-hidden">
@@ -271,9 +282,15 @@
                             @if ($finding->endpoint) <div class="text-xs font-mono text-gray-400 mt-1">{{ $finding->endpoint }}</div> @endif
                             <p class="text-sm text-gray-400 mt-1 line-clamp-2">{{ $finding->description }}</p>
                         </div>
+                        @if (!auth()->user()->isAuditor())
                             <a href="{{ route('remediation.show', $finding) }}" class="btn-ghost !py-1.5 text-xs">
-                            View Details <span class="material-symbols-rounded text-[16px]">arrow_forward</span>
-                        </a>
+                                View Remediation <span class="material-symbols-rounded text-[16px]">arrow_forward</span>
+                            </a>
+                        @else
+                            <a href="{{ route('findings.show', $finding) }}" class="btn-ghost !py-1.5 text-xs">
+                                Inspect Finding <span class="material-symbols-rounded text-[16px]">arrow_forward</span>
+                            </a>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -281,13 +298,16 @@
             @endforelse
         </div>
     </div>
+    @endif
 
+    @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
     {{-- Graph --}}
     <div data-tab-panel="graph" data-tab-group="project-tabs" class="hidden">
         <div class="card p-4">
             <div id="project-graph" class="h-[480px]"></div>
         </div>
     </div>
+    @endif
 
     {{-- Reports --}}
     <div data-tab-panel="reports" data-tab-group="project-tabs" class="hidden">

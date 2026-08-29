@@ -29,20 +29,22 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            @if (in_array($scan->status, ['queued','running','pending']))
-                <form method="POST" action="{{ route('scans.cancel', $scan) }}" data-confirm="Cancel this scan?">
-                    @csrf
-                    <button type="submit" class="btn-danger"><span class="material-symbols-rounded text-base">cancel</span> Cancel</button>
-                </form>
-            @endif
-            @if ($scan->status === 'failed' && $scan->canRetry())
-                <form method="POST" action="{{ route('scans.retry', $scan) }}">
-                    @csrf
-                    <button type="submit" class="btn-accent"><span class="material-symbols-rounded text-base">refresh</span> Retry</button>
-                </form>
-            @endif
-            @if ($scan->status === 'completed' && !$scan->report)
-                <a href="{{ route('reports.generate', $scan) }}" class="btn-secondary"><span class="material-symbols-rounded text-base">description</span> Generate Report</a>
+            @if (!auth()->user()->isClient() && !auth()->user()->isAuditor())
+                @if (in_array($scan->status, ['queued','running','pending']))
+                    <form method="POST" action="{{ route('scans.cancel', $scan) }}" data-confirm="Cancel this scan?">
+                        @csrf
+                        <button type="submit" class="btn-danger"><span class="material-symbols-rounded text-base">cancel</span> Cancel</button>
+                    </form>
+                @endif
+                @if ($scan->status === 'failed' && $scan->canRetry())
+                    <form method="POST" action="{{ route('scans.retry', $scan) }}">
+                        @csrf
+                        <button type="submit" class="btn-accent"><span class="material-symbols-rounded text-base">refresh</span> Retry</button>
+                    </form>
+                @endif
+                @if ($scan->status === 'completed' && !$scan->report)
+                    <a href="{{ route('reports.generate', $scan) }}" class="btn-secondary"><span class="material-symbols-rounded text-base">description</span> Generate Report</a>
+                @endif
             @endif
             @if ($scan->report)
                 <a href="{{ route('reports.show', $scan->report) }}" class="btn-secondary"><span class="material-symbols-rounded text-base">description</span> View Report</a>

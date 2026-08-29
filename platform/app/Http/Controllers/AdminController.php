@@ -16,7 +16,7 @@ class AdminController extends Controller
 {
     public function auditLogs(Request $request)
     {
-        $this->requireAdmin();
+        $this->requireAdminOrAuditor();
 
         $logs = AuditLog::query()
             ->with('user')
@@ -34,7 +34,7 @@ class AdminController extends Controller
 
     public function systemHealth()
     {
-        $this->requireAdmin();
+        $this->requireAdminOrAuditor();
 
         $gateway = config('services.api_gateway.url', 'http://api-gateway:8080');
         $services = $this->fetchServices($gateway);
@@ -235,5 +235,10 @@ class AdminController extends Controller
     private function requireAdmin(): void
     {
         abort_unless(auth()->user()?->isAdmin(), 403, 'Administrators only.');
+    }
+
+    private function requireAdminOrAuditor(): void
+    {
+        abort_unless(auth()->user()?->isAdmin() || auth()->user()?->isAuditor(), 403, 'Administrators and Auditors only.');
     }
 }
